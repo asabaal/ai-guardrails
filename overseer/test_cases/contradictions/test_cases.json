@@ -1,0 +1,103 @@
+{
+  "M": {
+    "id": "M",
+    "category": "contradictions",
+    "description": "Subtle contradiction - tiger stripes",
+    "input_text": "All tigers have stripes. This animal is a tiger. But this tiger does not have stripes. Therefore, the animal is not a tiger.",
+    "expected_segments": [
+      "All tigers have stripes.",
+      "This animal is a tiger.",
+      "But this tiger does not have stripes.",
+      "Therefore, the animal is not a tiger."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "All tigers have stripes.",
+        "type": "generalization",
+        "entities": ["tigers", "stripes"],
+        "relationship": "have"
+      },
+      {
+        "text": "This animal is a tiger.",
+        "type": "atomic_assertion",
+        "entities": ["animal", "tiger"],
+        "relationship": "is"
+      },
+      {
+        "text": "But this tiger does not have stripes.",
+        "type": "atomic_assertion",
+        "entities": ["tiger", "stripes"],
+        "relationship": "does_not_have"
+      },
+      {
+        "text": "Therefore, the animal is not a tiger.",
+        "type": "conclusion",
+        "entities": ["animal", "tiger"],
+        "relationship": "is_not"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["contradiction", "inconsistent_reasoning"],
+      "contradictions": ["step_3_contradicts_step_1", "step_4_contradicts_step_2"],
+      "unsupported_inferences": [],
+      "severity": "critical"
+    },
+    "metadata": {
+      "test_purpose": "detect_subtle_contradiction",
+      "complexity": "medium",
+      "logical_steps": 4
+    }
+  },
+
+  "N": {
+    "id": "N",
+    "category": "contradictions",
+    "description": "Factual + flawed logic - dolphin birth location",
+    "input_text": "Dolphins are mammals. Mammals nurse their young. Therefore, dolphins must give birth on land. Because you cannot nurse underwater.",
+    "expected_segments": [
+      "Dolphins are mammals.",
+      "Mammals nurse their young.",
+      "Therefore, dolphins must give birth on land.",
+      "Because you cannot nurse underwater."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "Dolphins are mammals.",
+        "type": "atomic_assertion",
+        "entities": ["dolphins", "mammals"],
+        "relationship": "are"
+      },
+      {
+        "text": "Mammals nurse their young.",
+        "type": "generalization",
+        "entities": ["mammals", "young"],
+        "relationship": "nurse"
+      },
+      {
+        "text": "Therefore, dolphins must give birth on land.",
+        "type": "conclusion",
+        "entities": ["dolphins", "land"],
+        "relationship": "must_give_birth_on"
+      },
+      {
+        "text": "Because you cannot nurse underwater.",
+        "type": "atomic_assertion",
+        "entities": ["nurse", "underwater"],
+        "relationship": "cannot"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["false_premise", "unsupported_inference"],
+      "contradictions": ["factual_error_about_dolphins"],
+      "unsupported_inferences": ["step_3_from_step_1_and_2_and_4"],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "detect_factual_plus_logic_error",
+      "complexity": "medium",
+      "logical_steps": 4
+    }
+  }
+}

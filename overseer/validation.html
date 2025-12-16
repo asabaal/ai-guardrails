@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layer 1 Segmentation Validation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        select, button {
+            padding: 10px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            background: white;
+            min-width: 200px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats {
+            padding: 20px 30px;
+            background: #e3f2fd;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .stat-label {
+            color: #495057;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .case-container {
+            margin-bottom: 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .case-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .case-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .case-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .comparison-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+        }
+
+        .segment-column {
+            border-right: 1px solid #e9ecef;
+        }
+
+        .segment-column:last-child {
+            border-right: none;
+        }
+
+        .column-header {
+            background: #495057;
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .expected-header {
+            background: #28a745;
+        }
+
+        .llm-header {
+            background: #17a2b8;
+        }
+
+        .rule-header {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .final-header {
+            background: #6f42c1;
+        }
+
+        .segments-content {
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .segment-item {
+            background: white;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #007bff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .segment-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .expected-segment {
+            border-left-color: #28a745;
+        }
+
+        .llm-segment {
+            border-left-color: #17a2b8;
+        }
+
+        .rule-segment {
+            border-left-color: #ffc107;
+        }
+
+        .final-segment {
+            border-left-color: #6f42c1;
+        }
+
+        .segment-number {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 8px;
+        }
+
+        .accuracy-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .accuracy-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .accuracy-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .accuracy-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 1200px) {
+            .comparison-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .segment-column {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .segment-column:last-child {
+                border-bottom: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Layer 1 Segmentation Validation</h1>
+            <p>Visual validation of text segmentation results against expected outputs</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="categorySelect">Category:</label>
+                <select id="categorySelect">
+                    <option value="">All Categories</option>
+                </select>
+                
+                <label for="caseSelect">Test Case:</label>
+                <select id="caseSelect">
+                    <option value="">Select a category first</option>
+                </select>
+                
+                <button onclick="loadSelectedCase()">Load Case</button>
+                <button onclick="loadAllCases()">Load All Cases</button>
+                <button onclick="exportResults()">Export Results</button>
+            </div>
+        </div>
+
+        <div class="stats" id="statsSection">
+            <div class="stat-item">
+                <div class="stat-value" id="totalCases">-</div>
+                <div class="stat-label">Total Cases</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="avgAccuracy">-</div>
+                <div class="stat-label">Avg Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="llmSuccess">-</div>
+                <div class="stat-label">LLM Success Rate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="ruleSuccess">-</div>
+                <div class="stat-label">Rule Success Rate</div>
+            </div>
+        </div>
+
+        <div class="content" id="contentSection">
+            <div class="loading">Loading validation data...</div>
+        </div>
+    </div>
+
+    <script>
+        let validationData = null;
+        let currentCategory = '';
+        let currentCase = '';
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadValidationData();
+        });
+
+        async function loadValidationData() {
+            try {
+                const response = await fetch('generated_results/segmentation_results.json');
+                validationData = await response.json();
+                
+                populateCategorySelect();
+                updateStats();
+                
+                // Load all cases by default
+                loadAllCases();
+                
+            } catch (error) {
+                document.getElementById('contentSection').innerHTML = 
+                    `<div class="error">Error loading validation data: ${error.message}</div>`;
+            }
+        }
+
+        function populateCategorySelect() {
+            const categorySelect = document.getElementById('categorySelect');
+            categorySelect.innerHTML = '<option value="">All Categories</option>';
+            
+            Object.keys(validationData.categories).forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                categorySelect.appendChild(option);
+            });
+            
+            categorySelect.addEventListener('change', function() {
+                currentCategory = this.value;
+                populateCaseSelect();
+            });
+        }
+
+        function populateCaseSelect() {
+            const caseSelect = document.getElementById('caseSelect');
+            caseSelect.innerHTML = '<option value="">Select a case</option>';
+            
+            if (!currentCategory) {
+                caseSelect.innerHTML = '<option value="">Select a category first</option>';
+                return;
+            }
+            
+            const category = validationData.categories[currentCategory];
+            category.test_cases.forEach((testCase, index) => {
+                const option = document.createElement('option');
+                option.value = testCase.case_id;
+                option.textContent = `${testCase.case_id}: ${testCase.input_text.substring(0, 50)}...`;
+                caseSelect.appendChild(option);
+            });
+            
+            caseSelect.addEventListener('change', function() {
+                currentCase = this.value;
+            });
+        }
+
+        function loadSelectedCase() {
+            if (!currentCase) {
+                alert('Please select a test case first');
+                return;
+            }
+            
+            const testCase = findTestCase(currentCase);
+            if (testCase) {
+                displayTestCase(testCase);
+            }
+        }
+
+        function loadAllCases() {
+            if (!validationData) return;
+            
+            let html = '';
+            Object.values(validationData.categories).forEach(category => {
+                category.test_cases.forEach(testCase => {
+                    html += renderTestCase(testCase);
+                });
+            });
+            
+            document.getElementById('contentSection').innerHTML = html || '<div class="no-data">No test cases found</div>';
+        }
+
+        function findTestCase(caseId) {
+            for (const category of Object.values(validationData.categories)) {
+                const testCase = category.test_cases.find(tc => tc.case_id === caseId);
+                if (testCase) return testCase;
+            }
+            return null;
+        }
+
+        function renderTestCase(testCase) {
+            const llmAccuracy = calculateAccuracy(testCase.expected_segments, testCase.llm_segments);
+            const ruleAccuracy = calculateAccuracy(testCase.expected_segments, testCase.rule_segments);
+            const finalAccuracy = calculateAccuracy(testCase.expected_segments, testCase.final_segments);
+            
+            return `
+                <div class="case-container">
+                    <div class="case-header">
+                        <div class="case-title">${testCase.case_id}</div>
+                        <div class="case-meta">
+                            <span>Category: ${testCase.case_id.split('_')[0]}</span>
+                            <span>LLM Accuracy: ${llmAccuracy}%</span>
+                            <span>Rule Accuracy: ${ruleAccuracy}%</span>
+                            <span>Final Accuracy: ${finalAccuracy}%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-section">
+                        <div class="input-text">"${testCase.input_text}"</div>
+                    </div>
+                    
+                    <div class="comparison-section">
+                        <div class="segment-column">
+                            <div class="column-header expected-header">Expected Segments</div>
+                            <div class="segments-content">
+                                ${testCase.expected_segments.map((seg, i) => 
+                                    `<div class="segment-item expected-segment">
+                                        <span class="segment-number">${i+1}.</span>${seg}
+                                    </div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="segment-column">
+                            <div class="column-header llm-header">LLM Segments</div>
+                            <div class="segments-content">
+                                ${testCase.llm_segments.map((seg, i) => 
+                                    `<div class="segment-item llm-segment">
+                                        <span class="segment-number">${i+1}.</span>${seg}
+                                    </div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="segment-column">
+                            <div class="column-header rule-header">Rule Segments</div>
+                            <div class="segments-content">
+                                ${testCase.rule_segments.map((seg, i) => 
+                                    `<div class="segment-item rule-segment">
+                                        <span class="segment-number">${i+1}.</span>${seg}
+                                    </div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayTestCase(testCase) {
+            document.getElementById('contentSection').innerHTML = renderTestCase(testCase);
+        }
+
+        function calculateAccuracy(expected, actual) {
+            if (!expected.length || !actual.length) return 0;
+            
+            let matches = 0;
+            expected.forEach(expSeg => {
+                if (actual.some(actSeg => 
+                    actSeg.toLowerCase().includes(expSeg.toLowerCase()) ||
+                    expSeg.toLowerCase().includes(actSeg.toLowerCase())
+                )) {
+                    matches++;
+                }
+            });
+            
+            return Math.round((matches / expected.length) * 100);
+        }
+
+        function updateStats() {
+            if (!validationData) return;
+            
+            const totalCases = validationData.metadata.total_test_cases;
+            let totalLlmAccuracy = 0;
+            let totalRuleAccuracy = 0;
+            let llmSuccessCount = 0;
+            let ruleSuccessCount = 0;
+            
+            Object.values(validationData.categories).forEach(category => {
+                category.test_cases.forEach(testCase => {
+                    const llmAccuracy = calculateAccuracy(testCase.expected_segments, testCase.llm_segments);
+                    const ruleAccuracy = calculateAccuracy(testCase.expected_segments, testCase.rule_segments);
+                    
+                    totalLlmAccuracy += llmAccuracy;
+                    totalRuleAccuracy += ruleAccuracy;
+                    
+                    if (llmAccuracy >= 70) llmSuccessCount++;
+                    if (ruleAccuracy >= 70) ruleSuccessCount++;
+                });
+            });
+            
+            document.getElementById('totalCases').textContent = totalCases;
+            document.getElementById('avgAccuracy').textContent = 
+                Math.round((totalLlmAccuracy + totalRuleAccuracy) / (2 * totalCases)) + '%';
+            document.getElementById('llmSuccess').textContent = 
+                Math.round((llmSuccessCount / totalCases) * 100) + '%';
+            document.getElementById('ruleSuccess').textContent = 
+                Math.round((ruleSuccessCount / totalCases) * 100) + '%';
+        }
+
+        function exportResults() {
+            if (!validationData) {
+                alert('No data to export');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(validationData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `validation_results_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+    </script>
+</body>
+</html>

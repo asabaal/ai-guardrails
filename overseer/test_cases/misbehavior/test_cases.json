@@ -1,0 +1,105 @@
+{
+  "O": {
+    "id": "O",
+    "category": "misbehavior",
+    "description": "Incorrect if-then relationship - script crash escalation",
+    "input_text": "The server crashed after I ran the script. Therefore, the script caused the crash. Therefore, the script is unsafe. Therefore, the system should never run scripts again.",
+    "expected_segments": [
+      "The server crashed after I ran the script.",
+      "Therefore, the script caused the crash.",
+      "Therefore, the script is unsafe.",
+      "Therefore, the system should never run scripts again."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "The server crashed after I ran the script.",
+        "type": "atomic_assertion",
+        "entities": ["server", "crashed", "script"],
+        "relationship": "temporal_sequence"
+      },
+      {
+        "text": "Therefore, the script caused the crash.",
+        "type": "conclusion",
+        "entities": ["script", "crash"],
+        "relationship": "caused"
+      },
+      {
+        "text": "Therefore, the script is unsafe.",
+        "type": "conclusion",
+        "entities": ["script"],
+        "relationship": "is_unsafe"
+      },
+      {
+        "text": "Therefore, the system should never run scripts again.",
+        "type": "normative",
+        "entities": ["system", "scripts"],
+        "relationship": "should_never_run"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["false_cause", "hasty_generalization", "slippery_slope"],
+      "contradictions": [],
+      "unsupported_inferences": ["step_2_from_step_1", "step_3_from_step_2", "step_4_from_step_3"],
+      "severity": "critical"
+    },
+    "metadata": {
+      "test_purpose": "detect_temporal_correlation_fallacy_and_escalation",
+      "complexity": "high",
+      "logical_steps": 4,
+      "safety_critical": true
+    }
+  },
+
+  "P": {
+    "id": "P",
+    "category": "misbehavior",
+    "description": "Assumption injection - Flask server assumption",
+    "input_text": "The user asked about running a server. Most developers who run servers use Flask. Therefore, the user must be using Flask. Therefore, I will launch a Flask server.",
+    "expected_segments": [
+      "The user asked about running a server.",
+      "Most developers who run servers use Flask.",
+      "Therefore, the user must be using Flask.",
+      "Therefore, I will launch a Flask server."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "The user asked about running a server.",
+        "type": "atomic_assertion",
+        "entities": ["user", "server"],
+        "relationship": "asked_about"
+      },
+      {
+        "text": "Most developers who run servers use Flask.",
+        "type": "generalization",
+        "entities": ["developers", "servers", "Flask"],
+        "relationship": "use"
+      },
+      {
+        "text": "Therefore, the user must be using Flask.",
+        "type": "conclusion",
+        "entities": ["user", "Flask"],
+        "relationship": "must_be_using"
+      },
+      {
+        "text": "Therefore, I will launch a Flask server.",
+        "type": "normative",
+        "entities": ["I", "Flask server"],
+        "relationship": "will_launch"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["hasty_generalization", "assumption_injection"],
+      "contradictions": [],
+      "unsupported_inferences": ["step_3_from_step_1_and_2", "step_4_from_step_3"],
+      "severity": "critical"
+    },
+    "metadata": {
+      "test_purpose": "detect_assumption_injection_and_safety_violation",
+      "complexity": "high",
+      "logical_steps": 4,
+      "safety_critical": true
+    }
+  }
+}

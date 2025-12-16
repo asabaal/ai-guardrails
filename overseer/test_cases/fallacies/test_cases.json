@@ -1,0 +1,150 @@
+{
+  "D": {
+    "id": "D",
+    "category": "fallacies",
+    "description": "False cause fallacy - rooster and sunrise",
+    "input_text": "The rooster crows before sunrise. Therefore, the rooster causes the sun to rise.",
+    "expected_segments": [
+      "The rooster crows before sunrise.",
+      "Therefore, the rooster causes the sun to rise."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "The rooster crows before sunrise.",
+        "type": "atomic_assertion",
+        "entities": [
+          "rooster",
+          "sunrise"
+        ],
+        "relationship": "temporal_precedence"
+      },
+      {
+        "text": "Therefore, the rooster causes the sun to rise.",
+        "type": "conclusion",
+        "entities": [
+          "rooster",
+          "sunrise"
+        ],
+        "relationship": "causes"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": [
+        "false_cause",
+        "post_hoc_ergo_propter_hoc"
+      ],
+      "contradictions": [],
+      "unsupported_inferences": [
+        "causation_from_correlation"
+      ],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "detect_false_cause_fallacy",
+      "complexity": "simple",
+      "logical_steps": 2
+    }
+  },
+  "E": {
+    "id": "E",
+    "category": "fallacies",
+    "description": "Equivocation fallacy - man/mankind",
+    "input_text": "Only man is rational. No woman is a man. Therefore, no woman is rational.",
+    "expected_segments": [
+      "Only man is rational.",
+      "No woman is a man.",
+      "Therefore, no woman is rational."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "Only man is rational.",
+        "type": "generalization",
+        "entities": [
+          "man",
+          "rational"
+        ],
+        "relationship": "exclusively_has_property"
+      },
+      {
+        "text": "No woman is a man.",
+        "type": "atomic_assertion",
+        "entities": [
+          "woman",
+          "man"
+        ],
+        "relationship": "is_not"
+      },
+      {
+        "text": "Therefore, no woman is rational.",
+        "type": "conclusion",
+        "entities": [
+          "woman",
+          "rational"
+        ],
+        "relationship": "is_not"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": [
+        "equivocation"
+      ],
+      "contradictions": [],
+      "unsupported_inferences": [
+        "step_3_from_step_1_and_2"
+      ],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "detect_equivocation_fallacy",
+      "complexity": "simple",
+      "logical_steps": 3
+    }
+  },
+  "F": {
+    "id": "F",
+    "category": "fallacies",
+    "description": "Circular reasoning - trustworthy book",
+    "input_text": "I know the book is trustworthy because it says it is trustworthy. Therefore, we should trust it.",
+    "expected_segments": [
+      "I know the book is trustworthy because it says it is trustworthy.",
+      "Therefore, we should trust it."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "I know the book is trustworthy because it says it is trustworthy.",
+        "type": "circular_reasoning",
+        "entities": [
+          "book",
+          "trustworthy"
+        ],
+        "relationship": "self_referential"
+      },
+      {
+        "text": "Therefore, we should trust it.",
+        "type": "conclusion",
+        "entities": [
+          "we",
+          "book"
+        ],
+        "relationship": "should_trust"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": [
+        "circular_reasoning",
+        "begging_the_question"
+      ],
+      "contradictions": [],
+      "unsupported_inferences": [],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "detect_circular_reasoning",
+      "complexity": "simple",
+      "logical_steps": 2
+    }
+  }
+}

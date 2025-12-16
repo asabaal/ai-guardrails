@@ -1,0 +1,424 @@
+"""
+TextSegmenter: Extract reasoning steps from input text using LLM prompts
+
+Purpose: Extract reasoning steps from input text using LLM prompts
+Input: Raw text from AI models or documents
+Output: Numbered list of logical propositions
+Constraints: Text processing only, no evaluation
+
+Following AI Safety Development Protocols (AI_SAFETY_DEVELOPMENT_PROTOCOLS.md)
+"""
+
+from typing import List, Optional, Dict, Any
+import re
+import json
+import subprocess
+from abc import ABC, abstractmethod
+
+
+class TextSegmenter(ABC):
+    """
+    Abstract base class for text segmentation components.
+    Extracts reasoning steps from input text.
+    """
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """Initialize the text segmenter with configuration."""
+        self.config = config or {}
+        
+    @abstractmethod
+    def segment(self, text: str) -> List[str]:
+        """
+        Segment input text into logical reasoning steps.
+        
+        Args:
+            text: Raw input text containing reasoning
+            
+        Returns:
+            List of segmented logical steps
+            
+        Raises:
+            ValueError: If text is empty or invalid
+            RuntimeError: If segmentation fails
+        """
+        pass
+    
+    def validate_input(self, text: str) -> None:
+        """Validate input text meets minimum requirements."""
+        if not text or not text.strip():
+            raise ValueError("Input text cannot be empty")
+        if len(text.strip()) < 10:
+            raise ValueError("Input text too short for meaningful segmentation")
+
+
+class LLMTextSegmenter(TextSegmenter):
+    """
+    LLM-based text segmenter using AI model prompts.
+    Primary segmentation method with fallback capability.
+    """
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        super().__init__(config)
+        self.segmentation_prompt = self.config.get(
+            'segmentation_prompt',
+            "Break down the following reasoning into individual logical steps. "
+            "Return each step as a separate, complete sentence or statement:\n\n{text}"
+        )
+        self.model_name = self.config.get('model_name', 'gpt-oss:20b')
+        self.max_retries = self.config.get('max_retries', 3)
+        self.timeout = self.config.get('timeout', 30)
+        
+    def segment(self, text: str) -> List[str]:
+        """
+        Segment text using LLM analysis.
+        
+        Args:
+            text: Input text to segment
+            
+        Returns:
+            List of logical reasoning steps
+        """
+        self.validate_input(text)
+        
+        # Try LLM segmentation first
+        try:
+            llm_segments = self._llm_segmentation(text)
+            if llm_segments:
+                return llm_segments
+        except Exception as e:
+            print(f"LLM segmentation failed: {e}")
+        
+        # Fallback to rule-based segmentation
+        return self._fallback_segmentation(text)
+    
+    def _llm_segmentation(self, text: str) -> List[str]:
+        """
+        Perform LLM-based segmentation using ollama.
+        
+        Args:
+            text: Input text to segment
+            
+        Returns:
+            List of logical reasoning steps from LLM
+        """
+        prompt = self.segmentation_prompt.format(text=text)
+        
+        for attempt in range(self.max_retries):
+            try:
+                # Use echo to pipe prompt to ollama run
+                echo_process = subprocess.Popen(
+                    ['echo', prompt],
+                    stdout=subprocess.PIPE,
+                    text=True
+                )
+                
+                result = subprocess.run(
+                    ['ollama', 'run', self.model_name, '--hidethinking'],
+                    stdin=echo_process.stdout,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout
+                )
+                
+                echo_process.wait()
+                
+                if result.returncode == 0:
+                    response = result.stdout.strip()
+                    segments = self._parse_llm_response(response)
+                    if segments:
+                        print(f"LLM segmentation successful on attempt {attempt + 1}")
+                        return segments
+                else:
+                    print(f"LLM process failed with return code {result.returncode}")
+                    if result.stderr:
+                        print(f"LLM stderr: {result.stderr}")
+                        
+            except subprocess.TimeoutExpired:
+                print(f"LLM timeout on attempt {attempt + 1}")
+                continue
+            except Exception as e:
+                print(f"LLM error on attempt {attempt + 1}: {e}")
+                continue
+                
+        print("All LLM attempts failed, using fallback segmentation")
+        return []
+    
+    def _parse_llm_response(self, response: str) -> List[str]:
+        """
+        Parse LLM response into individual segments.
+        
+        Args:
+            response: Raw response from LLM
+            
+        Returns:
+            List of parsed segments
+        """
+        segments = []
+        
+        # Clean terminal control characters
+        import re
+        response = re.sub(r'\x1b\[[0-9;]*[mGKHJ]', '', response)  # Remove ANSI escape sequences
+        response = re.sub(r'\[\?[0-9]+[hl]', '', response)  # Remove terminal mode changes
+        response = re.sub(r'\[\?25[hl]', '', response)  # Remove cursor visibility
+        
+        # Split into lines and process
+        lines = response.split('\n')
+        actual_response_lines = []
+        
+        for line in lines:
+            line = line.strip()
+            # Skip control characters but keep empty lines for later processing
+            if line.startswith('[') or (len(line) < 3 and line != ''):
+                continue
+            actual_response_lines.append(line)
+        
+        # Join the filtered lines
+        filtered_response = '\n'.join(actual_response_lines)
+        
+        # Try to extract numbered or bulleted logical steps
+        step_patterns = [
+            r'^(\d+)[\.\)]\s*(.+)',  # 1. Step or 1) Step
+            r'^-\s*(.+)',            # - Step
+            r'^\*\s*(.+)',           # * Step
+            r'^\*\*\s*(.+)',         # ** Step
+        ]
+        
+        for line in filtered_response.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+                
+            # Try to match step patterns
+            matched = False
+            for pattern in step_patterns:
+                match = re.match(pattern, line, re.IGNORECASE)
+                if match:
+                    step_text = match.group(2) if len(match.groups()) > 1 else match.group(1)
+                    step_text = step_text.strip()
+                    if step_text and len(step_text) > 5:
+                        # Clean up formatting
+                        step_text = re.sub(r'\*\*(.+?)\*\*', r'\1', step_text)  # Remove bold
+                        step_text = re.sub(r'\*(.+?)\*', r'\1', step_text)      # Remove italic
+                        step_text = step_text.strip()
+                        
+                        if step_text and not step_text.endswith(('.', '!', '?')):
+                            step_text += '.'
+                        segments.append(step_text)
+                        matched = True
+                        break
+            
+            # If no pattern matched, try to extract complete sentences
+            if not matched and len(line) > 10:
+                # Look for complete sentences
+                sentences = re.split(r'(?<=[.!?])\s+', line)
+                for sentence in sentences:
+                    sentence = sentence.strip()
+                    if sentence and len(sentence) > 5:
+                        # Clean up formatting
+                        sentence = re.sub(r'\*\*(.+?)\*\*', r'\1', sentence)
+                        sentence = re.sub(r'\*(.+?)\*', r'\1', sentence)
+                        sentence = sentence.strip()
+                        
+                        if sentence and not sentence.endswith(('.', '!', '?')):
+                            sentence += '.'
+                        segments.append(sentence)
+        
+        return segments
+    
+    def _fallback_segmentation(self, text: str) -> List[str]:
+        """Fallback segmentation using basic rules when LLM unavailable."""
+        # Split on common logical connectors
+        connectors = [
+            r'\.\s*Therefore',
+            r'\.\s*Thus', 
+            r'\.\s*Hence',
+            r'\.\s*So',
+            r'\.\s*Consequently',
+            r'\.\s*Because',
+            r'\.\s*Since',
+            r'\.\s*If',
+            r'\.\s*Then'
+        ]
+        
+        segments = [text.strip()]
+        
+        for connector in connectors:
+            new_segments = []
+            for segment in segments:
+                parts = re.split(connector, segment, flags=re.IGNORECASE)
+                if len(parts) > 1:
+                    # Re-add connector to subsequent parts
+                    for i, part in enumerate(parts):
+                        if i == 0:
+                            new_segments.append(part.strip())
+                        else:
+                            new_segments.append(connector.replace(r'\.\s*', '. ') + part.strip())
+                else:
+                    new_segments.append(segment.strip())
+            segments = new_segments
+            
+        # Filter out empty segments
+        return [seg for seg in segments if seg and len(seg.strip()) > 5]
+
+
+class RuleBasedSplitter(TextSegmenter):
+    """
+    Deterministic text splitter using logical connectors.
+    Fallback method when LLM segmentation fails.
+    """
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        super().__init__(config)
+        self.logical_connectors = self.config.get(
+            'logical_connectors',
+            [
+                'therefore', 'thus', 'hence', 'so', 'consequently',
+                'because', 'since', 'as', 'for', 'given that',
+                'if', 'then', 'else', 'otherwise',
+                'but', 'however', 'although', 'while',
+                'and', 'also', 'furthermore', 'moreover'
+            ]
+        )
+        
+    def segment(self, text: str) -> List[str]:
+        """
+        Segment text using rule-based connector detection.
+        
+        Args:
+            text: Input text to segment
+            
+        Returns:
+            List of segments split on logical connectors
+        """
+        self.validate_input(text)
+        
+        segments = [text.strip()]
+        
+        # Split on each logical connector
+        for connector in self.logical_connectors:
+            new_segments = []
+            pattern = rf'\.\s*{connector}\s+'
+            
+            for segment in segments:
+                parts = re.split(pattern, segment, flags=re.IGNORECASE)
+                if len(parts) > 1:
+                    for i, part in enumerate(parts):
+                        if i == 0:
+                            new_segments.append(part.strip() + '.')
+                        else:
+                            new_segments.append(connector.capitalize() + ' ' + part.strip())
+                else:
+                    new_segments.append(segment.strip())
+                    
+            segments = new_segments
+            
+        # Additional splitting on sentence boundaries
+        final_segments = []
+        for segment in segments:
+            sentences = re.split(r'(?<=[.!?])\s+', segment)
+            final_segments.extend([s.strip() for s in sentences if s.strip()])
+            
+        return final_segments
+
+
+class Normalizer:
+    """
+    Clean and standardize extracted segments.
+    
+    Purpose: Clean and standardize extracted segments
+    Input: Raw segments from extraction
+    Output: Normalized, clean propositions
+    Constraints: Text cleaning only, no content alteration
+    """
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """Initialize normalizer with configuration."""
+        self.config = config or {}
+        
+    def normalize(self, segments: List[str]) -> List[str]:
+        """
+        Normalize a list of text segments.
+        
+        Args:
+            segments: Raw text segments from extraction
+            
+        Returns:
+            Normalized, clean text segments
+        """
+        normalized = []
+        
+        for segment in segments:
+            # Basic cleaning
+            clean_segment = self._clean_text(segment)
+            
+            # Validate segment has content
+            if clean_segment and len(clean_segment.strip()) > 3:
+                normalized.append(clean_segment.strip())
+                
+        return normalized
+    
+    def _clean_text(self, text: str) -> str:
+        """Clean individual text segment."""
+        if not text:
+            return ""
+            
+        # Remove extra whitespace
+        text = re.sub(r'\s+', ' ', text.strip())
+        
+        # Fix common punctuation issues
+        text = re.sub(r'\s+([.,!?])', r'\1', text)
+        
+        # Ensure proper sentence ending
+        if text and not text.endswith(('.', '!', '?')):
+            text += '.'
+            
+        return text
+
+
+class Aggregator:
+    """
+    Combine LLM and rule-based results.
+    
+    Purpose: Combine LLM and rule-based results
+    Input: Multiple segmentation attempts
+    Output: Final, stable list of steps
+    Constraints: Result aggregation only, no modification
+    """
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """Initialize aggregator with configuration."""
+        self.config = config or {}
+        self.prefer_llm = self.config.get('prefer_llm', True)
+        
+    def aggregate(self, llm_segments: Optional[List[str]], 
+                  rule_segments: List[str]) -> List[str]:
+        """
+        Aggregate results from multiple segmentation methods.
+        
+        Args:
+            llm_segments: Results from LLM segmentation (may be None)
+            rule_segments: Results from rule-based segmentation
+            
+        Returns:
+            Final aggregated list of segments
+        """
+        if llm_segments and self.prefer_llm:
+            # Use LLM results if available and preferred
+            return self._validate_and_clean(llm_segments)
+        else:
+            # Use rule-based results
+            return self._validate_and_clean(rule_segments)
+    
+    def _validate_and_clean(self, segments: List[str]) -> List[str]:
+        """Validate and clean segment list."""
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_segments = []
+        
+        for segment in segments:
+            normalized = segment.lower().strip()
+            if normalized not in seen and len(segment.strip()) > 5:
+                seen.add(normalized)
+                unique_segments.append(segment.strip())
+                
+        return unique_segments

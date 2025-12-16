@@ -1,0 +1,221 @@
+# Logical Primitives Taxonomy for Overseer AI
+# Core configuration defining logical categories and relationships
+# Version: 1.0
+# Date: December 1, 2025
+
+# Logical Statement Types
+statement_types:
+  atomic_assertion:
+    description: "Simple factual claim without logical connectors"
+    examples:
+      - "Apples contain fiber."
+      - "This shape has four sides."
+      - "A snake lays eggs."
+    detection_patterns:
+      - "[subject] [verb] [object]"
+      - "[subject] has [property]"
+      - "[subject] is [adjective]"
+    
+  conditional:
+    description: "If-then statements expressing logical implication"
+    structure:
+      antecedent: "Condition part (if clause)"
+      consequent: "Result part (then clause)"
+    examples:
+      - "If an animal lays eggs, it is an oviparous animal."
+    detection_patterns:
+      - "If [condition], then [result]"
+      - "[condition] implies [result]"
+      - "[condition] → [result]"
+    
+  generalization:
+    description: "Broad statements about categories or universal properties"
+    examples:
+      - "Triangles have three sides."
+      - "Foods that contain fiber support digestion."
+      - "Only man is rational."
+    detection_patterns:
+      - "[category] [verb] [property]"
+      - "All [category] [verb] [property]"
+      - "Only [category] [verb] [property]"
+    
+  conclusion:
+    description: "Statements that follow from previous reasoning"
+    indicators:
+      - "Therefore"
+      - "Thus"
+      - "Hence"
+      - "So"
+      - "Consequently"
+    examples:
+      - "Therefore, apples support digestion."
+      - "Therefore, this shape is a triangle."
+    
+  circular_reasoning:
+    description: "Self-referential statements that assume their own conclusion"
+    examples:
+      - "I know the book is trustworthy because it says it is trustworthy."
+    detection_patterns:
+      - "[X] because [X]"
+      - "[X] is true because [X]"
+
+# Entity Relationship Types
+relationship_types:
+  has_property:
+    description: "Entity possesses a characteristic"
+    examples:
+      - "Apples have fiber"
+      - "Triangles have three sides"
+    
+  supports:
+    description: "Entity enables or helps another entity"
+    examples:
+      - "Fiber supports digestion"
+    
+  is_a:
+    description: "Classification or categorization"
+    examples:
+      - "A snake is oviparous"
+      - "This shape is a triangle"
+    
+  causes:
+    description: "Causal relationship between entities"
+    examples:
+      - "Rooster causes sunrise" (fallacious)
+    
+  temporal_precedence:
+    description: "One entity occurs before another in time"
+    examples:
+      - "Rooster crows before sunrise"
+    
+  exclusively_has_property:
+    description: "Only the specified entity has the property"
+    examples:
+      - "Only man is rational"
+    
+  is_not:
+    description: "Negative relationship or non-identity"
+    examples:
+      - "No woman is a man"
+    
+  lays:
+    description: "Reproductive action of producing eggs"
+    examples:
+      - "Snake lays eggs"
+    
+  self_referential:
+    description: "Entity refers to itself for justification"
+    examples:
+      - "Book says it is trustworthy"
+    
+  should_trust:
+    description: "Recommendation for confidence or belief"
+    examples:
+      - "We should trust the book"
+
+# Logical Fallacy Types
+fallacy_types:
+  non_sequitur:
+    description: "Conclusion does not follow from premises"
+    detection: "Conclusion lacks logical connection to premises"
+    example: "Triangles have three sides. This shape has four sides. Therefore, this shape is a triangle."
+    
+  false_cause:
+    description: "Assuming causation from correlation"
+    subtypes:
+      - post_hoc_ergo_propter_hoc: "After this, therefore because of this"
+    detection: "Temporal relationship interpreted as causal"
+    example: "Rooster crows before sunrise. Therefore, rooster causes sunrise."
+    
+  equivocation:
+    description: "Using ambiguous terms with different meanings"
+    detection: "Key term changes meaning between premises"
+    example: "Only man is rational. No woman is a man. Therefore, no woman is rational."
+    
+  circular_reasoning:
+    aliases:
+      - begging_the_question
+    description: "Argument assumes what it's trying to prove"
+    detection: "Premise and conclusion are essentially the same"
+    example: "Book is trustworthy because it says it is trustworthy."
+
+# Evaluation Severity Levels
+severity_levels:
+  none:
+    description: "No logical issues detected"
+    color: "green"
+    
+  minor:
+    description: "Minor issues that don't invalidate main conclusion"
+    examples:
+      - "Hidden assumptions"
+      - "Weak support"
+    color: "yellow"
+    
+  major:
+    description: "Significant logical flaws that undermine reasoning"
+    examples:
+      - "Fallacies present"
+      - "Unsupported inferences"
+    color: "orange"
+    
+  critical:
+    description: "Severe logical contradictions or complete reasoning failure"
+    examples:
+      - "Direct contradictions"
+      - "Multiple major fallacies"
+    color: "red"
+
+# Contradiction Types
+contradiction_types:
+  direct:
+    description: "Explicitly contradictory statements"
+    example: "X is true. X is false."
+    
+  indirect:
+    description: "Statements that cannot both be true"
+    example: "All A are B. Some A are not B."
+    
+  contextual:
+    description: "Contradictions revealed through context"
+    example: "X always happens. X sometimes fails to happen."
+
+# Unsupported Inference Types
+unsupported_inference_types:
+  step_3_from_step_2:
+    description: "Final step doesn't follow from immediate premise"
+    
+  step_3_from_step_1_and_2:
+    description: "Final step doesn't follow from combined premises"
+    
+  causation_from_correlation:
+    description: "Inferring causal relationship from mere correlation"
+    
+  generalization_from_insufficient_evidence:
+    description: "Making broad claims from limited examples"
+
+# Hidden Assumption Types
+hidden_assumption_types:
+  all_snakes_lay_eggs:
+    description: "Universal claim from specific instance"
+    pattern: "Specific instance → Universal generalization"
+    
+  unstated_premise:
+    description: "Required premise not explicitly stated"
+    pattern: "Missing logical link in argument chain"
+
+# Configuration Metadata
+metadata:
+  version: "1.0"
+  created: "2025-12-01"
+  purpose: "Core configuration for Overseer AI logic analysis system"
+  scope: "Defines all logical primitives used in classification and evaluation"
+  validation_required: true
+  test_coverage:
+    - simple_logic
+    - fallacies
+    - chains
+    - realistic_ai
+    - contradictions
+    - misbehavior
+    - safety_protocols

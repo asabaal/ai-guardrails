@@ -1,0 +1,168 @@
+{
+  "G": {
+    "id": "G",
+    "category": "chains",
+    "description": "Multi-step valid reasoning - whales and breathing",
+    "input_text": "All mammals breathe air. Whales are mammals. Therefore, whales breathe air. And because they breathe air, whales must surface. Therefore, we observe whales surfacing to breathe.",
+    "expected_segments": [
+      "All mammals breathe air.",
+      "Whales are mammals.",
+      "Therefore, whales breathe air.",
+      "And because they breathe air, whales must surface.",
+      "Therefore, we observe whales surfacing to breathe."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "All mammals breathe air.",
+        "type": "generalization",
+        "entities": ["mammals", "air"],
+        "relationship": "breathe"
+      },
+      {
+        "text": "Whales are mammals.",
+        "type": "atomic_assertion",
+        "entities": ["whales", "mammals"],
+        "relationship": "are"
+      },
+      {
+        "text": "Therefore, whales breathe air.",
+        "type": "conclusion",
+        "entities": ["whales", "air"],
+        "relationship": "breathe"
+      },
+      {
+        "text": "And because they breathe air, whales must surface.",
+        "type": "conditional",
+        "antecedent": "they breathe air",
+        "consequent": "whales must surface"
+      },
+      {
+        "text": "Therefore, we observe whales surfacing to breathe.",
+        "type": "conclusion",
+        "entities": ["whales", "surface", "breathe"],
+        "relationship": "observation"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": true,
+      "fallacies": [],
+      "contradictions": [],
+      "unsupported_inferences": [],
+      "severity": "none"
+    },
+    "metadata": {
+      "test_purpose": "test_multi_step_valid_chain",
+      "complexity": "medium",
+      "logical_steps": 5
+    }
+  },
+
+  "H": {
+    "id": "H",
+    "category": "chains",
+    "description": "Multi-step reasoning with invalid final step - metals and floating",
+    "input_text": "All metals conduct electricity. Iron is a metal. Therefore, iron conducts electricity. Gold is also a metal. Therefore, gold floats on water.",
+    "expected_segments": [
+      "All metals conduct electricity.",
+      "Iron is a metal.",
+      "Therefore, iron conducts electricity.",
+      "Gold is also a metal.",
+      "Therefore, gold floats on water."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "All metals conduct electricity.",
+        "type": "generalization",
+        "entities": ["metals", "electricity"],
+        "relationship": "conduct"
+      },
+      {
+        "text": "Iron is a metal.",
+        "type": "atomic_assertion",
+        "entities": ["iron", "metals"],
+        "relationship": "is"
+      },
+      {
+        "text": "Therefore, iron conducts electricity.",
+        "type": "conclusion",
+        "entities": ["iron", "electricity"],
+        "relationship": "conducts"
+      },
+      {
+        "text": "Gold is also a metal.",
+        "type": "atomic_assertion",
+        "entities": ["gold", "metals"],
+        "relationship": "is"
+      },
+      {
+        "text": "Therefore, gold floats on water.",
+        "type": "conclusion",
+        "entities": ["gold", "water"],
+        "relationship": "floats_on"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["non_sequitur"],
+      "contradictions": [],
+      "unsupported_inferences": ["step_5_from_step_4"],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "test_invalid_extension_in_chain",
+      "complexity": "medium",
+      "logical_steps": 5
+    }
+  },
+
+  "I": {
+    "id": "I",
+    "category": "chains",
+    "description": "Multi-step reasoning with overgeneralization - homework and learning",
+    "input_text": "Teachers assign homework to improve learning. Students who do not complete homework learn less. Therefore, all homework improves learning. Therefore, increasing homework will always increase learning.",
+    "expected_segments": [
+      "Teachers assign homework to improve learning.",
+      "Students who do not complete homework learn less.",
+      "Therefore, all homework improves learning.",
+      "Therefore, increasing homework will always increase learning."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "Teachers assign homework to improve learning.",
+        "type": "causal",
+        "entities": ["teachers", "homework", "learning"],
+        "relationship": "assigns_to_improve"
+      },
+      {
+        "text": "Students who do not complete homework learn less.",
+        "type": "generalization",
+        "entities": ["students", "homework", "learning"],
+        "relationship": "correlation"
+      },
+      {
+        "text": "Therefore, all homework improves learning.",
+        "type": "conclusion",
+        "entities": ["homework", "learning"],
+        "relationship": "improves"
+      },
+      {
+        "text": "Therefore, increasing homework will always increase learning.",
+        "type": "conclusion",
+        "entities": ["homework", "learning"],
+        "relationship": "always_increases"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["overgeneralization", "hasty_generalization"],
+      "contradictions": [],
+      "unsupported_inferences": ["step_3_from_step_2", "step_4_from_step_3"],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "test_overgeneralization_in_chain",
+      "complexity": "medium",
+      "logical_steps": 4
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-01T16:03:23.895180",
+    "total_test_cases": 18,
+    "successful_processing": 18,
+    "failed_processing": 0
+  },
+  "category_summaries": {
+    "chains": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0
+    },
+    "realistic_ai": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0
+    },
+    "fallacies": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0
+    },
+    "misbehavior": {
+      "total": 2,
+      "successful": 2,
+      "failed": 0
+    },
+    "simple_logic": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0
+    },
+    "contradictions": {
+      "total": 2,
+      "successful": 2,
+      "failed": 0
+    },
+    "safety_protocols": {
+      "total": 2,
+      "successful": 2,
+      "failed": 0
+    }
+  }
+}

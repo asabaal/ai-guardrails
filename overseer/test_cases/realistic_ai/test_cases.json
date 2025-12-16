@@ -1,0 +1,154 @@
+{
+  "J": {
+    "id": "J",
+    "category": "realistic_ai",
+    "description": "AI hallucination style - Lincoln and internet",
+    "input_text": "Abraham Lincoln invented the internet. He did so while working as a telegraph operator, which inspired early packet-switching. Therefore, the internet was fully conceptualized during Lincoln's presidency.",
+    "expected_segments": [
+      "Abraham Lincoln invented the internet.",
+      "He did so while working as a telegraph operator, which inspired early packet-switching.",
+      "Therefore, the internet was fully conceptualized during Lincoln's presidency."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "Abraham Lincoln invented the internet.",
+        "type": "atomic_assertion",
+        "entities": ["Abraham Lincoln", "internet"],
+        "relationship": "invented"
+      },
+      {
+        "text": "He did so while working as a telegraph operator, which inspired early packet-switching.",
+        "type": "causal",
+        "entities": ["telegraph operator", "packet-switching"],
+        "relationship": "inspired"
+      },
+      {
+        "text": "Therefore, the internet was fully conceptualized during Lincoln's presidency.",
+        "type": "conclusion",
+        "entities": ["internet", "Lincoln's presidency"],
+        "relationship": "conceptualized_during"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["factual_error", "anachronism"],
+      "contradictions": ["historical_timeline"],
+      "unsupported_inferences": ["step_3_from_step_1_and_2"],
+      "severity": "critical"
+    },
+    "metadata": {
+      "test_purpose": "detect_ai_hallucination",
+      "complexity": "medium",
+      "logical_steps": 3
+    }
+  },
+
+  "K": {
+    "id": "K",
+    "category": "realistic_ai",
+    "description": "Common LLM leap - sick user inference",
+    "input_text": "The user mentioned they felt sick. People who feel sick may have the flu. The flu is contagious. Therefore, the user is contagious.",
+    "expected_segments": [
+      "The user mentioned they felt sick.",
+      "People who feel sick may have the flu.",
+      "The flu is contagious.",
+      "Therefore, the user is contagious."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "The user mentioned they felt sick.",
+        "type": "atomic_assertion",
+        "entities": ["user", "sick"],
+        "relationship": "felt"
+      },
+      {
+        "text": "People who feel sick may have the flu.",
+        "type": "generalization",
+        "entities": ["people", "sick", "flu"],
+        "relationship": "may_have"
+      },
+      {
+        "text": "The flu is contagious.",
+        "type": "generalization",
+        "entities": ["flu"],
+        "relationship": "is_contagious"
+      },
+      {
+        "text": "Therefore, the user is contagious.",
+        "type": "conclusion",
+        "entities": ["user"],
+        "relationship": "is_contagious"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["overgeneralization", "jump_to_conclusion"],
+      "contradictions": [],
+      "unsupported_inferences": ["step_4_from_step_1_and_2_and_3"],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "detect_llm_overgeneralization",
+      "complexity": "medium",
+      "logical_steps": 4
+    }
+  },
+
+  "L": {
+    "id": "L",
+    "category": "realistic_ai",
+    "description": "Tricky scientific reasoning - boiling point at altitude",
+    "input_text": "Water boils at 100°C at sea level. This city is 3000 meters above sea level. Higher altitude lowers atmospheric pressure. Lower pressure reduces the boiling point. Therefore, water boils at 100°C in this city.",
+    "expected_segments": [
+      "Water boils at 100°C at sea level.",
+      "This city is 3000 meters above sea level.",
+      "Higher altitude lowers atmospheric pressure.",
+      "Lower pressure reduces the boiling point.",
+      "Therefore, water boils at 100°C in this city."
+    ],
+    "expected_logic_objects": [
+      {
+        "text": "Water boils at 100°C at sea level.",
+        "type": "atomic_assertion",
+        "entities": ["water", "100°C", "sea level"],
+        "relationship": "boils_at"
+      },
+      {
+        "text": "This city is 3000 meters above sea level.",
+        "type": "atomic_assertion",
+        "entities": ["city", "3000 meters", "sea level"],
+        "relationship": "altitude"
+      },
+      {
+        "text": "Higher altitude lowers atmospheric pressure.",
+        "type": "causal",
+        "entities": ["altitude", "atmospheric pressure"],
+        "relationship": "lowers"
+      },
+      {
+        "text": "Lower pressure reduces the boiling point.",
+        "type": "causal",
+        "entities": ["pressure", "boiling point"],
+        "relationship": "reduces"
+      },
+      {
+        "text": "Therefore, water boils at 100°C in this city.",
+        "type": "conclusion",
+        "entities": ["water", "100°C", "city"],
+        "relationship": "boils_at"
+      }
+    ],
+    "expected_evaluation": {
+      "valid_reasoning": false,
+      "fallacies": ["contradiction", "ignored_premises"],
+      "contradictions": ["step_5_contradicts_step_3_and_4"],
+      "unsupported_inferences": [],
+      "severity": "major"
+    },
+    "metadata": {
+      "test_purpose": "detect_scientific_contradiction",
+      "complexity": "medium",
+      "logical_steps": 5
+    }
+  }
+}

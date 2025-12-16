@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overseer Test Case Explorer</title>
+    <style>
+        :root {
+            /* Backgrounds */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            
+            /* Text */
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --text-accent: #00ff88;
+            
+            /* Categories */
+            --simple-logic: #4a9eff;
+            --fallacies: #ff6b6b;
+            --chains: #ffd93d;
+            --realistic-ai: #6bcf7f;
+            --contradictions: #e056fd;
+            --misbehavior: #ff9f43;
+            --safety-protocols: #ff4757;
+            
+            /* Severity */
+            --severity-none: #2ecc71;
+            --severity-minor: #f39c12;
+            --severity-major: #e67e22;
+            --severity-critical: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 60px auto auto 1fr;
+            min-height: 100vh;
+            gap: 1px;
+            background: #333;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            background: var(--bg-secondary);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-accent);
+        }
+
+        .header .stats {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .analytics-panel {
+            grid-column: 1;
+            grid-row: 2;
+            background: var(--bg-secondary);
+            padding: 20px;
+        }
+
+        .category-panel {
+            grid-column: 1;
+            grid-row: 3;
+            background: var(--bg-secondary);
+            padding: 20px;
+        }
+
+        .viewer-panel {
+            grid-column: 1;
+            grid-row: 4;
+            background: var(--bg-primary);
+            padding: 20px;
+        }
+
+        .category-item {
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .category-header:hover {
+            background: #333;
+        }
+
+        .category-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .category-name {
+            flex: 1;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .category-count {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .test-case-list {
+            display: none;
+        }
+
+        .test-case-list.active {
+            display: block;
+        }
+
+        .test-case-item {
+            padding: 10px 12px;
+            border-top: 1px solid #333;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 12px;
+        }
+
+        .test-case-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .test-case-item.active {
+            background: #333;
+            border-left: 3px solid var(--text-accent);
+        }
+
+        .test-case-viewer {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .test-case-header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .test-id {
+            background: var(--text-accent);
+            color: var(--bg-primary);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .test-description {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .test-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .test-actions button {
+            background: var(--bg-tertiary);
+            border: 1px solid #333;
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .test-actions button:hover {
+            background: #333;
+            border-color: var(--text-accent);
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .section h4 {
+            color: var(--text-accent);
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-text {
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            font-size: 15px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .copyable {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .copyable:hover::after {
+            content: "📋";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .expected-segments {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .segment-item {
+            background: var(--bg-primary);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        .segment-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--text-accent);
+            color: var(--bg-primary);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .segment-text {
+            margin-left: 30px;
+        }
+
+        .logic-objects {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .logic-object {
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .object-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .entities {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .evaluation-result {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .eval-item {
+            background: var(--bg-primary);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .eval-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .eval-value {
+            font-weight: 600;
+        }
+
+        .severity-none { color: var(--severity-none); }
+        .severity-minor { color: var(--severity-minor); }
+        .severity-major { color: var(--severity-major); }
+        .severity-critical { color: var(--severity-critical); }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .meta-item {
+            background: var(--bg-primary);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .meta-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .analytics-panel h3 {
+            color: var(--text-accent);
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h2 {
+            color: var(--text-accent);
+            margin-bottom: 10px;
+        }
+
+        .quick-filters {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+
+        .quick-filters label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .quick-filters input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .fallacy-list, .contradiction-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .fallacy-tag, .contradiction-tag {
+            background: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            border: 1px solid #333;
+        }
+
+        .hidden-assumptions {
+            margin-top: 10px;
+        }
+
+        .assumption-item {
+            background: var(--bg-primary);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-size: 11px;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>🔍 Overseer Test Case Explorer</h1>
+            <div class="stats">
+                <span id="total-cases">Loading...</span> test cases across <span id="total-categories">Loading...</span> categories
+            </div>
+        </header>
+
+        <aside class="analytics-panel">
+            <h3>📊 Analytics</h3>
+            <div id="analytics-content">
+                <div class="stats-overview">
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-total">-</span>
+                        <span class="stat-label">Total Cases</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-critical" style="color: var(--severity-critical)">-</span>
+                        <span class="stat-label">Critical</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-major" style="color: var(--severity-major)">-</span>
+                        <span class="stat-label">Major</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-minor" style="color: var(--severity-minor)">-</span>
+                        <span class="stat-label">Minor</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <nav class="category-panel">
+            <h3 style="margin-bottom: 15px; color: var(--text-accent);">Categories</h3>
+            <div id="category-list"></div>
+            
+            <div class="quick-filters">
+                <label>
+                    <input type="checkbox" id="safety-critical">
+                    Safety Critical Only
+                </label>
+                <label>
+                    <input type="checkbox" id="high-complexity">
+                    High Complexity Only
+                </label>
+            </div>
+        </nav>
+
+        <main class="viewer-panel">
+            <div id="test-case-viewer" class="test-case-viewer">
+                <div class="empty-state">
+                    <h2>Select a Test Case</h2>
+                    <p>Choose a test case from the categories above to begin exploring.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class TestCaseLoader {
+            constructor() {
+                this.cache = new Map();
+                this.categories = ['simple_logic', 'fallacies', 'chains', 'realistic_ai', 'contradictions', 'misbehavior', 'safety_protocols'];
+            }
+
+            async loadCategory(category) {
+                if (this.cache.has(category)) {
+                    return this.cache.get(category);
+                }
+
+                try {
+                    const response = await fetch(`test_cases/${category}/test_cases.json`);
+                    const data = await response.json();
+                    this.cache.set(category, data);
+                    return data;
+                } catch (error) {
+                    console.error(`Failed to load category ${category}:`, error);
+                    return {};
+                }
+            }
+
+            async loadAllCategories() {
+                const allData = {};
+                for (const category of this.categories) {
+                    allData[category] = await this.loadCategory(category);
+                }
+                return allData;
+            }
+        }
+
+        class CategoryNavigator {
+            constructor(dataLoader) {
+                this.dataLoader = dataLoader;
+                this.categories = {};
+                this.currentTestCase = null;
+            }
+
+            async render() {
+                const allData = await this.dataLoader.loadAllCategories();
+                this.categories = allData;
+                
+                const categoryList = document.getElementById('category-list');
+                categoryList.innerHTML = '';
+
+                Object.entries(allData).forEach(([category, cases]) => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category-item';
+                    
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'category-header';
+                    categoryHeader.innerHTML = `
+                        <span class="category-color" style="background: var(--${category})"></span>
+                        <span class="category-name">${this.formatCategoryName(category)}</span>
+                        <span class="category-count">${Object.keys(cases).length}</span>
+                    `;
+                    
+                    const testCaseList = document.createElement('div');
+                    testCaseList.className = 'test-case-list';
+                    
+                    Object.entries(cases).forEach(([id, testCase]) => {
+                        const testCaseItem = document.createElement('div');
+                        testCaseItem.className = 'test-case-item';
+                        testCaseItem.textContent = `Example ${id}: ${testCase.description}`;
+                        testCaseItem.addEventListener('click', () => this.selectTestCase(category, id));
+                        testCaseList.appendChild(testCaseItem);
+                    });
+
+                    categoryHeader.addEventListener('click', () => {
+                        testCaseList.classList.toggle('active');
+                    });
+
+                    categoryDiv.appendChild(categoryHeader);
+                    categoryDiv.appendChild(testCaseList);
+                    categoryList.appendChild(categoryDiv);
+                });
+
+                this.updateHeaderStats();
+                this.updateAnalytics();
+            }
+
+            formatCategoryName(category) {
+                return category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            selectTestCase(category, id) {
+                // Remove previous active state
+                document.querySelectorAll('.test-case-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Add active state to selected item
+                event.target.classList.add('active');
+
+                this.currentTestCase = { category, id };
+                const testCase = this.categories[category][id];
+                this.renderTestCase(testCase);
+            }
+
+            renderTestCase(testCase) {
+                const viewer = document.getElementById('test-case-viewer');
+                
+                if (!testCase) {
+                    viewer.innerHTML = `
+                        <div class="empty-state">
+                            <h2>Select a Test Case</h2>
+                            <p>Choose a test case from the categories on the left to begin exploring.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                viewer.innerHTML = `
+                    <div class="test-case-header">
+                        <span class="test-id">Example ${testCase.id}</span>
+                        <span class="test-description">${testCase.description}</span>
+                        <div class="test-actions">
+                            <button class="copy-reference" data-id="${testCase.id}" title="Copy for discussion">📋</button>
+                            <button class="copy-full" data-id="${testCase.id}" title="Copy full test case">📄</button>
+                            <button class="generate-prompt" data-id="${testCase.id}" title="Generate discussion prompt">💬</button>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h4>Input Text</h4>
+                        <div class="input-text copyable" data-section="input_text">
+                            ${testCase.input_text}
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h4>Expected Segments</h4>
+                        <div class="expected-segments">
+                            ${testCase.expected_segments.map((segment, index) => `
+                                <div class="segment-item">
+                                    <span class="segment-number">${index + 1}</span>
+                                    <span class="segment-text">${segment}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h4>Logic Objects</h4>
+                        <div class="logic-objects">
+                            ${testCase.expected_logic_objects.map(obj => `
+                                <div class="logic-object">
+                                    <span class="type-badge" style="background: var(--${this.getTypeColor(obj.type)})">
+                                        ${this.formatTypeName(obj.type)}
+                                    </span>
+                                    <div class="object-text">${obj.text}</div>
+                                    ${obj.entities ? `
+                                        <div class="entities">
+                                            Entities: ${obj.entities.join(', ')}
+                                        </div>
+                                    ` : ''}
+                                    ${obj.relationship ? `
+                                        <div class="entities">
+                                            Relationship: ${obj.relationship}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h4>Evaluation</h4>
+                        <div class="evaluation-result">
+                            <div class="eval-item">
+                                <div class="eval-label">Valid Reasoning</div>
+                                <div class="eval-value">${testCase.expected_evaluation.valid_reasoning ? '✅ Yes' : '❌ No'}</div>
+                            </div>
+                            <div class="eval-item">
+                                <div class="eval-label">Severity</div>
+                                <div class="eval-value severity-${testCase.expected_evaluation.severity}">${testCase.expected_evaluation.severity.toUpperCase()}</div>
+                            </div>
+                        </div>
+                        
+                        ${testCase.expected_evaluation.fallacies && testCase.expected_evaluation.fallacies.length > 0 ? `
+                            <div style="margin-top: 15px;">
+                                <div class="eval-label">Fallacies</div>
+                                <div class="fallacy-list">
+                                    ${testCase.expected_evaluation.fallacies.map(fallacy => `
+                                        <span class="fallacy-tag">${fallacy.replace(/_/g, ' ')}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${testCase.expected_evaluation.contradictions && testCase.expected_evaluation.contradictions.length > 0 ? `
+                            <div style="margin-top: 15px;">
+                                <div class="eval-label">Contradictions</div>
+                                <div class="contradiction-list">
+                                    ${testCase.expected_evaluation.contradictions.map(contradiction => `
+                                        <span class="contradiction-tag">${contradiction}</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${testCase.expected_evaluation.hidden_assumptions && testCase.expected_evaluation.hidden_assumptions.length > 0 ? `
+                            <div class="hidden-assumptions">
+                                <div class="eval-label">Hidden Assumptions</div>
+                                ${testCase.expected_evaluation.hidden_assumptions.map(assumption => `
+                                    <div class="assumption-item">${assumption.replace(/_/g, ' ')}</div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="section">
+                        <h4>Metadata</h4>
+                        <div class="metadata">
+                            <div class="meta-item">
+                                <div class="meta-label">Purpose</div>
+                                <div class="meta-value">${testCase.metadata.test_purpose.replace(/_/g, ' ')}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Complexity</div>
+                                <div class="meta-value">${testCase.metadata.complexity}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Logical Steps</div>
+                                <div class="meta-value">${testCase.metadata.logical_steps}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                this.attachEventListeners();
+            }
+
+            getTypeColor(type) {
+                const typeColors = {
+                    'atomic_assertion': 'simple-logic',
+                    'conditional': 'chains',
+                    'generalization': 'simple-logic',
+                    'conclusion': 'chains',
+                    'circular_reasoning': 'fallacies'
+                };
+                return typeColors[type] || 'text-secondary';
+            }
+
+            formatTypeName(type) {
+                return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            attachEventListeners() {
+                // Copy reference button
+                document.querySelector('.copy-reference')?.addEventListener('click', (e) => {
+                    const id = e.target.dataset.id;
+                    const reference = `Example ${id} from Overseer test suite`;
+                    navigator.clipboard.writeText(reference);
+                    this.showToast('Reference copied to clipboard!');
+                });
+
+                // Copy full test case button
+                document.querySelector('.copy-full')?.addEventListener('click', (e) => {
+                    const id = e.target.dataset.id;
+                    const testCase = this.categories[this.currentTestCase.category][id];
+                    const fullText = JSON.stringify(testCase, null, 2);
+                    navigator.clipboard.writeText(fullText);
+                    this.showToast('Full test case copied to clipboard!');
+                });
+
+                // Generate discussion prompt
+                document.querySelector('.generate-prompt')?.addEventListener('click', (e) => {
+                    const id = e.target.dataset.id;
+                    const testCase = this.categories[this.currentTestCase.category][id];
+                    const prompt = `Let's analyze Example ${id}: "${testCase.description}"
+
+Input: "${testCase.input_text}"
+
+What logical reasoning patterns do you observe? Is the reasoning valid?`;
+                    navigator.clipboard.writeText(prompt);
+                    this.showToast('Discussion prompt copied to clipboard!');
+                });
+
+                // Copy sections
+                document.querySelectorAll('.copyable').forEach(element => {
+                    element.addEventListener('click', (e) => {
+                        const text = e.target.textContent;
+                        navigator.clipboard.writeText(text);
+                        this.showToast('Text copied to clipboard!');
+                    });
+                });
+            }
+
+            showToast(message) {
+                // Simple toast notification
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: var(--text-accent);
+                    color: var(--bg-primary);
+                    padding: 10px 15px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    z-index: 1000;
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 2000);
+            }
+
+            updateHeaderStats() {
+                let totalCases = 0;
+                Object.values(this.categories).forEach(cases => {
+                    totalCases += Object.keys(cases).length;
+                });
+
+                document.getElementById('total-cases').textContent = totalCases;
+                document.getElementById('total-categories').textContent = Object.keys(this.categories).length;
+            }
+
+            updateAnalytics() {
+                let totalCases = 0;
+                let critical = 0;
+                let major = 0;
+                let minor = 0;
+
+                Object.values(this.categories).forEach(cases => {
+                    Object.values(cases).forEach(testCase => {
+                        totalCases++;
+                        const severity = testCase.expected_evaluation.severity;
+                        if (severity === 'critical') critical++;
+                        else if (severity === 'major') major++;
+                        else if (severity === 'minor') minor++;
+                    });
+                });
+
+                document.getElementById('stat-total').textContent = totalCases;
+                document.getElementById('stat-critical').textContent = critical;
+                document.getElementById('stat-major').textContent = major;
+                document.getElementById('stat-minor').textContent = minor;
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', async () => {
+            const dataLoader = new TestCaseLoader();
+            const navigator = new CategoryNavigator(dataLoader);
+            
+            await navigator.render();
+            
+            // Setup filters
+            document.getElementById('safety-critical').addEventListener('change', (e) => {
+                // Filter implementation would go here
+                console.log('Safety critical filter:', e.target.checked);
+            });
+            
+            document.getElementById('high-complexity').addEventListener('change', (e) => {
+                // Filter implementation would go here
+                console.log('High complexity filter:', e.target.checked);
+            });
+        });
+    </script>
+</body>
+</html>

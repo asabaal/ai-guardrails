@@ -1,8 +1,7 @@
 # app.py
 import streamlit as st
 import spacy
-from core_logic.parser import StatementParser # We'll reuse our parser
-from core_logic.reasoner import SimpleLogicEngine # And our reasoner
+from core_logic.contextual_engine import ContextualLogicEngine # Use the new contextual engine
 
 # --- Page Setup ---
 st.set_page_config(layout="wide", page_title="Logic Lab")
@@ -12,16 +11,17 @@ st.markdown("A tool to build and test a transparent, controllable logic engine."
 # --- Initialize Session State ---
 # Streamlit reruns the script on every interaction. We use session_state
 # to keep our knowledge base and other data persistent across interactions.
-if 'knowledge_base' not in st.session_state:
-    st.session_state.knowledge_base = []
+if 'contextual_engine' not in st.session_state:
+    st.session_state.contextual_engine = ContextualLogicEngine()
 if 'parser' not in st.session_state:
     # Load the spaCy model once and store it in session state
     try:
         st.session_state.parser = spacy.load("en_core_web_sm")
     except OSError:
         st.info("Downloading spaCy model 'en_core_web_sm'...")
-        from spacy.cli import download
-        download("en_core_web_sm")
+        import subprocess
+        import sys
+        subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
         st.session_state.parser = spacy.load("en_core_web_sm")
 
 # --- Sidebar: Input and Control ---
@@ -31,6 +31,9 @@ with st.sidebar:
     
     if st.button("Parse and Evaluate"):
         if new_statement:
+            # Process the statement using the contextual engine
+            st.session_state.contextual_engine.process_statement(new_statement)
+            
             # We'll parse the statement and store the raw result in session state
             # for display and potential correction.
             doc = st.session_state.parser(new_statement)
@@ -45,23 +48,16 @@ with st.sidebar:
             }
             st.session_state.current_parsing = parsing_details
             
-            # Now, run our simple parser to get the structured data
-            # We'll create a simplified version here for the UI
-            subject = None
-            object = None
-            negated = "neg" in [t.dep_ for t in doc]
-            
-            for token in doc:
-                if token.dep_ == "nsubj":
-                    subject = token.text.lower()
-                if token.dep_ in ["attr", "acomp", "dobj"]:
-                    object = token.text.lower()
-            
-            st.session_state.parsed_statement = {
-                "subject": subject,
-                "object": object,
-                "negated": negated
-            }
+            # Get the parsed result from the contextual engine
+            parsed = st.session_state.contextual_engine._parse_statement(new_statement)
+            if parsed:
+                st.session_state.parsed_statement = parsed
+            else:
+                st.session_state.parsed_statement = {
+                    "subject": None,
+                    "object": None,
+                    "negated": False
+                }
 
 # --- Main Content Area ---
 
@@ -72,48 +68,45 @@ if 'current_parsing' in st.session_state:
     st.subheader("Token-by-Token Analysis")
     st.dataframe(st.session_state.current_parsing['tokens'], use_container_width=True)
 
-    # Show the parsed statement and allow correction
-    st.subheader("Parsed Statement (Correct if Needed)")
+    # Show the parsed statement
+    st.subheader("Parsed Statement")
     parsed = st.session_state.parsed_statement
     
-    # Use columns to lay out the input fields nicely
+    # Use columns to lay out the parsed info nicely
     col1, col2, col3 = st.columns(3)
     with col1:
-        corrected_subject = st.text_input("Subject", value=parsed.get('subject', ''), key="correct_subject")
+        st.text_input("Subject", value=parsed.get('subject', 'None'), disabled=True)
     with col2:
-        corrected_object = st.text_input("Object", value=parsed.get('object', ''), key="correct_object")
+        st.text_input("Object", value=parsed.get('object', 'None'), disabled=True)
     with col3:
-        corrected_negated = st.checkbox("Negated", value=parsed.get('negated', False), key="correct_negated")
+        st.checkbox("Negated", value=parsed.get('negated', False), disabled=True)
     
-    if st.button("Commit to Knowledge Base"):
-        final_fact = {
-            "subject": corrected_subject.lower(),
-            "object": corrected_object.lower(),
-            "negated": corrected_negated,
-            "original_text": st.session_state.current_parsing['text']
-        }
-        # Check for contradictions before adding
-        contradiction_found = False
-        for known_fact in st.session_state.knowledge_base:
-            if (known_fact['subject'] == final_fact['subject'] and
-                known_fact['object'] == final_fact['object'] and
-                known_fact['negated'] != final_fact['negated']):
-                st.error(f"🚨 CONTRADICTION DETECTED with: '{known_fact['original_text']}'")
-                contradiction_found = True
-                break
-        
-        if not contradiction_found:
-            st.session_state.knowledge_base.append(final_fact)
-            st.success(f"✅ Fact added: '{final_fact['original_text']}'")
-            # Clear the parsing info to reset the UI
-            del st.session_state.current_parsing
-            del st.session_state.parsed_statement
-            st.rerun()
+    st.info("✅ Statement automatically processed and added to conversation memory.")
 
 
-st.header("3. Current Knowledge Base")
+st.header("3. Conversation Context")
 
-if not st.session_state.knowledge_base:
-    st.info("The knowledge base is empty. Add a statement to begin.")
+# Get conversation summary from the contextual engine
+summary = st.session_state.contextual_engine.get_conversation_summary()
+
+if summary['total_statements'] == 0:
+    st.info("No statements processed yet. Add a statement to begin.")
 else:
-    st.dataframe(st.session_state.knowledge_base, use_container_width=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Total Statements", summary['total_statements'])
+    with col2:
+        st.metric("Entities Tracked", summary['entities_tracked'])
+    
+    st.subheader("Recent Context")
+    if summary['recent_context']:
+        for i, stmt in enumerate(summary['recent_context'], 1):
+            st.write(f"{i}. {stmt}")
+    
+    st.subheader("Entity States")
+    if summary['entity_states']:
+        for entity_name, entity_attrs in summary['entity_states'].items():
+            with st.expander(f"📝 {entity_name.title()}"):
+                for attr, value in entity_attrs.items():
+                    if not attr.startswith('_'):  # Skip private attributes
+                        st.write(f"• {attr}: {value}")
