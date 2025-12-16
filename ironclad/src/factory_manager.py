@@ -2,9 +2,7 @@ import json
 import os
 import sys
 import ollama
-# We import the logic from your existing Ironclad tool
-# Ensure ironclad_phase3.py has a function like `run_generation_loop(request)`
-# If not, we can wrap it here. For now, I will simulate the call to show the structure.
+# We import logic from your existing Ironclad tool
 import ironclad
 
 MODEL_NAME = "gpt-oss:20b"
@@ -30,25 +28,22 @@ def build_components(blueprint):
             "Ensure 100% test coverage."
         )
         
-        # --- CALLING IRONCLAD ---
-        # We assume we refactor ironclad_phase3 to have a callable `process_request`
-        # that returns the code content if successful.
-        # For this example, we'll assume ironclad.generate_and_verify returns the dict.
-        
+# --- CALLING IRONCLAD ---
         # Hooking into your existing Ironclad logic:
-        candidate = ironclad.generate_candidate(request) 
+        candidate = ironclad.generate_candidate(request, MODEL_NAME, ironclad.DEFAULT_SYSTEM_PROMPT) 
         
-        # Run the Ironclad Validation Loop
+        # Run Ironclad Validation Loop
         is_valid = False
         attempts = 0
         while not is_valid and attempts < 3:
-            is_valid, logs, cov = ironclad.validate_candidate(candidate)
+            is_valid, logs = ironclad.validate_candidate(candidate)
             if not is_valid:
-                print(f"   [-] Ironclad Repairing {func['name']} (Attempt {attempts+1})...")
-                candidate = ironclad.repair_candidate(candidate, logs)
+                if attempts < 2:  # Only repair 2 times max
+                    print(f"   [-] Ironclad Repairing {func['name']} (Attempt {attempts+1})...")
+                    candidate = ironclad.repair_candidate(candidate, logs, MODEL_NAME, ironclad.DEFAULT_SYSTEM_PROMPT)
                 attempts += 1
         
-        if is_valid:
+        if is_valid and candidate:
             print(f"   [+] Verified: {func['name']}")
             # Save the file into the module folder
             filename = f"{func['name']}.py"
@@ -57,7 +52,7 @@ def build_components(blueprint):
             verified_files.append(func['name'])
         else:
             print(f"   [!] CRITICAL FAILURE: Could not build {func['name']}.")
-            return False, module_dir
+            return False, module_dir, []
 
     return True, module_dir, verified_files
 
@@ -101,7 +96,7 @@ def clean_json(text):
 
 if __name__ == "__main__":
     if not os.path.exists("blueprint.json"):
-        print("Run module_forge.py first!")
+        print("Run module_designer.py first!")
         sys.exit(1)
         
     with open("blueprint.json", "r") as f:

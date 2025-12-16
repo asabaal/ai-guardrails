@@ -1,0 +1,30 @@
+{
+    "module_name": "simple_adder_cli",
+    "dependencies": [
+        "argparse",
+        "sys"
+    ],
+    "functions": [
+        {
+            "name": "parse_args",
+            "signature": "def parse_args() -> argparse.Namespace",
+            "description": "Parses command-line arguments using argparse. Expects two positional arguments representing the numbers to add. Returns a Namespace with attributes 'num1' and 'num2'. Handles the case where fewer than two arguments are provided by displaying usage and exiting. Also captures parsing errors such as non-numeric inputs and shows a clear error message."
+        },
+        {
+            "name": "convert_to_float",
+            "signature": "def convert_to_float(value: str) -> float",
+            "description": "Attempts to convert a string to a float. Raises a ValueError with an informative message if conversion fails. This function is used to ensure that the arguments received from argparse are valid numeric values before performing arithmetic."
+        },
+        {
+            "name": "add_numbers",
+            "signature": "def add_numbers(a: float, b: float) -> float",
+            "description": "Adds two float numbers and returns the result. Handles edge cases such as adding NaN or infinite values by propagating Python's float behavior and documenting that such results are returned as is."
+        },
+        {
+            "name": "print_result",
+            "signature": "def print_result(result: float) -> None",
+            "description": "Prints the result to standard output. Formats the output as a plain string. Optionally, could be extended to support formatted output (e.g., rounding), but for a simple CLI, it simply prints the raw float value."
+        }
+    ],
+    "main_logic_description": "The main block orchestrates the workflow: it first calls parse_args() to retrieve the two number arguments. Each argument is then passed through convert_to_float() to validate and convert to float. The validated numbers are fed to add_numbers() to compute the sum. Finally, print_result() outputs the result. The main block should also handle exceptions from conversion or addition and display user-friendly error messages before exiting with a non-zero status code."
+}

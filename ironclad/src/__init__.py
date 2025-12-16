@@ -10,10 +10,12 @@ from .ironclad import (
     generate_candidate,
     validate_candidate,
     save_brick,
+    repair_candidate,
     main,
     DEFAULT_MODEL_NAME,
     DEFAULT_OUTPUT_DIR,
-    DEFAULT_SYSTEM_PROMPT
+    DEFAULT_SYSTEM_PROMPT,
+    MAX_RETRIES
 )
 
 __version__ = "1.0.0"
@@ -22,8 +24,10 @@ __all__ = [
     "generate_candidate", 
     "validate_candidate",
     "save_brick",
+    "repair_candidate",
     "main",
     "DEFAULT_MODEL_NAME",
     "DEFAULT_OUTPUT_DIR",
-    "DEFAULT_SYSTEM_PROMPT"
+    "DEFAULT_SYSTEM_PROMPT",
+    "MAX_RETRIES"
 ]

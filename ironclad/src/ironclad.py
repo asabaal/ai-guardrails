@@ -9,6 +9,7 @@ import ollama
 # --- DEFAULT CONFIGURATION ---
 DEFAULT_MODEL_NAME = "gpt-oss:20b"  # Must be installed via 'ollama pull llama3'
 DEFAULT_OUTPUT_DIR = "verified_bricks"  # Where successful code is saved
+MAX_RETRIES = 3  # Maximum number of repair attempts
 
 # --- DEFAULT PROMPT TEMPLATE ---
 # We force the model to output strict JSON so we can parse it reliably.
@@ -125,6 +126,40 @@ def save_brick(candidate, output_dir=DEFAULT_OUTPUT_DIR):
         
     print(f"[SUCCESS] Verified brick saved to: {output_dir}/{name}.py")
 
+def repair_candidate(candidate, traceback_log, model_name=DEFAULT_MODEL_NAME, system_prompt=DEFAULT_SYSTEM_PROMPT):
+    """
+    The Repair Mechanic: Takes broken code + error, asks for a patch.
+    """
+    print(f"[*] Attempting repair...")
+    
+    REPAIR_PROMPT_TEMPLATE = """
+    The code you generated failed tests.
+    Here is error traceback:
+    {traceback}
+    
+    Here is the code you wrote:
+    {code}
+    
+    Fix the code (and tests if necessary) to solve the error.
+    Do not output explanation. Output only the fixed JSON structure.
+    """
+    
+    prompt_content = REPAIR_PROMPT_TEMPLATE.format(
+        traceback=traceback_log,
+        code=candidate.get("code", "")
+    )
+    
+    try:
+        response = ollama.chat(model=model_name, messages=[
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': prompt_content},
+        ])
+        return json.loads(clean_json_response(response['message']['content']))
+    except Exception as e:
+        print(f"[!] Repair Error: {e}")
+        return None
+
+
 def main(request=None, model_name=None, output_dir=None, system_prompt=None):
     """
     Main function that can be called with parameters or from CLI
@@ -149,14 +184,32 @@ def main(request=None, model_name=None, output_dir=None, system_prompt=None):
         print("[X] INCINERATED: Output invalid.")
         sys.exit(1)
         
-    # 2. Validate
+    # 2. Validation Loop with Repair
     is_valid, logs = validate_candidate(candidate)
+    attempts = 0
     
-    # 3. Decision Gate
+    while not is_valid and attempts < MAX_RETRIES:
+        print(f"[-] FAIL (Attempt {attempts + 1}/{MAX_RETRIES}). Triggering repair...")
+        
+        # 3. The Repair
+        candidate = repair_candidate(candidate, logs, model_name, system_prompt)
+        if not candidate:
+            print("[!] Repair produced invalid JSON. Aborting.")
+            sys.exit(1)
+            
+        is_valid, logs = validate_candidate(candidate)
+        attempts += 1
+
+    # 4. Final Gate
     if is_valid:
+        if attempts > 0:
+            print(f"[+] Verified after {attempts} repairs.")
         save_brick(candidate, output_dir)
     else:
-        print("[X] INCINERATED: Logic failed verification. Code discarded.")
+        print("[-] FINAL FAILURE.")
+        print("--- Last Traceback ---")
+        print(logs)
+        print("[X] INCINERATED.")
         sys.exit(1)
 
 if __name__ == "__main__":

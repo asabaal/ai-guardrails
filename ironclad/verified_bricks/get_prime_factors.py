@@ -1,12 +1,8 @@
 def get_prime_factors(n):
-    """
-    Return the list of prime factors of a positive integer n.
-    Raises ValueError for non-positive inputs or non-integer types.
-    """
     if not isinstance(n, int):
-        raise ValueError("Input must be an integer")
-    if n <= 0:
-        raise ValueError("Input must be a positive integer")
+        raise TypeError("Input must be an integer")
+    if n <= 1:
+        raise ValueError("Input must be an integer greater than 1")
     factors = []
     while n % 2 == 0:
         factors.append(2)

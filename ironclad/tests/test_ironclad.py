@@ -318,20 +318,107 @@ class TestMain:
     @patch('sys.argv', ['ironclad.py', 'test request'])
     @patch('ironclad.generate_candidate')
     @patch('ironclad.validate_candidate')
-    def test_main_validation_failure(self, mock_validate, mock_generate):
-        """Test main function when validation fails"""
+    @patch('ironclad.repair_candidate')
+    def test_main_validation_failure(self, mock_repair, mock_validate, mock_generate):
+        """Test main function when validation fails and repair also fails"""
         mock_generate.return_value = {
             "filename": "test_func",
             "code": "def test_func(): return 'test'",
             "test": "def test_test_func(): assert test_func() == 'test'"
         }
         mock_validate.return_value = (False, "Tests failed")
+        mock_repair.return_value = None  # Repair fails
         
         with patch('builtins.print') as mock_print:
             with pytest.raises(SystemExit) as exc_info:
                 ironclad.main()
             assert exc_info.value.code == 1
-            mock_print.assert_any_call("[X] INCINERATED: Logic failed verification. Code discarded.")
+            mock_print.assert_any_call("[!] Repair produced invalid JSON. Aborting.")
+    
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.repair_candidate')
+    @patch('ironclad.save_brick')
+    def test_main_repair_success(self, mock_save, mock_repair, mock_validate, mock_generate):
+        """Test main function when validation fails but repair succeeds"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        # First validation fails, second succeeds after repair
+        mock_validate.side_effect = [
+            (False, "Tests failed"),
+            (True, "Tests passed")
+        ]
+        mock_repair.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'fixed'",
+            "test": "def test_test_func(): assert test_func() == 'fixed'"
+        }
+        
+        with patch('builtins.print') as mock_print:
+            ironclad.main()
+            
+        mock_generate.assert_called_once()
+        assert mock_validate.call_count == 2
+        mock_repair.assert_called_once()
+        mock_save.assert_called_once()
+        mock_print.assert_any_call("[+] Verified after 1 repairs.")
+    
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.repair_candidate')
+    def test_main_max_retries_exceeded(self, mock_repair, mock_validate, mock_generate):
+        """Test main function when max retries are exceeded"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        # Always fails validation
+        mock_validate.return_value = (False, "Tests failed")
+        mock_repair.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'still broken'",
+            "test": "def test_test_func(): assert test_func() == 'still broken'"
+        }
+        
+        with patch('builtins.print') as mock_print:
+            with pytest.raises(SystemExit) as exc_info:
+                ironclad.main()
+            assert exc_info.value.code == 1
+            
+        mock_generate.assert_called_once()
+        assert mock_validate.call_count == 4  # 1 initial + 3 repairs
+        assert mock_repair.call_count == 3
+        mock_print.assert_any_call("[-] FINAL FAILURE.")
+    
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.repair_candidate')
+    def test_main_repair_json_error(self, mock_repair, mock_validate, mock_generate):
+        """Test main function when repair returns invalid JSON"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        mock_validate.return_value = (False, "Tests failed")
+        mock_repair.return_value = None  # Invalid JSON
+        
+        with patch('builtins.print') as mock_print:
+            with pytest.raises(SystemExit) as exc_info:
+                ironclad.main()
+            assert exc_info.value.code == 1
+            
+        mock_generate.assert_called_once()
+        mock_validate.assert_called_once()
+        mock_repair.assert_called_once()
+        mock_print.assert_any_call("[!] Repair produced invalid JSON. Aborting.")
 
 
 class TestMainExecution:

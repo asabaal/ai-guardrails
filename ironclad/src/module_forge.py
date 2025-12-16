@@ -1,64 +1,77 @@
+#!/usr/bin/env python3
+"""
+Module Forge - End-to-end module generation integration layer
+
+This module orchestrates the complete workflow from user request to finished module:
+1. Designs blueprint using module_designer
+2. Builds components using factory_manager  
+3. Assembles final module using factory_manager
+"""
 import sys
 import json
-import re
-import ollama
+import os
+from module_designer import draft_blueprint
+import factory_manager
 
-# --- CONFIGURATION ---
-MODEL_NAME = "gpt-oss:20b"
-
-# --- THE ARCHITECT PERSONA ---
-ARCHITECT_PROMPT = """
-You are a Senior Software Architect. You do not write code implementation. 
-You design the structure of Python modules.
-
-Your Goal: Break a user request into small, atomic, testable functions.
-
-Output strict JSON only (no markdown) in this format:
-{
-    "module_name": "snake_case_name",
-    "dependencies": ["list", "of", "libs"],
-    "functions": [
-        {
-            "name": "function_name",
-            "signature": "def function_name(arg1: type) -> type",
-            "description": "Detailed description of logic and edge cases."
-        }
-    ],
-    "main_logic_description": "Describe how the main block should stitch these functions together."
-}
-"""
-
-def clean_json(text):
-    text = text.strip()
-    text = re.sub(r"^```(json)?", "", text)
-    text = re.sub(r"```$", "", text)
-    return text.strip()
-
-def draft_blueprint(request):
-    print(f"[*] Architecting solution for: '{request}'...")
-    try:
-        response = ollama.chat(model=MODEL_NAME, messages=[
-            {'role': 'system', 'content': ARCHITECT_PROMPT},
-            {'role': 'user', 'content': request},
-        ])
-        return json.loads(clean_json(response['message']['content']))
-    except Exception as e:
-        print(f"[!] Blueprint Failed: {e}")
-        return None
 
 def main():
+    """
+    Main entry point for end-to-end module generation
+    """
     if len(sys.argv) < 2:
-        print("Usage: python module_forge.py 'I want a tool that...'")
+        print("Usage: python module_forge.py 'I need a tool that...'")
+        print("Example: python module_forge.py 'I need a CLI tool that processes stock data'")
         sys.exit(1)
-        
-    blueprint = draft_blueprint(sys.argv[1])
     
-    if blueprint:
-        print(json.dumps(blueprint, indent=4))
-        # In the next step, we will pipe this JSON into the Factory.
-        with open("blueprint.json", "w") as f:
-            json.dump(blueprint, f, indent=4)
-        print("[+] Blueprint saved to blueprint.json")
+    user_request = sys.argv[1]
+    
+    print("=" * 60)
+    print("🔨 MODULE FORGE - End-to-End Module Generation")
+    print("=" * 60)
+    
+    # Step 1: Design Blueprint
+    print("\n[1/3] 📐 Designing module blueprint...")
+    blueprint = draft_blueprint(user_request)
+    
+    if not blueprint:
+        print("[❌] Failed to generate blueprint. Aborting.")
+        sys.exit(1)
+    
+    print(f"[✅] Blueprint designed: {blueprint['module_name']}")
+    print(f"    Functions: {[f['name'] for f in blueprint['functions']]}")
+    
+    # Save blueprint for factory manager
+    blueprint_file = "blueprint.json"
+    with open(blueprint_file, "w") as f:
+        json.dump(blueprint, f, indent=4)
+    print(f"[💾] Blueprint saved to: {blueprint_file}")
+    
+    # Step 2: Build Components
+    print("\n[2/3] 🏗️  Building components...")
+    success, module_dir, components = factory_manager.build_components(blueprint)
+    
+    if not success:
+        print("[❌] Failed to build components. Aborting.")
+        sys.exit(1)
+    
+    print(f"[✅] Components built: {components}")
+    print(f"    Module directory: {module_dir}")
+    
+    # Step 3: Assemble Module
+    print("\n[3/3] 🔧 Assembling final module...")
+    try:
+        factory_manager.assemble_main(blueprint, module_dir, components)
+        print(f"[✅] Module assembled successfully!")
+        print(f"    📁 Location: {module_dir}")
+        print(f"    🚀 Run: cd {module_dir} && python main.py")
+    except Exception as e:
+        print(f"[❌] Failed to assemble module: {e}")
+        sys.exit(1)
+    
+    print("\n" + "=" * 60)
+    print("🎉 MODULE FORGE COMPLETE - Your module is ready!")
+    print("=" * 60)
+
 
 if __name__ == "__main__":
     main()
