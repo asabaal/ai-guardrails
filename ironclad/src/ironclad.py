@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import re
 import ollama
+from code_utils import clean_json_response as utils_clean_json_response, clean_code_content
 
 # --- DEFAULT CONFIGURATION ---
 DEFAULT_MODEL_NAME = "gpt-oss:20b"  # Must be installed via 'ollama pull llama3'
@@ -18,24 +19,26 @@ You are a strict code generator. You do not talk. You output JSON only.
 Your goal is to write a Python function and a corresponding Pytest unit test.
 The test must prove the function works and handle edge cases.
 
+CRITICAL: All code must contain actual newline characters, not escaped \\n sequences.
+When writing Python code, use real newlines between statements and lines.
+
 Output format must be exactly this JSON structure:
 {
     "filename": "function_name",
     "code": "def function_name... ",
-    "test": "import pytest\\nfrom function_name import function_name\\n\\ndef test_case_1()..."
+    "test": "import pytest\nfrom function_name import function_name\n\ndef test_case_1()..."
 }
+
+The code and test fields must contain properly formatted Python code with actual newline characters.
 """
 
 def clean_json_response(response_text):
     """
     Cleans up the model's output if it adds markdown fences (```json ... ```).
+    Also decodes escaped newlines in JSON content.
+    Returns a cleaned JSON string ready for parsing.
     """
-    cleaned = response_text.strip()
-    # Remove markdown code blocks if present
-    if cleaned.startswith("```"):
-        cleaned = re.sub(r"^```(json)?", "", cleaned)
-        cleaned = re.sub(r"```$", "", cleaned)
-    return cleaned.strip()
+    return utils_clean_json_response(response_text)
 
 def generate_candidate(request, model_name=DEFAULT_MODEL_NAME, system_prompt=DEFAULT_SYSTEM_PROMPT):
     """
@@ -70,8 +73,8 @@ def validate_candidate(candidate):
     Writes code to a temp folder and runs pytest.
     """
     function_name = candidate.get("filename", "unknown_func")
-    code_content = candidate.get("code", "")
-    test_content = candidate.get("test", "")
+    code_content = clean_code_content(candidate.get("code", ""))
+    test_content = clean_code_content(candidate.get("test", ""))
     
     with tempfile.TemporaryDirectory() as temp_dir:
         # Define paths

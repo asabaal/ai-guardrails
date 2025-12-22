@@ -186,3 +186,4 @@ class TestCliIntegration:
         source = inspect.getsource(cli)
         assert "if __name__ == '__main__':" in source
         assert "main()" in source
+    

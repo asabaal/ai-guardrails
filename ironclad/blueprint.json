@@ -1,30 +1,31 @@
 {
-    "module_name": "simple_adder_cli",
+    "module_name": "temperature_converter_cli",
     "dependencies": [
         "argparse",
-        "sys"
+        "sys",
+        "typing"
     ],
     "functions": [
         {
-            "name": "parse_args",
-            "signature": "def parse_args() -> argparse.Namespace",
-            "description": "Parses command-line arguments using argparse. Expects two positional arguments representing the numbers to add. Returns a Namespace with attributes 'num1' and 'num2'. Handles the case where fewer than two arguments are provided by displaying usage and exiting. Also captures parsing errors such as non-numeric inputs and shows a clear error message."
+            "name": "parse_arguments",
+            "signature": "def parse_arguments(args: List[str]) -> argparse.Namespace",
+            "description": "Parses the command line arguments using argparse. Expects a temperature value and a source unit flag (--celsius or --fahrenheit). Raises an error if both or neither unit flags are provided, or if the value cannot be converted to float. Returns an argparse.Namespace containing the parsed value and unit."
         },
         {
-            "name": "convert_to_float",
-            "signature": "def convert_to_float(value: str) -> float",
-            "description": "Attempts to convert a string to a float. Raises a ValueError with an informative message if conversion fails. This function is used to ensure that the arguments received from argparse are valid numeric values before performing arithmetic."
+            "name": "convert_temperature",
+            "signature": "def convert_temperature(value: float, from_unit: str, to_unit: str) -> float",
+            "description": "Converts a temperature value from one unit to another. Supports 'celsius' and 'fahrenheit' (case-insensitive). If from_unit and to_unit are identical, returns the original value. Uses the formulas: F = C * 9/5 + 32 and C = (F - 32) * 5/9. Raises ValueError for unsupported units."
         },
         {
-            "name": "add_numbers",
-            "signature": "def add_numbers(a: float, b: float) -> float",
-            "description": "Adds two float numbers and returns the result. Handles edge cases such as adding NaN or infinite values by propagating Python's float behavior and documenting that such results are returned as is."
+            "name": "format_output",
+            "signature": "def format_output(value: float, from_unit: str, to_unit: str) -> str",
+            "description": "Formats the conversion result into a user-friendly string. Rounds the output to two decimal places and appends the appropriate unit abbreviations ('C' or 'F'). Example: \"100.00 C is 212.00 F\"."
         },
         {
-            "name": "print_result",
-            "signature": "def print_result(result: float) -> None",
-            "description": "Prints the result to standard output. Formats the output as a plain string. Optionally, could be extended to support formatted output (e.g., rounding), but for a simple CLI, it simply prints the raw float value."
+            "name": "main",
+            "signature": "def main() -> None",
+            "description": "Entry point for the CLI. Calls parse_arguments with sys.argv[1:], performs conversion via convert_temperature, formats the result with format_output, and prints it to stdout. Handles exceptions by printing a concise error message to stderr and exiting with a non-zero status."
         }
     ],
-    "main_logic_description": "The main block orchestrates the workflow: it first calls parse_args() to retrieve the two number arguments. Each argument is then passed through convert_to_float() to validate and convert to float. The validated numbers are fed to add_numbers() to compute the sum. Finally, print_result() outputs the result. The main block should also handle exceptions from conversion or addition and display user-friendly error messages before exiting with a non-zero status code."
+    "main_logic_description": "The main() function orchestrates the CLI workflow: it first parses user inputs, then validates the source and target units. It converts the numeric temperature, formats the conversion result, and outputs it. Error handling ensures that invalid inputs or unsupported units are reported cleanly, and the program exits with an appropriate status code."
 }

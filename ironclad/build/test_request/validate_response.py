@@ -1,36 +1,35 @@
-import logging
+import re
 import requests
 
-def validate_response(response: requests.Response) -> bool:
+def validate_response(response: requests.Response, expected_status: int = 200) -> bool:
     """Validate an HTTP response.
 
     Parameters
     ----------
     response : requests.Response
-        The HTTP response to validate.
+        The response object to validate.
+    expected_status : int, optional
+        The expected HTTP status code (default 200).
 
     Returns
     -------
     bool
-        ``True`` if the status code indicates success (200–299).
-
-    Raises
-    ------
-    requests.HTTPError
-        If the status code indicates a failure. The error message contains the
-        status code and reason phrase.
-
-    Notes
-    -----
-    A warning is logged when the status code is 429 (rate limiting) or any
-    5xx server error.
+        ``True`` if the response has the expected status code and a
+        Content‑Type header that matches the pattern ``application/json``;
+        otherwise ``False``.
     """
-    status = response.status_code
-    # Log warnings for rate limiting or server errors
-    if status == 429 or 500 <= status <= 599:
-        logging.warning(f"Received status code {status}: {response.reason}")
-    # Success range
-    if 200 <= status <= 299:
-        return True
-    # Failure: raise HTTPError with message
-    raise requests.HTTPError(f"Status {status}: {response.reason}")
+    if response is None:
+        return False
+    status = getattr(response, "status_code", None)
+    if status != expected_status:
+        return False
+    headers = getattr(response, "headers", None)
+    if not isinstance(headers, dict):
+        return False
+    # Accept both normal and lowercase header keys.
+    content_type = headers.get("Content-Type", headers.get("content-type", ""))
+    if not isinstance(content_type, str):
+        return False
+    # Default pattern is a simple substring match for application/json.
+    pattern = r"application/json"
+    return re.search(pattern, content_type) is not None

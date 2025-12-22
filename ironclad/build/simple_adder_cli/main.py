@@ -1,1 +1,32 @@
-import sys\nfrom parse_args import parse_args\nfrom convert_to_float import convert_to_float\nfrom add_numbers import add_numbers\nfrom print_result import print_result\n\n\ndef main():\n    try:\n        arg1, arg2 = parse_args()\n    except Exception as e:\n        print(f\\"Error parsing arguments: {e}\", file=sys.stderr)\n        sys.exit(1)\n\n    try:\n        num1 = convert_to_float(arg1)\n        num2 = convert_to_float(arg2)\n    except ValueError as e:\n        print(f\\"Invalid number: {e}\", file=sys.stderr)\n        sys.exit(1)\n\n    try:\n        result = add_numbers(num1, num2)\n    except Exception as e:\n        print(f\\"Error adding numbers: {e}\", file=sys.stderr)\n        sys.exit(1)\n\n    print_result(result)\n\n\nif __name__ == \\\"__main__\\\":\n    main()
+import sys
+from parse_args import parse_args
+from convert_to_float import convert_to_float
+from add_numbers import add_numbers
+from print_result import print_result
+
+
+def main():
+    try:
+        arg1, arg2 = parse_args()
+    except Exception as e:
+        print(f"Error parsing arguments: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        num1 = convert_to_float(arg1)
+        num2 = convert_to_float(arg2)
+    except ValueError as e:
+        print(f"Invalid number: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        result = add_numbers(num1, num2)
+    except Exception as e:
+        print(f"Error adding numbers: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    print_result(result)
+
+
+if __name__ == "__main__":
+    main()
