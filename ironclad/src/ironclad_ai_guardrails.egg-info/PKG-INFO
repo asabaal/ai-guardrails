@@ -1,0 +1,52 @@
+Metadata-Version: 2.4
+Name: ironclad-ai-guardrails
+Version: 1.0.0
+Summary: AI-powered code generation, validation, and UI generation framework
+Home-page: https://github.com/ironclad-ai/ironclad
+Author: Ironclad AI Team
+Author-email: Ironclad AI Team <team@ironclad.ai>
+Maintainer-email: Ironclad AI Team <team@ironclad.ai>
+License: MIT
+Project-URL: Homepage, https://github.com/ironclad-ai/ironclad
+Project-URL: Documentation, https://ironclad-ai.readthedocs.io/
+Project-URL: Repository, https://github.com/ironclad-ai/ironclad
+Project-URL: Bug Reports, https://github.com/ironclad-ai/ironclad/issues
+Keywords: ai,code-generation,validation,ui-generation,testing,guardrails,automation,module-forge,cli,web-ui,api-generation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Software Development :: User Interfaces
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.25.0
+Requires-Dist: typing-extensions>=4.0.0
+Requires-Dist: dataclasses>=0.6; python_version < "3.7"
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0; extra == "dev"
+Requires-Dist: pytest-cov>=2.0; extra == "dev"
+Requires-Dist: black>=21.0; extra == "dev"
+Requires-Dist: flake8>=3.8; extra == "dev"
+Requires-Dist: mypy>=0.900; extra == "dev"
+Requires-Dist: isort>=5.0; extra == "dev"
+Provides-Extra: ui
+Requires-Dist: rich>=13.0.0; extra == "ui"
+Requires-Dist: textual>=0.41.0; extra == "ui"
+Provides-Extra: docs
+Requires-Dist: sphinx>=4.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0; extra == "docs"
+Provides-Extra: test
+Requires-Dist: pytest>=6.0; extra == "test"
+Requires-Dist: pytest-cov>=2.0; extra == "test"
+Requires-Dist: coverage>=5.0; extra == "test"
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python

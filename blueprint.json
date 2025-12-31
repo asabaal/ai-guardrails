@@ -1,0 +1,40 @@
+{
+    "module_name": "temp_converter_cli",
+    "dependencies": [
+        "argparse",
+        "sys"
+    ],
+    "functions": [
+        {
+            "name": "parse_args",
+            "signature": "def parse_args() -> argparse.Namespace",
+            "description": "Uses argparse to parse command-line arguments. Expects two positional arguments: the temperature value and the target scale ('c' or 'f'). Optional flag '--to' can also be used to specify target scale. Validates that the temperature value can be converted to a float and that the target scale is either 'c' or 'f'. Raises argparse.ArgumentTypeError for invalid inputs."
+        },
+        {
+            "name": "validate_temperature",
+            "signature": "def validate_temperature(value: str) -> float",
+            "description": "Attempts to convert the input string to a float. Raises ValueError if conversion fails. Handles edge cases such as extremely large or small numbers, and ensures the value is within a reasonable physical range (e.g., -1e6 to 1e6)."
+        },
+        {
+            "name": "celsius_to_fahrenheit",
+            "signature": "def celsius_to_fahrenheit(celsius: float) -> float",
+            "description": "Converts a temperature from Celsius to Fahrenheit using the formula F = C * 9/5 + 32. Handles floating point precision by rounding to a default of 2 decimal places, but the rounding precision can be overridden via an optional parameter."
+        },
+        {
+            "name": "fahrenheit_to_celsius",
+            "signature": "def fahrenheit_to_celsius(fahrenheit: float) -> float",
+            "description": "Converts a temperature from Fahrenheit to Celsius using the formula C = (F - 32) * 5/9. Handles floating point precision by rounding to a default of 2 decimal places, but the rounding precision can be overridden via an optional parameter."
+        },
+        {
+            "name": "format_temperature",
+            "signature": "def format_temperature(value: float, scale: str) -> str",
+            "description": "Formats the temperature value with its unit. For Celsius, appends '\u00b0C'; for Fahrenheit, appends '\u00b0F'. Handles rounding to two decimal places unless a higher precision is explicitly requested. Validates that the scale argument is either 'c' or 'f', raising a ValueError otherwise."
+        },
+        {
+            "name": "main",
+            "signature": "def main() -> None",
+            "description": "Entry point for the CLI. Calls parse_args, validates the temperature, determines which conversion function to use based on the target scale, performs the conversion, formats the output, and prints it to stdout. Includes error handling to capture and display user-friendly messages for invalid arguments."
+        }
+    ],
+    "main_logic_description": "The main block starts by invoking the main() function within a if __name__ == \"__main__\" guard. main() parses command-line arguments, validates the temperature input, decides whether to convert from Celsius to Fahrenheit or vice versa based on the target scale, calls the appropriate conversion function, formats the result with its unit, and prints it. Any exceptions during parsing or conversion are caught and displayed as error messages, ensuring the CLI exits with a non-zero status code when input is invalid."
+}

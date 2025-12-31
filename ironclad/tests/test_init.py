@@ -2,11 +2,7 @@ import pytest
 import sys
 import os
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-
-# Test importing the package
-import src as ironclad_package
+import ironclad_ai_guardrails as ironclad_package
 
 
 class TestInitModule:

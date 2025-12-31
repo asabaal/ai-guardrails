@@ -8,10 +8,7 @@ import sys
 import os
 from unittest.mock import patch, MagicMock
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-
-import module_designer
+import ironclad_ai_guardrails.module_designer as module_designer
 
 
 class TestCleanJson:
@@ -51,7 +48,7 @@ class TestCleanJson:
 class TestDraftBlueprint:
     """Test the draft_blueprint function"""
     
-    @patch('module_designer.ollama.chat')
+    @patch('ironclad_ai_guardrails.module_designer.ollama.chat')
     def test_draft_blueprint_success(self, mock_chat):
         """Test successful blueprint drafting"""
         mock_response = {
@@ -71,7 +68,7 @@ class TestDraftBlueprint:
 class TestModuleDesignerMain:
     """Test module_designer main() function"""
     
-    @patch('module_designer.draft_blueprint')
+    @patch('ironclad_ai_guardrails.module_designer.draft_blueprint')
     @patch('builtins.open', create=True)
     @patch('json.dump')
     @patch('builtins.print')
@@ -89,7 +86,7 @@ class TestModuleDesignerMain:
         mock_dump.assert_called_once()
         mock_print.assert_any_call('[+] Blueprint saved to blueprint.json')
     
-    @patch('module_designer.draft_blueprint')
+    @patch('ironclad_ai_guardrails.module_designer.draft_blueprint')
     @patch('builtins.print')
     def test_main_no_arguments(self, mock_print, mock_draft):
         """Test main with no arguments (lines 50-52)"""
@@ -100,7 +97,7 @@ class TestModuleDesignerMain:
             assert exc_info.value.code == 1
             mock_print.assert_any_call("Usage: python module_designer.py 'I want a tool that...'")
     
-    @patch('module_designer.draft_blueprint')
+    @patch('ironclad_ai_guardrails.module_designer.draft_blueprint')
     @patch('builtins.print')
     def test_main_blueprint_failure(self, mock_print, mock_draft):
         """Test main when blueprint drafting fails"""
@@ -114,7 +111,7 @@ class TestModuleDesignerMain:
                         if '[+] Blueprint saved' in str(call)]
         assert len(success_calls) == 0
     
-    @patch('module_designer.ollama.chat')
+    @patch('ironclad_ai_guardrails.module_designer.ollama.chat')
     def test_draft_blueprint_json_error(self, mock_chat):
         """Test blueprint drafting with JSON error (lines 44-47)"""
         mock_chat.return_value = {
@@ -125,7 +122,7 @@ class TestModuleDesignerMain:
         
         assert result is None
     
-    @patch('module_designer.ollama.chat')
+    @patch('ironclad_ai_guardrails.module_designer.ollama.chat')
     def test_draft_blueprint_ollama_error(self, mock_chat):
         """Test blueprint drafting with ollama error (lines 50-61)"""
         mock_chat.side_effect = Exception("Ollama error")

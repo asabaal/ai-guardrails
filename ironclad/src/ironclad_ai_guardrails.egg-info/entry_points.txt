@@ -1,0 +1,4 @@
+[console_scripts]
+ironclad = ironclad_ai_guardrails.cli:main
+ironclad-ui = ironclad_ai_guardrails.ui_cli:main
+module-forge = ironclad_ai_guardrails.module_forge:main

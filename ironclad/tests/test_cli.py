@@ -5,10 +5,8 @@ import tempfile
 from unittest.mock import patch, MagicMock
 from unittest.mock import mock_open
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-from cli import create_parser, load_prompt_file, main
-import ironclad
+from ironclad_ai_guardrails.cli import create_parser, load_prompt_file, main
+import ironclad_ai_guardrails.ironclad as ironclad
 
 
 class TestCreateParser:
@@ -71,7 +69,7 @@ class TestLoadPromptFile:
 class TestCliMain:
     """Test the main CLI functionality"""
     
-    @patch('cli.ironclad_main')
+    @patch('ironclad_ai_guardrails.cli.ironclad_main')
     def test_main_with_basic_request(self, mock_ironclad_main):
         """Test main function with basic request"""
         mock_ironclad_main.return_value = None
@@ -85,7 +83,7 @@ class TestCliMain:
                 system_prompt=ironclad.DEFAULT_SYSTEM_PROMPT
             )
     
-    @patch('cli.ironclad_main')
+    @patch('ironclad_ai_guardrails.cli.ironclad_main')
     def test_main_with_all_options(self, mock_ironclad_main):
         """Test main function with all CLI options"""
         mock_ironclad_main.return_value = None
@@ -97,7 +95,7 @@ class TestCliMain:
             '--output', 'custom_dir',
             '--prompt-file', 'custom.txt'
         ]):
-            with patch('cli.load_prompt_file', return_value='Custom prompt'):
+            with patch('ironclad_ai_guardrails.cli.load_prompt_file', return_value='Custom prompt'):
                 with patch('builtins.print'):
                     main()
                     mock_ironclad_main.assert_called_once_with(
@@ -107,7 +105,7 @@ class TestCliMain:
                         system_prompt='Custom prompt'
                     )
     
-    @patch('cli.ironclad_main')
+    @patch('ironclad_ai_guardrails.cli.ironclad_main')
     def test_main_with_keyboard_interrupt(self, mock_ironclad_main):
         """Test handling of keyboard interrupt"""
         mock_ironclad_main.side_effect = KeyboardInterrupt()
@@ -118,7 +116,7 @@ class TestCliMain:
                     main()
                     mock_exit.assert_called_once_with(1)
     
-    @patch('cli.ironclad_main')
+    @patch('ironclad_ai_guardrails.cli.ironclad_main')
     def test_main_with_unexpected_error(self, mock_ironclad_main):
         """Test handling of unexpected errors"""
         mock_ironclad_main.side_effect = Exception("Unexpected error")
@@ -133,7 +131,7 @@ class TestCliMain:
 class TestCliIntegration:
     """Integration tests for CLI functionality"""
     
-    @patch('cli.ironclad_main')
+    @patch('ironclad_ai_guardrails.cli.ironclad_main')
     def test_cli_with_custom_prompt_file(self, mock_ironclad_main):
         """Test CLI with custom prompt file loading"""
         mock_ironclad_main.return_value = None
@@ -160,7 +158,7 @@ class TestCliIntegration:
         finally:
             os.unlink(prompt_file)
     
-    @patch('cli.ironclad_main')
+    @patch('ironclad_ai_guardrails.cli.ironclad_main')
     def test_cli_main_as_script(self, mock_ironclad_main):
         """Test CLI main when called as script"""
         mock_ironclad_main.return_value = None
@@ -175,13 +173,13 @@ class TestCliIntegration:
                     system_prompt=ironclad.DEFAULT_SYSTEM_PROMPT
                 )
     
-    @patch('cli.ironclad_main')
+    @patch('ironclad_ai_guardrails.cli.ironclad_main')
     def test_cli_main_block_execution(self, mock_ironclad_main):
         """Test that __main__ block calls main()"""
         mock_ironclad_main.return_value = None
         
         # Test the __main__ block by importing and checking the source
-        import cli
+        import ironclad_ai_guardrails.cli as cli
         import inspect
         source = inspect.getsource(cli)
         assert "if __name__ == '__main__':" in source

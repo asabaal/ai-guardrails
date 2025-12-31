@@ -4,9 +4,6 @@ import os
 import subprocess
 import tempfile
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-
 
 class TestMainBlocks:
     """Test __main__ blocks in modules"""
@@ -24,20 +21,19 @@ class TestMainBlocks:
         # Create a test script that imports and runs ironclad
         test_script = f'''
 import sys
-sys.path.insert(0, "{os.path.dirname(ironclad_path)}")
 
-# Mock the functions to avoid actual execution
+# Mock functions to avoid actual execution
 import unittest.mock
-with unittest.mock.patch('ironclad.generate_candidate') as mock_gen:
-    with unittest.mock.patch('ironclad.validate_candidate') as mock_val:
-        with unittest.mock.patch('ironclad.save_brick') as mock_save:
+with unittest.mock.patch('ironclad_ai_guardrails.ironclad.generate_candidate') as mock_gen:
+    with unittest.mock.patch('ironclad_ai_guardrails.ironclad.validate_candidate') as mock_val:
+        with unittest.mock.patch('ironclad_ai_guardrails.ironclad.save_brick') as mock_save:
             mock_gen.return_value = None
             
             # Simulate command line arguments
             sys.argv = ['ironclad.py', 'test request']
             
-            # Import and execute the module
-            import ironclad
+            # Import and execute module
+            import ironclad_ai_guardrails.ironclad as ironclad
             ironclad.main()
 '''
         
@@ -69,18 +65,17 @@ with unittest.mock.patch('ironclad.generate_candidate') as mock_gen:
         # Create a test script that imports and runs cli
         test_script = f'''
 import sys
-sys.path.insert(0, "{os.path.dirname(cli_path)}")
 
-# Mock the main function to avoid actual execution
+# Mock functions to avoid actual execution
 import unittest.mock
-with unittest.mock.patch('cli.ironclad_main') as mock_main:
+with unittest.mock.patch('ironclad_ai_guardrails.cli.ironclad_main') as mock_main:
     mock_main.return_value = None
     
     # Simulate command line arguments
     sys.argv = ['cli.py', 'test request']
     
-    # Import and execute the module
-    import cli
+    # Import and execute module
+    import ironclad_ai_guardrails.cli as cli
     cli.main()
 '''
         

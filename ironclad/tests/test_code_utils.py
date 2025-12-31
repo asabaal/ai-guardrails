@@ -8,10 +8,7 @@ import json
 import os
 import sys
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-
-import code_utils
+import ironclad_ai_guardrails.code_utils as code_utils
 
 
 class TestDecodeNewlinesInText:

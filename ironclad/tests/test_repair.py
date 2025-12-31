@@ -5,15 +5,13 @@ import sys
 import tempfile
 from unittest.mock import patch, MagicMock
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-import ironclad
+import ironclad_ai_guardrails.ironclad as ironclad
 
 
 class TestRepairCandidate:
     """Test the repair_candidate function"""
     
-    @patch('ironclad.ollama.chat')
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
     def test_repair_candidate_success(self, mock_chat):
         """Test successful repair of candidate"""
         mock_response = {
@@ -38,7 +36,7 @@ class TestRepairCandidate:
         assert "test_fixed_func" in result['test']
         mock_chat.assert_called_once()
     
-    @patch('ironclad.ollama.chat')
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
     def test_repair_candidate_with_custom_model(self, mock_chat):
         """Test repair with custom model and system prompt"""
         mock_response = {
@@ -65,7 +63,7 @@ class TestRepairCandidate:
         system_message = call_args[1]['messages'][0]['content']
         assert "custom prompt" in system_message
     
-    @patch('ironclad.ollama.chat')
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
     def test_repair_candidate_json_decode_error(self, mock_chat):
         """Test repair when AI returns invalid JSON"""
         mock_chat.return_value = {
@@ -84,7 +82,7 @@ class TestRepairCandidate:
             error_calls = [call for call in mock_print.call_args_list if "[!] Repair Error:" in str(call)]
             assert len(error_calls) > 0
     
-    @patch('ironclad.ollama.chat')
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
     def test_repair_candidate_ollama_error(self, mock_chat):
         """Test repair when ollama connection fails"""
         mock_chat.side_effect = Exception("Connection error")
@@ -101,7 +99,7 @@ class TestRepairCandidate:
         """Test that repair prints attempt message"""
         candidate = {"filename": "func", "code": "def func(): pass", "test": "def test_func(): pass"}
         
-        with patch('ironclad.ollama.chat') as mock_chat:
+        with patch('ironclad_ai_guardrails.ironclad.ollama.chat') as mock_chat:
             mock_chat.return_value = {
                 'message': {'content': '{"filename": "func", "code": "def func(): pass", "test": "def test_func(): pass"}'}
             }
@@ -113,7 +111,7 @@ class TestRepairCandidate:
 class TestRepairIntegration:
     """Test repair functionality integration with other ironclad functions"""
     
-    @patch('ironclad.ollama.chat')
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
     @patch('ironclad.validate_candidate')
     def test_repair_workflow_integration(self, mock_validate, mock_chat):
         """Test repair in context of validation failure"""
@@ -155,7 +153,7 @@ class TestRepairIntegration:
         }
         traceback = "NameError: name 'undefined_var' is not defined"
         
-        with patch('ironclad.ollama.chat') as mock_chat:
+        with patch('ironclad_ai_guardrails.ironclad.ollama.chat') as mock_chat:
             mock_chat.return_value = {
                 'message': {
                     'content': '{"filename": "fixed_func", "code": "def fixed_func(): return \'value\'", "test": "def test_fixed_func(): assert fixed_func() == \'value\'"}'

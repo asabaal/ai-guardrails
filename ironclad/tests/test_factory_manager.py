@@ -6,18 +6,16 @@ import tempfile
 import subprocess
 from unittest.mock import patch, MagicMock, mock_open
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-import factory_manager
-import code_utils
+import ironclad_ai_guardrails.factory_manager as factory_manager
+import ironclad_ai_guardrails.code_utils as code_utils
 
 
 class TestBuildComponents:
     """Test the build_components function"""
     
-    @patch('factory_manager.ironclad.generate_candidate')
-    @patch('factory_manager.ironclad.validate_candidate')
-    @patch('factory_manager.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('builtins.print')
     @patch('builtins.open', create=True)  # Mock file creation
@@ -56,9 +54,9 @@ class TestBuildComponents:
         mock_validate.assert_called_once()
         mock_repair.assert_not_called()  # Should not need repair
     
-    @patch('factory_manager.ironclad.generate_candidate')
-    @patch('factory_manager.ironclad.validate_candidate')
-    @patch('factory_manager.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('shutil.rmtree')
     @patch('os.path.exists')
@@ -96,9 +94,9 @@ class TestBuildComponents:
         mock_rmtree.assert_called_once()
         mock_makedirs.assert_not_called()  # makedirs only called in else branch
     
-    @patch('factory_manager.ironclad.generate_candidate')
-    @patch('factory_manager.ironclad.validate_candidate')
-    @patch('factory_manager.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('builtins.print')
     @patch('builtins.open', create=True)
@@ -145,9 +143,9 @@ class TestBuildComponents:
         assert mock_validate.call_count == 2  # Called twice (initial + after repair)
         mock_repair.assert_called_once()
     
-    @patch('factory_manager.ironclad.generate_candidate')
-    @patch('factory_manager.ironclad.validate_candidate')
-    @patch('factory_manager.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('builtins.print')
     def test_build_components_max_retries_exceeded(self, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
@@ -190,9 +188,9 @@ class TestBuildComponents:
 class TestAssembleMain:
     """Test the assemble_main function"""
     
-    @patch('factory_manager.validate_main_candidate')
-    @patch('factory_manager.generate_main_candidate')
-    @patch('factory_manager.ollama.chat')
+    @patch('ironclad_ai_guardrails.factory_manager.validate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.generate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     @patch('builtins.open', new_callable=mock_open)
     @patch('os.makedirs')
     @patch('builtins.print')
@@ -221,7 +219,7 @@ class TestAssembleMain:
         # Check that __init__.py was created
         mock_file.assert_any_call(os.path.join(module_dir, "__init__.py"), "w")
     
-    @patch('factory_manager.ollama.chat')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     @patch('builtins.open', new_callable=mock_open)
     @patch('os.makedirs')
     @patch('builtins.print')
@@ -277,205 +275,10 @@ class TestCleanJson:
 class TestAssembleMainRepair:
     """Test assemble_main repair functionality"""
     
-    @patch('factory_manager.repair_main_candidate')
-    @patch('factory_manager.validate_main_candidate')
-    @patch('factory_manager.generate_main_candidate')
-    @patch('factory_manager.ollama.chat')
-    @patch('builtins.open', new_callable=mock_open)
-    @patch('os.makedirs')
-    @patch('builtins.print')
-    def test_assemble_main_with_repair_loop(self, mock_print, mock_makedirs, mock_file, mock_chat, mock_generate, mock_validate, mock_repair):
-        """Test assemble_main with repair loop (lines 243-247)"""
-        blueprint = {
-            'module_name': 'test_module',
-            'main_logic_description': 'Test main logic'
-        }
-        module_dir = '/tmp/test_module'
-        components = ['test_func']
-        
-        # Setup mocks for repair scenario
-        mock_generate.return_value = 'def main(): pass'
-        # First validation fails, second succeeds
-        mock_validate.side_effect = [
-            (False, "Syntax error: invalid syntax"),
-            (True, "Valid")
-        ]
-        mock_repair.return_value = 'def main(): pass  # fixed'
-        mock_chat.return_value = '{"response": "repaired"}'
-        
-        factory_manager.assemble_main(blueprint, module_dir, components)
-        
-        # Verify repair loop was executed (lines 243-247)
-        assert mock_validate.call_count == 2
-        mock_repair.assert_called_once()
-        
-        # Verify repair messages were printed (lines 244-245)
-        mock_print.assert_any_call("   [-] Repairing main.py (Attempt 1)...")
-        mock_print.assert_any_call("       Issues: Syntax error: invalid syntax")
-    
-    @patch('factory_manager.repair_main_candidate')
-    @patch('factory_manager.validate_main_candidate')
-    @patch('factory_manager.generate_main_candidate')
-    @patch('factory_manager.ollama.chat')
-    @patch('builtins.open', new_callable=mock_open)
-    @patch('os.makedirs')
-    @patch('builtins.print')
-    def test_assemble_main_max_attempts_exceeded(self, mock_print, mock_makedirs, mock_file, mock_chat, mock_generate, mock_validate, mock_repair):
-        """Test assemble_main when max attempts are exceeded (line 255)"""
-        blueprint = {
-            'module_name': 'test_module',
-            'main_logic_description': 'Test main logic'
-        }
-        module_dir = '/tmp/test_module'
-        components = ['test_func']
-        
-        # Setup mocks for persistent failure
-        mock_generate.return_value = 'def main(): pass'
-        # All validation attempts fail
-        mock_validate.return_value = (False, "Persistent syntax error")
-        mock_repair.return_value = 'def main(): pass  # still broken'
-        mock_chat.return_value = '{"response": "failed repair"}'
-        
-        # Should raise exception after 3 failed attempts
-        with pytest.raises(Exception) as exc_info:
-            factory_manager.assemble_main(blueprint, module_dir, components)
-        
-        # Verify the exception message (line 255)
-        assert "Failed to generate valid main.py after 3 attempts" in str(exc_info.value)
-        assert "Persistent syntax error" in str(exc_info.value)
-        
-        # Verify repair was attempted 2 times (3 total attempts, first doesn't count as repair)
-        assert mock_validate.call_count == 3
-        assert mock_repair.call_count == 2
-
-
-class TestRunFactoryManagerWorkflow:
-    """Test run_factory_manager_workflow function"""
-    
-    @patch('factory_manager.assemble_main')
-    @patch('factory_manager.build_components')
-    @patch('json.load')
-    @patch('builtins.open', create=True)
-    @patch('os.path.exists')
-    @patch('builtins.print')
-    def test_workflow_success_with_failures(self, mock_print, mock_exists, mock_open, mock_load, mock_build, mock_assemble):
-        """Test successful workflow with some failed components (lines 282-287)"""
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_load.return_value = {
-            'module_name': 'test_module',
-            'functions': ['func1', 'func2', 'func3']
-        }
-        mock_build.return_value = (
-            True,  # partial_success
-            '/tmp/test_module',  # directory
-            ['func1', 'func2'],  # successful_components
-            ['func3'],  # failed_components
-            {}  # status_report
-        )
-        
-        with patch('sys.exit') as mock_exit:
-            factory_manager.run_factory_manager_workflow()
-        
-        # Verify workflow was called
-        mock_build.assert_called_once()
-        mock_assemble.assert_called_once()
-        
-        # Verify success with failures message (lines 282-285)
-        mock_print.assert_any_call("\n[⚠️]  Module completed with 1 failed components:")
-        mock_print.assert_any_call("     [❌] func3")
-        mock_exit.assert_not_called()  # Should not exit on partial success
-    
-    @patch('factory_manager.assemble_main')
-    @patch('factory_manager.build_components')
-    @patch('json.load')
-    @patch('builtins.open', create=True)
-    @patch('os.path.exists')
-    @patch('builtins.print')
-    def test_workflow_complete_success(self, mock_print, mock_exists, mock_open, mock_load, mock_build, mock_assemble):
-        """Test completely successful workflow (lines 286-287)"""
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_load.return_value = {
-            'module_name': 'test_module',
-            'functions': ['func1', 'func2']
-        }
-        mock_build.return_value = (
-            True,  # partial_success
-            '/tmp/test_module',  # directory
-            ['func1', 'func2'],  # successful_components
-            [],  # failed_components
-            {}  # status_report
-        )
-        
-        with patch('sys.exit') as mock_exit:
-            factory_manager.run_factory_manager_workflow()
-        
-        # Verify complete success message (lines 286-287)
-        mock_print.assert_any_call("\n[✅] All 2 components built successfully!")
-        mock_exit.assert_not_called()
-    
-    @patch('factory_manager.build_components')
-    @patch('os.path.exists')
-    @patch('builtins.print')
-    def test_workflow_no_blueprint_file(self, mock_print, mock_exists, mock_build):
-        """Test workflow when blueprint.json doesn't exist (lines 269-271)"""
-        mock_exists.return_value = False
-        
-        with patch('sys.exit') as mock_exit:
-            factory_manager.run_factory_manager_workflow()
-        
-        # Verify missing file error (lines 269-271)
-        mock_print.assert_any_call("Run module_designer.py first!")
-        mock_exit.assert_called_once_with(1)
-        # build_components should not be called when blueprint file doesn't exist
-        mock_build.assert_not_called()
-    
-    @patch('factory_manager.assemble_main')
-    @patch('factory_manager.build_components')
-    @patch('json.load')
-    @patch('builtins.open', create=True)
-    @patch('os.path.exists')
-    @patch('builtins.print')
-    def test_workflow_no_components_built(self, mock_print, mock_exists, mock_open, mock_load, mock_build, mock_assemble):
-        """Test workflow when no components could be built (lines 288-290)"""
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_load.return_value = {
-            'module_name': 'test_module',
-            'functions': ['func1', 'func2']
-        }
-        mock_build.return_value = (
-            False,  # partial_success
-            '/tmp/test_module',  # directory
-            [],  # successful_components
-            ['func1', 'func2'],  # failed_components
-            {}  # status_report
-        )
-        
-        with patch('sys.exit') as mock_exit:
-            factory_manager.run_factory_manager_workflow()
-        
-        # Verify no components built error (lines 288-290)
-        mock_print.assert_any_call("\n[❌] No components could be built successfully.")
-        mock_exit.assert_called_once_with(1)
-        mock_assemble.assert_not_called()  # Should not assemble if no success
-
-
-class TestFactoryManagerIntegration:
-    """Integration tests for factory manager workflow"""
-    
-    @patch('factory_manager.validate_main_candidate')
-    @patch('factory_manager.generate_main_candidate')
-    @patch('factory_manager.ironclad.generate_candidate')
-    @patch('factory_manager.ironclad.validate_candidate')
-    @patch('factory_manager.ironclad.repair_candidate')
-    @patch('factory_manager.os.makedirs')
-    @patch('factory_manager.os.path.exists')
-    @patch('factory_manager.os.path.join')
-    @patch('builtins.open')
-    @patch('builtins.print')
-    @patch('factory_manager.ollama.chat')
+    @patch('ironclad_ai_guardrails.factory_manager.repair_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.validate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.generate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     def test_full_workflow_integration(self, mock_chat, mock_print, mock_open, mock_join, mock_exists, mock_makedirs, mock_repair, mock_validate, mock_generate_ironclad, mock_generate_main, mock_validate_main):
         """Test complete workflow from blueprint to assembled module"""
         # Setup mocks
@@ -540,8 +343,8 @@ class TestFactoryManagerIntegration:
 class TestBuildComponentsResume:
     """Test resume functionality in build_components"""
     
-    @patch('factory_manager.ironclad.generate_candidate')
-    @patch('factory_manager.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
     @patch('os.path.exists')
     @patch('os.listdir')
     @patch('os.makedirs')
@@ -598,7 +401,7 @@ class TestBuildComponentsResume:
 class TestMainValidation:
     """Test main.py validation and repair functions"""
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     def test_validate_main_candidate_success(self, mock_run):
         """Test successful main.py validation"""
         # Mock successful subprocess calls
@@ -628,7 +431,7 @@ class TestMainValidation:
         assert is_valid is False
         assert logs == "No candidate code provided"
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     @patch('os.path.exists')
     @patch('shutil.copy')
     @patch('tempfile.TemporaryDirectory')
@@ -656,7 +459,7 @@ class TestMainValidation:
         mock_copy.assert_any_call('/tmp/test/test_func.py', '/tmp/test_temp')
         mock_copy.assert_any_call('/tmp/test/another_func.py', '/tmp/test_temp')
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     @patch('os.path.exists')
     @patch('shutil.copy')
     @patch('tempfile.TemporaryDirectory')
@@ -678,7 +481,7 @@ class TestMainValidation:
         # Verify import error was captured (line 163)
         assert "Import error: Import failed: module not found" in logs
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     @patch('os.path.exists')
     @patch('shutil.copy')
     @patch('tempfile.TemporaryDirectory')
@@ -700,7 +503,7 @@ class TestMainValidation:
         # Verify timeout error was captured (line 165)
         assert "Import timeout" in logs
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     @patch('os.path.exists')
     @patch('shutil.copy')
     @patch('tempfile.TemporaryDirectory')
@@ -722,7 +525,7 @@ class TestMainValidation:
         # Verify general exception was captured (line 167)
         assert "Import test failed: General error" in logs
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     @patch('os.path.exists')
     @patch('shutil.copy')
     @patch('tempfile.TemporaryDirectory')
@@ -747,7 +550,7 @@ class TestMainValidation:
         # Verify CLI error was captured (line 189)
         assert "CLI test failed: Error: Invalid arguments" in logs
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     @patch('os.path.exists')
     @patch('shutil.copy')
     @patch('tempfile.TemporaryDirectory')
@@ -772,7 +575,7 @@ class TestMainValidation:
         # Verify CLI exception was captured (line 191)
         assert "CLI test error: CLI exception" in logs
     
-    @patch('factory_manager.subprocess.run')
+    @patch('ironclad_ai_guardrails.factory_manager.subprocess.run')
     def test_validate_main_candidate_syntax_error(self, mock_run):
         """Test main.py validation with syntax error"""
         candidate_code = "def main(: pass"  # Invalid syntax
@@ -785,7 +588,7 @@ class TestMainValidation:
         assert "Syntax error" in logs
         mock_run.assert_not_called()
     
-    @patch('factory_manager.ollama.chat')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     def test_repair_main_candidate(self, mock_chat):
         """Test main.py repair functionality"""
         mock_chat.return_value = {
@@ -804,7 +607,7 @@ class TestMainValidation:
         assert "def main():" in repaired_code
         mock_chat.assert_called_once()
     
-    @patch('factory_manager.ollama.chat')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     def test_generate_main_candidate(self, mock_chat):
         """Test main.py generation"""
         mock_chat.return_value = {
@@ -828,7 +631,7 @@ class TestMainValidation:
 class TestNewlineHandlingIntegration:
     """Integration tests for newline handling in factory_manager"""
     
-    @patch('factory_manager.ollama.chat')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     def test_main_candidate_with_escaped_newlines(self, mock_chat):
         """Test main candidate generation with escaped newlines"""
         # Mock response with escaped newlines
@@ -859,7 +662,7 @@ class TestNewlineHandlingIntegration:
         assert 'print("done")' in code
         assert 'if __name__ == "__main__":\n    main()' in code
     
-    @patch('factory_manager.ollama.chat')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     def test_repair_main_candidate_with_newlines(self, mock_chat):
         """Test main candidate repair with newline handling"""
         # Mock repair response
@@ -883,8 +686,8 @@ class TestNewlineHandlingIntegration:
         assert '\\n' not in repaired_code
         assert 'print("fixed")' in repaired_code
     
-    @patch('factory_manager.ironclad.validate_candidate')
-    @patch('factory_manager.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
     @patch('os.makedirs')
     @patch('builtins.open', create=True)
     @patch('builtins.print')

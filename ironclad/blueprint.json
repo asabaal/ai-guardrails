@@ -1,5 +1,5 @@
 {
-    "module_name": "temperature_converter_cli",
+    "module_name": "temp_converter",
     "dependencies": [
         "argparse",
         "sys",
@@ -7,25 +7,35 @@
     ],
     "functions": [
         {
-            "name": "parse_arguments",
-            "signature": "def parse_arguments(args: List[str]) -> argparse.Namespace",
-            "description": "Parses the command line arguments using argparse. Expects a temperature value and a source unit flag (--celsius or --fahrenheit). Raises an error if both or neither unit flags are provided, or if the value cannot be converted to float. Returns an argparse.Namespace containing the parsed value and unit."
+            "name": "parse_args",
+            "signature": "def parse_args(argv: List[str]) -> argparse.Namespace",
+            "description": "Parse command\u2011line arguments. Expects a numeric value with --value/-v, a source unit with --unit/-u ('c' or 'f'), and a target unit with --target/-t ('c' or 'f'). Validates that units are one of the allowed characters and that target is the opposite of source. Provides helpful error messages and exits if parsing fails."
         },
         {
-            "name": "convert_temperature",
-            "signature": "def convert_temperature(value: float, from_unit: str, to_unit: str) -> float",
-            "description": "Converts a temperature value from one unit to another. Supports 'celsius' and 'fahrenheit' (case-insensitive). If from_unit and to_unit are identical, returns the original value. Uses the formulas: F = C * 9/5 + 32 and C = (F - 32) * 5/9. Raises ValueError for unsupported units."
+            "name": "validate_temperature",
+            "signature": "def validate_temperature(value_str: str) -> float",
+            "description": "Attempts to convert the input string to a float. Raises ValueError with a clear message if conversion fails, covering cases such as empty string, non\u2011numeric characters, or overflow. Returns the numeric value on success."
+        },
+        {
+            "name": "celsius_to_fahrenheit",
+            "signature": "def celsius_to_fahrenheit(celsius: float) -> float",
+            "description": "Perform the standard Celsius to Fahrenheit conversion: F = C * 9/5 + 32. Handles extreme float values by letting Python's IEEE\u2011754 rules apply; no special clipping is performed."
+        },
+        {
+            "name": "fahrenheit_to_celsius",
+            "signature": "def fahrenheit_to_celsius(fahrenheit: float) -> float",
+            "description": "Perform the standard Fahrenheit to Celsius conversion: C = (F - 32) * 5/9. Handles extreme float values similarly to the other conversion function."
         },
         {
             "name": "format_output",
-            "signature": "def format_output(value: float, from_unit: str, to_unit: str) -> str",
-            "description": "Formats the conversion result into a user-friendly string. Rounds the output to two decimal places and appends the appropriate unit abbreviations ('C' or 'F'). Example: \"100.00 C is 212.00 F\"."
+            "signature": "def format_output(original_value: float, original_unit: str, converted_value: float, target_unit: str) -> str",
+            "description": "Return a human\u2011readable string showing the original temperature, its unit, the converted temperature, and its unit. Formats numbers to two decimal places and normalises unit symbols to uppercase 'C' and 'F'."
         },
         {
             "name": "main",
-            "signature": "def main() -> None",
-            "description": "Entry point for the CLI. Calls parse_arguments with sys.argv[1:], performs conversion via convert_temperature, formats the result with format_output, and prints it to stdout. Handles exceptions by printing a concise error message to stderr and exiting with a non-zero status."
+            "signature": "def main(argv: List[str]) -> None",
+            "description": "Entry point for the CLI. Calls parse_args to get the Namespace, validates the numeric value, selects the appropriate conversion function based on the source and target units, formats the output string, prints it to stdout, and exits with code 0. If any exception occurs, prints an error message to stderr and exits with a non\u2011zero code."
         }
     ],
-    "main_logic_description": "The main() function orchestrates the CLI workflow: it first parses user inputs, then validates the source and target units. It converts the numeric temperature, formats the conversion result, and outputs it. Error handling ensures that invalid inputs or unsupported units are reported cleanly, and the program exits with an appropriate status code."
+    "main_logic_description": "The main block first parses command\u2011line arguments using the parse_args function. It then validates and converts the provided temperature string to a float via validate_temperature. Depending on the source unit, it selects celsius_to_fahrenheit or fahrenheit_to_celsius, performs the conversion, and formats the result with format_output. Finally, it prints the formatted string to the console. Errors in parsing or validation trigger a user\u2011friendly message and an exit code of 1, ensuring the tool behaves predictably in shell scripts or other automated environments."
 }

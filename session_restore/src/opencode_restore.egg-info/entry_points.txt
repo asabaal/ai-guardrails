@@ -1,0 +1,2 @@
+[console_scripts]
+opencode-restore = opencode_restore.cli:main

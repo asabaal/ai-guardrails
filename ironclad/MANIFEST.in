@@ -1,0 +1,40 @@
+# Include the source files
+include src/**/*.py
+include src/**/*.json
+include src/**/*.txt
+
+# Include verified bricks
+recursive-include src/verified_bricks *.py
+
+# Include tests
+recursive-include tests *.py
+
+# Include examples
+recursive-include examples *.py
+
+# Include documentation
+include README.md
+include LICENSE
+include CHANGELOG.md
+include requirements.txt
+include pyproject.toml
+include setup.py
+
+# Include configuration files
+include blueprint.json
+
+# Exclude compiled files and caches
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude .git*
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude .coverage
+global-exclude .pytest_cache
+
+# Exclude build and dist directories
+prune build
+prune dist
+prune *.egg-info

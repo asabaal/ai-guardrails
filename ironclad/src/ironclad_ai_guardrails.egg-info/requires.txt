@@ -1,0 +1,26 @@
+requests>=2.25.0
+typing-extensions>=4.0.0
+
+[:python_version < "3.7"]
+dataclasses>=0.6
+
+[dev]
+pytest>=6.0
+pytest-cov>=2.0
+black>=21.0
+flake8>=3.8
+mypy>=0.900
+isort>=5.0
+
+[docs]
+sphinx>=4.0
+sphinx-rtd-theme>=1.0
+
+[test]
+pytest>=6.0
+pytest-cov>=2.0
+coverage>=5.0
+
+[ui]
+rich>=13.0.0
+textual>=0.41.0

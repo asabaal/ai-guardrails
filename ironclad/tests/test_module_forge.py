@@ -10,18 +10,15 @@ import sys
 import argparse
 from unittest.mock import patch, MagicMock, mock_open
 
-# Add src to path for importing
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
-
-import module_forge
+import ironclad_ai_guardrails.module_forge as module_forge
 
 
 class TestModuleForgeMain:
     """Test the main module_forge integration function"""
     
-    @patch('module_forge.draft_blueprint')
-    @patch('factory_manager.build_components')
-    @patch('factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.module_forge.draft_blueprint')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
     @patch('builtins.open', new_callable=mock_open)
     @patch('builtins.print')
     def test_main_blueprint_failure(self, mock_print, mock_file, mock_assemble, mock_build, mock_draft):
@@ -36,9 +33,9 @@ class TestModuleForgeMain:
             assert exc_info.value.code == 1
             mock_print.assert_any_call('[❌] Failed to generate blueprint. Aborting.')
     
-    @patch('module_forge.draft_blueprint')
-    @patch('factory_manager.build_components')
-    @patch('factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.module_forge.draft_blueprint')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
     @patch('builtins.open', new_callable=mock_open)
     @patch('builtins.print')
     def test_main_build_failure(self, mock_print, mock_file, mock_assemble, mock_build, mock_draft):
@@ -58,9 +55,9 @@ class TestModuleForgeMain:
             assert exc_info.value.code == 1
             mock_print.assert_any_call('[❌] No components could be built successfully. Aborting.')
     
-    @patch('module_forge.draft_blueprint')
-    @patch('factory_manager.build_components')
-    @patch('factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.module_forge.draft_blueprint')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
     @patch('builtins.open', new_callable=mock_open)
     @patch('builtins.print')
     def test_main_assembly_failure(self, mock_print, mock_file, mock_assemble, mock_build, mock_draft):
@@ -85,9 +82,9 @@ class TestModuleForgeMain:
 class TestModuleForgeIntegration:
     """Test integration between module_forge components"""
     
-    @patch('module_forge.draft_blueprint')
-    @patch('factory_manager.build_components')
-    @patch('factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.module_forge.draft_blueprint')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
     @patch('builtins.open', new_callable=mock_open)
     def test_full_integration_workflow(self, mock_file, mock_assemble, mock_build, mock_draft):
         """Test complete integration workflow"""
@@ -135,9 +132,9 @@ class TestModuleForgeIntegration:
 class TestModuleForgeResume:
     """Test resume functionality in module_forge"""
     
-    @patch('module_forge.draft_blueprint')
-    @patch('factory_manager.build_components')
-    @patch('factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.module_forge.draft_blueprint')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
     @patch('builtins.open', new_callable=mock_open)
     @patch('builtins.print')
     def test_resume_mode_flag(self, mock_print, mock_file, mock_assemble, mock_build, mock_draft):
@@ -168,9 +165,9 @@ class TestModuleForgeResume:
 class TestModuleForgePartialFailure:
     """Test module_forge with partial component failures"""
     
-    @patch('module_forge.draft_blueprint')
-    @patch('factory_manager.build_components')
-    @patch('factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.module_forge.draft_blueprint')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
     @patch('builtins.open', new_callable=mock_open)
     @patch('builtins.print')
     def test_partial_component_failure(self, mock_print, mock_file, mock_assemble, mock_build, mock_draft):
