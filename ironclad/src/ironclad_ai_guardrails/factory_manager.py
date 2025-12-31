@@ -8,6 +8,7 @@ import shutil
 import subprocess
 # We import logic from your existing Ironclad tool
 from ironclad_ai_guardrails.code_utils import clean_json_response as utils_clean_json, clean_code_content, validate_python_syntax
+from ironclad_ai_guardrails.ironclad import generate_candidate, validate_candidate, repair_candidate, save_brick
 
 MODEL_NAME = "gpt-oss:20b"
 

@@ -5,7 +5,7 @@ This package provides tools for generating Python code using AI models
 and automatically verifying the generated code through comprehensive testing.
 """
 
-from .ironclad import (
+from ironclad_ai_guardrails.ironclad import (
     clean_json_response,
     generate_candidate,
     validate_candidate,
@@ -19,6 +19,7 @@ from .ironclad import (
 )
 
 __version__ = "1.0.0"
+
 __all__ = [
     "clean_json_response",
     "generate_candidate",
@@ -29,5 +30,5 @@ __all__ = [
     "DEFAULT_MODEL_NAME",
     "DEFAULT_OUTPUT_DIR",
     "DEFAULT_SYSTEM_PROMPT",
-    "MAX_RETRIES"
+    "MAX_RETRIES",
 ]

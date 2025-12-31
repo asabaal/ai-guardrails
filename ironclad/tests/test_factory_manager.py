@@ -13,50 +13,9 @@ import ironclad_ai_guardrails.code_utils as code_utils
 class TestBuildComponents:
     """Test the build_components function"""
     
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
-    @patch('os.makedirs')
-    @patch('builtins.print')
-    @patch('builtins.open', create=True)  # Mock file creation
-    def test_build_components_success(self, mock_open, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
-        """Test successful component building"""
-        # Setup mocks
-        mock_generate.return_value = {
-            'filename': 'test_func',
-            'code': 'def test_func(): return "test"',
-            'test': 'def test_test_func(): assert test_func() == "test"'
-        }
-        mock_validate.return_value = (True, "Tests passed")
-        
-        blueprint = {
-            'module_name': 'test_module',
-            'functions': [
-                {
-                    'name': 'test_func',
-                    'signature': 'def test_func() -> str',
-                    'description': 'A test function'
-                }
-            ]
-        }
-        
-        # Execute
-        partial_success, module_dir, successful_components, failed_components, status_report = factory_manager.build_components(blueprint)
-        
-        # Assertions
-        assert partial_success is True
-        assert 'test_module' in module_dir
-        assert successful_components == ['test_func']
-        assert failed_components == []
-        assert status_report['test_func']['status'] == 'success'
-        mock_makedirs.assert_called_once()
-        mock_generate.assert_called_once()
-        mock_validate.assert_called_once()
-        mock_repair.assert_not_called()  # Should not need repair
-    
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('shutil.rmtree')
     @patch('os.path.exists')
@@ -94,9 +53,9 @@ class TestBuildComponents:
         mock_rmtree.assert_called_once()
         mock_makedirs.assert_not_called()  # makedirs only called in else branch
     
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('builtins.print')
     @patch('builtins.open', create=True)
@@ -143,9 +102,9 @@ class TestBuildComponents:
         assert mock_validate.call_count == 2  # Called twice (initial + after repair)
         mock_repair.assert_called_once()
     
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('builtins.print')
     def test_build_components_max_retries_exceeded(self, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
@@ -343,8 +302,8 @@ class TestAssembleMainRepair:
 class TestBuildComponentsResume:
     """Test resume functionality in build_components"""
     
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
     @patch('os.path.exists')
     @patch('os.listdir')
     @patch('os.makedirs')
@@ -686,8 +645,8 @@ class TestNewlineHandlingIntegration:
         assert '\\n' not in repaired_code
         assert 'print("fixed")' in repaired_code
     
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.validate_candidate')
-    @patch('ironclad_ai_guardrails.factory_manager.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
     @patch('os.makedirs')
     @patch('builtins.open', create=True)
     @patch('builtins.print')

@@ -1,4 +1,23 @@
-def function_name(a, b):
-    if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
-        raise TypeError('Both arguments must be int or float')
-    return a + b
+import urllib.request
+from typing import Optional
+
+def get_http_status(url: str) -> Optional[int]:
+    """Return the HTTP status code for a GET request to *url*.
+
+    Parameters
+    ----------
+    url : str
+        The URL to request.
+
+    Returns
+    -------
+    Optional[int]
+        The HTTP status code if the request succeeds; otherwise ``None``.
+    """
+    if not url:
+        return None
+    try:
+        with urllib.request.urlopen(url, timeout=5) as response:
+            return response.getcode()
+    except Exception:
+        return None

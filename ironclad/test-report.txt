@@ -1,0 +1,2520 @@
+(devtools) asabaal@asabaal-Asabaal-Ventures:/mnt/storage/repos/ai-guardrails/ironclad$ pytest --cov=src --cov-report=term-missing
+===================================================== test session starts ======================================================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0 -- /mnt/storage/python_env/devtools/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/storage/repos/ai-guardrails/ironclad
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
+collected 206 items                                                                                                            
+
+tests/test_cli.py::TestCreateParser::test_create_parser_exists PASSED                                                    [  0%]
+tests/test_cli.py::TestCreateParser::test_parser_with_request_only PASSED                                                [  0%]
+tests/test_cli.py::TestCreateParser::test_parser_with_all_arguments PASSED                                               [  1%]
+tests/test_cli.py::TestLoadPromptFile::test_load_prompt_file_success PASSED                                              [  1%]
+tests/test_cli.py::TestLoadPromptFile::test_load_prompt_file_not_found PASSED                                            [  2%]
+tests/test_cli.py::TestLoadPromptFile::test_load_prompt_file_permission_error PASSED                                     [  2%]
+tests/test_cli.py::TestCliMain::test_main_with_basic_request PASSED                                                      [  3%]
+tests/test_cli.py::TestCliMain::test_main_with_all_options PASSED                                                        [  3%]
+tests/test_cli.py::TestCliMain::test_main_with_keyboard_interrupt PASSED                                                 [  4%]
+tests/test_cli.py::TestCliMain::test_main_with_unexpected_error PASSED                                                   [  4%]
+tests/test_cli.py::TestCliIntegration::test_cli_with_custom_prompt_file PASSED                                           [  5%]
+tests/test_cli.py::TestCliIntegration::test_cli_main_as_script PASSED                                                    [  5%]
+tests/test_cli.py::TestCliIntegration::test_cli_main_block_execution PASSED                                              [  6%]
+tests/test_code_utils.py::TestDecodeNewlinesInText::test_simple_newline_decoding PASSED                                  [  6%]
+tests/test_code_utils.py::TestDecodeNewlinesInText::test_escape_quote_decoding PASSED                                    [  7%]
+tests/test_code_utils.py::TestDecodeNewlinesInText::test_combined_decoding PASSED                                        [  7%]
+tests/test_code_utils.py::TestDecodeNewlinesInText::test_no_decoding_needed PASSED                                       [  8%]
+tests/test_code_utils.py::TestDecodeNewlinesInText::test_non_string_input PASSED                                         [  8%]
+tests/test_code_utils.py::TestDecodeNewlinesRecursive::test_dict_decoding PASSED                                         [  9%]
+tests/test_code_utils.py::TestDecodeNewlinesRecursive::test_nested_dict_decoding PASSED                                  [  9%]
+tests/test_code_utils.py::TestDecodeNewlinesRecursive::test_list_decoding PASSED                                         [ 10%]
+tests/test_code_utils.py::TestDecodeNewlinesRecursive::test_mixed_structure_decoding PASSED                              [ 10%]
+tests/test_code_utils.py::TestCleanJsonResponse::test_clean_markdown_fences FAILED                                       [ 11%]
+tests/test_code_utils.py::TestCleanJsonResponse::test_clean_without_fences PASSED                                        [ 11%]
+tests/test_code_utils.py::TestCleanJsonResponse::test_complex_json_cleaning PASSED                                       [ 12%]
+tests/test_code_utils.py::TestCleanJsonResponse::test_malformed_json_fallback PASSED                                     [ 12%]
+tests/test_code_utils.py::TestCleanCodeContent::test_basic_code_cleaning PASSED                                          [ 13%]
+tests/test_code_utils.py::TestCleanCodeContent::test_markdown_removal PASSED                                             [ 13%]
+tests/test_code_utils.py::TestCleanCodeContent::test_code_with_excessive_blank_lines PASSED                              [ 14%]
+tests/test_code_utils.py::TestCleanCodeContent::test_code_already_clean PASSED                                           [ 14%]
+tests/test_code_utils.py::TestCleanCodeContent::test_non_string_input PASSED                                             [ 15%]
+tests/test_code_utils.py::TestValidatePythonSyntax::test_valid_syntax PASSED                                             [ 15%]
+tests/test_code_utils.py::TestValidatePythonSyntax::test_invalid_syntax PASSED                                           [ 16%]
+tests/test_code_utils.py::TestValidatePythonSyntax::test_empty_code PASSED                                               [ 16%]
+tests/test_code_utils.py::TestValidatePythonSyntax::test_import_syntax PASSED                                            [ 16%]
+tests/test_code_utils.py::TestFixCommonCodeIssues::test_newline_normalization FAILED                                     [ 17%]
+tests/test_code_utils.py::TestFixCommonCodeIssues::test_operator_spacing PASSED                                          [ 17%]
+tests/test_code_utils.py::TestFixCommonCodeIssues::test_excessive_whitespace_cleanup FAILED                              [ 18%]
+tests/test_code_utils.py::TestSanitizeJsonContent::test_dict_sanitization PASSED                                         [ 18%]
+tests/test_code_utils.py::TestSanitizeJsonContent::test_list_sanitization PASSED                                         [ 19%]
+tests/test_code_utils.py::TestExtractCodeFromResponse::test_extract_from_code_blocks PASSED                              [ 19%]
+tests/test_code_utils.py::TestExtractCodeFromResponse::test_extract_from_python_patterns PASSED                          [ 20%]
+tests/test_code_utils.py::TestExtractCodeFromResponse::test_no_code_found FAILED                                         [ 20%]
+tests/test_code_utils.py::TestExtractCodeFromResponse::test_multiple_code_blocks PASSED                                  [ 21%]
+tests/test_code_utils.py::TestIntegration::test_complete_newline_handling_pipeline PASSED                                [ 21%]
+tests/test_code_utils.py::TestIntegration::test_problematic_case_from_existing_build PASSED                              [ 22%]
+tests/test_factory_manager.py::TestBuildComponents::test_build_components_success FAILED                                 [ 22%]
+tests/test_factory_manager.py::TestBuildComponents::test_build_components_smart_mode_existing_dir FAILED                 [ 23%]
+tests/test_factory_manager.py::TestBuildComponents::test_build_components_with_repair FAILED                             [ 23%]
+tests/test_factory_manager.py::TestBuildComponents::test_build_components_max_retries_exceeded FAILED                    [ 24%]
+tests/test_factory_manager.py::TestAssembleMain::test_assemble_main_success PASSED                                       [ 24%]
+tests/test_factory_manager.py::TestAssembleMain::test_assemble_main_json_error PASSED                                    [ 25%]
+tests/test_factory_manager.py::TestCleanJson::test_clean_json_normal PASSED                                              [ 25%]
+tests/test_factory_manager.py::TestCleanJson::test_clean_json_with_markdown PASSED                                       [ 26%]
+tests/test_factory_manager.py::TestCleanJson::test_clean_json_with_simple_fences PASSED                                  [ 26%]
+tests/test_factory_manager.py::TestCleanJson::test_clean_json_with_whitespace PASSED                                     [ 27%]
+tests/test_factory_manager.py::TestAssembleMainRepair::test_full_workflow_integration ERROR                              [ 27%]
+tests/test_factory_manager.py::TestBuildComponentsResume::test_resume_mode_existing_components FAILED                    [ 28%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_success PASSED                           [ 28%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_empty_code PASSED                        [ 29%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_copy_components PASSED                   [ 29%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_import_errors PASSED                     [ 30%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_import_timeout PASSED                    [ 30%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_import_exception PASSED                  [ 31%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_cli_error PASSED                         [ 31%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_cli_exception PASSED                     [ 32%]
+tests/test_factory_manager.py::TestMainValidation::test_validate_main_candidate_syntax_error PASSED                      [ 32%]
+tests/test_factory_manager.py::TestMainValidation::test_repair_main_candidate FAILED                                     [ 33%]
+tests/test_factory_manager.py::TestMainValidation::test_generate_main_candidate FAILED                                   [ 33%]
+tests/test_factory_manager.py::TestNewlineHandlingIntegration::test_main_candidate_with_escaped_newlines FAILED          [ 33%]
+tests/test_factory_manager.py::TestNewlineHandlingIntegration::test_repair_main_candidate_with_newlines FAILED           [ 34%]
+tests/test_factory_manager.py::TestNewlineHandlingIntegration::test_component_saving_with_cleaned_code FAILED            [ 34%]
+tests/test_factory_manager.py::TestCleanJsonFunction::test_clean_json_with_escaped_newlines PASSED                       [ 35%]
+tests/test_factory_manager.py::TestCleanJsonFunction::test_clean_json_with_markdown_fences PASSED                        [ 35%]
+tests/test_factory_manager.py::TestCleanJsonFunction::test_clean_json_with_nested_structure PASSED                       [ 36%]
+tests/test_init.py::TestInitModule::test_package_imports PASSED                                                          [ 36%]
+tests/test_init.py::TestInitModule::test_version_defined PASSED                                                          [ 37%]
+tests/test_init.py::TestInitModule::test_all_contains_expected_items PASSED                                              [ 37%]
+tests/test_init.py::TestInitModule::test_default_values PASSED                                                           [ 38%]
+tests/test_init.py::TestInitModule::test_functions_are_callable PASSED                                                   [ 38%]
+tests/test_ironclad.py::TestCleanJsonResponse::test_clean_normal_json PASSED                                             [ 39%]
+tests/test_ironclad.py::TestCleanJsonResponse::test_clean_json_with_markdown_fences PASSED                               [ 39%]
+tests/test_ironclad.py::TestCleanJsonResponse::test_clean_json_with_simple_fences PASSED                                 [ 40%]
+tests/test_ironclad.py::TestCleanJsonResponse::test_clean_json_with_extra_whitespace PASSED                              [ 40%]
+tests/test_ironclad.py::TestCleanJsonResponse::test_clean_empty_string PASSED                                            [ 41%]
+tests/test_ironclad.py::TestCleanJsonResponse::test_clean_only_fences PASSED                                             [ 41%]
+tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_success FAILED                                    [ 42%]
+tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_json_decode_error FAILED                          [ 42%]
+tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_ollama_error FAILED                               [ 43%]
+tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_with_markdown_response FAILED                     [ 43%]
+tests/test_ironclad.py::TestValidateCandidate::test_validate_candidate_none_candidate FAILED                             [ 44%]
+tests/test_ironclad.py::TestValidateCandidate::test_validate_candidate_invalid_structure PASSED                          [ 44%]
+tests/test_ironclad.py::TestValidateCandidate::test_validate_candidate_success PASSED                                    [ 45%]
+tests/test_ironclad.py::TestValidateCandidate::test_validate_candidate_test_failure PASSED                               [ 45%]
+tests/test_ironclad.py::TestValidateCandidate::test_validate_candidate_file_creation PASSED                              [ 46%]
+tests/test_ironclad.py::TestSaveBrick::test_save_brick_new_directory PASSED                                              [ 46%]
+tests/test_ironclad.py::TestSaveBrick::test_save_brick_creates_directory PASSED                                          [ 47%]
+tests/test_ironclad.py::TestSaveBrick::test_save_brick_existing_directory PASSED                                         [ 47%]
+tests/test_ironclad.py::TestMain::test_main_no_arguments PASSED                                                          [ 48%]
+tests/test_ironclad.py::TestMain::test_main_success_flow FAILED                                                          [ 48%]
+tests/test_ironclad.py::TestMain::test_main_generation_failure FAILED                                                    [ 49%]
+tests/test_ironclad.py::TestMain::test_main_validation_failure FAILED                                                    [ 49%]
+tests/test_ironclad.py::TestMain::test_main_repair_success FAILED                                                        [ 50%]
+tests/test_ironclad.py::TestMain::test_main_max_retries_exceeded FAILED                                                  [ 50%]
+tests/test_ironclad.py::TestMain::test_main_repair_json_error FAILED                                                     [ 50%]
+tests/test_ironclad.py::TestMainExecution::test_main_as_script FAILED                                                    [ 51%]
+tests/test_ironclad.py::TestMainExecution::test_main_execution_via_main_block FAILED                                     [ 51%]
+tests/test_ironclad.py::TestMainExecution::test_main_with_custom_parameters FAILED                                       [ 52%]
+tests/test_ironclad.py::TestIntegration::test_full_workflow_success FAILED                                               [ 52%]
+tests/test_main_blocks.py::TestMainBlocks::test_ironclad_main_block_execution PASSED                                     [ 53%]
+tests/test_main_blocks.py::TestMainBlocks::test_cli_main_block_execution PASSED                                          [ 53%]
+tests/test_module_designer.py::TestCleanJson::test_clean_json_normal PASSED                                              [ 54%]
+tests/test_module_designer.py::TestCleanJson::test_clean_json_with_whitespace PASSED                                     [ 54%]
+tests/test_module_designer.py::TestCleanJson::test_clean_json_with_markdown_fences PASSED                                [ 55%]
+tests/test_module_designer.py::TestCleanJson::test_clean_json_with_simple_fences PASSED                                  [ 55%]
+tests/test_module_designer.py::TestCleanJson::test_clean_json_with_json_keyword PASSED                                   [ 56%]
+tests/test_module_designer.py::TestDraftBlueprint::test_draft_blueprint_success FAILED                                   [ 56%]
+tests/test_module_designer.py::TestModuleDesignerMain::test_main_success PASSED                                          [ 57%]
+tests/test_module_designer.py::TestModuleDesignerMain::test_main_no_arguments PASSED                                     [ 57%]
+tests/test_module_designer.py::TestModuleDesignerMain::test_main_blueprint_failure PASSED                                [ 58%]
+tests/test_module_designer.py::TestModuleDesignerMain::test_draft_blueprint_json_error FAILED                            [ 58%]
+tests/test_module_designer.py::TestModuleDesignerMain::test_draft_blueprint_ollama_error FAILED                          [ 59%]
+tests/test_module_forge.py::TestModuleForgeMain::test_main_blueprint_failure PASSED                                      [ 59%]
+tests/test_module_forge.py::TestModuleForgeMain::test_main_build_failure PASSED                                          [ 60%]
+tests/test_module_forge.py::TestModuleForgeMain::test_main_assembly_failure PASSED                                       [ 60%]
+tests/test_module_forge.py::TestModuleForgeIntegration::test_full_integration_workflow PASSED                            [ 61%]
+tests/test_module_forge.py::TestModuleForgeResume::test_resume_mode_flag PASSED                                          [ 61%]
+tests/test_module_forge.py::TestModuleForgePartialFailure::test_partial_component_failure PASSED                         [ 62%]
+tests/test_repair.py::TestRepairCandidate::test_repair_candidate_success FAILED                                          [ 62%]
+tests/test_repair.py::TestRepairCandidate::test_repair_candidate_with_custom_model FAILED                                [ 63%]
+tests/test_repair.py::TestRepairCandidate::test_repair_candidate_json_decode_error FAILED                                [ 63%]
+tests/test_repair.py::TestRepairCandidate::test_repair_candidate_ollama_error FAILED                                     [ 64%]
+tests/test_repair.py::TestRepairCandidate::test_repair_candidate_prints_attempt_message PASSED                           [ 64%]
+tests/test_repair.py::TestRepairIntegration::test_repair_workflow_integration FAILED                                     [ 65%]
+tests/test_repair.py::TestRepairIntegration::test_repair_prompt_formatting FAILED                                        [ 65%]
+tests/test_ui_generator.py::TestUIGenerator::test_generator_creation PASSED                                              [ 66%]
+tests/test_ui_generator.py::TestUIGenerator::test_generate_web_ui FAILED                                                 [ 66%]
+tests/test_ui_generator.py::TestUIGenerator::test_generate_cli_gui FAILED                                                [ 66%]
+tests/test_ui_generator.py::TestUIGenerator::test_generate_desktop_ui FAILED                                             [ 67%]
+tests/test_ui_generator.py::TestUIGenerator::test_generate_api_docs PASSED                                               [ 67%]
+tests/test_ui_generator.py::TestUIGenerator::test_generate_cli_tui FAILED                                                [ 68%]
+tests/test_ui_generator.py::TestUIGenerator::test_unsupported_ui_type PASSED                                             [ 68%]
+tests/test_ui_generator.py::TestWebUIGeneration::test_html_component_generation FAILED                                   [ 69%]
+tests/test_ui_generator.py::TestWebUIGeneration::test_css_theme_generation PASSED                                        [ 69%]
+tests/test_ui_generator.py::TestWebUIGeneration::test_javascript_validation_generation PASSED                            [ 70%]
+tests/test_ui_generator.py::TestWebUIGeneration::test_javascript_interaction_generation FAILED                           [ 70%]
+tests/test_ui_generator.py::TestSaveUIArtifacts::test_save_artifacts_to_disk PASSED                                      [ 71%]
+tests/test_ui_generator.py::TestGenerateUIFromModuleSpec::test_generate_from_module_spec PASSED                          [ 71%]
+tests/test_ui_generator.py::TestGenerateUIFromModuleSpec::test_generate_from_module_spec_invalid_type PASSED             [ 72%]
+tests/test_ui_generator.py::TestEdgeCases::test_empty_components_list PASSED                                             [ 72%]
+tests/test_ui_generator.py::TestEdgeCases::test_component_without_validation PASSED                                      [ 73%]
+tests/test_ui_generator.py::TestEdgeCases::test_unsupported_component_type PASSED                                        [ 73%]
+tests/test_ui_generator.py::TestEdgeCases::test_custom_css_in_styling FAILED                                             [ 74%]
+tests/test_ui_spec.py::TestUIComponent::test_valid_component_creation PASSED                                             [ 74%]
+tests/test_ui_spec.py::TestUIComponent::test_component_with_options PASSED                                               [ 75%]
+tests/test_ui_spec.py::TestUIComponent::test_component_validation_empty_name FAILED                                      [ 75%]
+tests/test_ui_spec.py::TestUIComponent::test_component_validation_empty_data_binding PASSED                              [ 76%]
+tests/test_ui_spec.py::TestUIComponent::test_component_validation_invalid_data_binding_format PASSED                     [ 76%]
+tests/test_ui_spec.py::TestUIComponent::test_component_validation_select_without_options FAILED                          [ 77%]
+tests/test_ui_spec.py::TestUIComponent::test_component_validation_radio_without_options FAILED                           [ 77%]
+tests/test_ui_spec.py::TestUIInteraction::test_interaction_creation PASSED                                               [ 78%]
+tests/test_ui_spec.py::TestUIInteraction::test_interaction_without_parameters PASSED                                     [ 78%]
+tests/test_ui_spec.py::TestUILayout::test_layout_creation PASSED                                                         [ 79%]
+tests/test_ui_spec.py::TestUILayout::test_minimal_layout PASSED                                                          [ 79%]
+tests/test_ui_spec.py::TestUIStyling::test_styling_creation PASSED                                                       [ 80%]
+tests/test_ui_spec.py::TestUIStyling::test_default_styling PASSED                                                        [ 80%]
+tests/test_ui_spec.py::TestUISpec::test_valid_ui_spec_creation PASSED                                                    [ 81%]
+tests/test_ui_spec.py::TestUISpec::test_ui_spec_validation_empty_title PASSED                                            [ 81%]
+tests/test_ui_spec.py::TestUISpec::test_ui_spec_validation_no_components PASSED                                          [ 82%]
+tests/test_ui_spec.py::TestUISpec::test_ui_spec_validation_invalid_layout_type FAILED                                    [ 82%]
+tests/test_ui_spec.py::TestModuleSpecTransformation::test_transform_module_spec_to_web_ui FAILED                         [ 83%]
+tests/test_ui_spec.py::TestModuleSpecTransformation::test_transform_module_spec_to_cli_gui PASSED                        [ 83%]
+tests/test_ui_spec.py::TestModuleSpecTransformation::test_transform_module_spec_with_custom_title PASSED                 [ 83%]
+tests/test_ui_spec.py::TestModuleSpecTransformation::test_parameter_parsing PASSED                                       [ 84%]
+tests/test_ui_spec.py::TestModuleSpecTransformation::test_module_spec_without_main_function PASSED                       [ 84%]
+tests/test_ui_spec.py::TestUISpecSerialization::test_ui_spec_to_dict PASSED                                              [ 85%]
+tests/test_ui_spec.py::TestUISpecSerialization::test_ui_spec_to_json PASSED                                              [ 85%]
+tests/test_ui_spec.py::TestUISpecSerialization::test_ui_spec_from_dict PASSED                                            [ 86%]
+tests/test_ui_spec.py::TestUISpecSerialization::test_ui_spec_from_dict_missing_required_field PASSED                     [ 86%]
+tests/test_ui_spec.py::TestUISpecSerialization::test_ui_spec_from_dict_invalid_enum_value FAILED                         [ 87%]
+tests/test_ui_spec.py::TestUISpecSerialization::test_round_trip_serialization PASSED                                     [ 87%]
+tests/test_ui_spec.py::TestEdgeCases::test_empty_module_spec_transformation PASSED                                       [ 88%]
+tests/test_ui_spec.py::TestEdgeCases::test_module_spec_with_invalid_signature PASSED                                     [ 88%]
+tests/test_ui_spec.py::TestEdgeCases::test_component_validation_edge_cases PASSED                                        [ 89%]
+tests/test_ui_spec.py::TestEdgeCases::test_optional_parameter_handling PASSED                                            [ 89%]
+tests/test_ui_validator.py::TestValidationIssue::test_validation_issue_creation PASSED                                   [ 90%]
+tests/test_ui_validator.py::TestValidationIssue::test_validation_issue_minimal PASSED                                    [ 90%]
+tests/test_ui_validator.py::TestValidationResult::test_validation_result_creation PASSED                                 [ 91%]
+tests/test_ui_validator.py::TestUIValidator::test_validator_creation PASSED                                              [ 91%]
+tests/test_ui_validator.py::TestUIValidator::test_validator_nonexistent_directory PASSED                                 [ 92%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_web_ui_success PASSED                                         [ 92%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_web_ui_missing_files PASSED                                   [ 93%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_cli_gui_success PASSED                                        [ 93%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_desktop_ui_missing_main PASSED                                [ 94%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_api_docs_success PASSED                                       [ 94%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_broken_html FAILED                                            [ 95%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_invalid_json PASSED                                           [ 95%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_missing_css_properties FAILED                                 [ 96%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_python_no_main_block PASSED                                   [ 96%]
+tests/test_ui_validator.py::TestUIValidator::test_validate_security_sensitive_data FAILED                                [ 97%]
+tests/test_ui_validator.py::TestConvenienceFunctions::test_validate_ui_directory_function PASSED                         [ 97%]
+tests/test_ui_validator.py::TestConvenienceFunctions::test_print_validation_report_function FAILED                       [ 98%]
+tests/test_ui_validator.py::TestEdgeCases::test_validate_empty_directory PASSED                                          [ 98%]
+tests/test_ui_validator.py::TestEdgeCases::test_validate_unknown_ui_type FAILED                                          [ 99%]
+tests/test_ui_validator.py::TestEdgeCases::test_validate_file_reading_errors FAILED                                      [ 99%]
+tests/test_ui_validator.py::TestEdgeCases::test_validate_malformed_requirements FAILED                                   [100%]
+
+============================================================ ERRORS ============================================================
+___________________________ ERROR at setup of TestAssembleMainRepair.test_full_workflow_integration ____________________________
+file /mnt/storage/repos/ai-guardrails/ironclad/tests/test_factory_manager.py, line 278
+      @patch('ironclad_ai_guardrails.factory_manager.repair_main_candidate')
+      @patch('ironclad_ai_guardrails.factory_manager.validate_main_candidate')
+      @patch('ironclad_ai_guardrails.factory_manager.generate_main_candidate')
+      @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
+      def test_full_workflow_integration(self, mock_chat, mock_print, mock_open, mock_join, mock_exists, mock_makedirs, mock_repair, mock_validate, mock_generate_ironclad, mock_generate_main, mock_validate_main):
+E       fixture 'mock_exists' not found
+>       available fixtures: anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, class_mocker, cov, doctest_namespace, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, mocker, module_mocker, monkeypatch, no_cover, package_mocker, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, session_mocker, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/mnt/storage/repos/ai-guardrails/ironclad/tests/test_factory_manager.py:278
+=========================================================== FAILURES ===========================================================
+_______________________________________ TestCleanJsonResponse.test_clean_markdown_fences _______________________________________
+
+self = <test_code_utils.TestCleanJsonResponse object at 0x7ae8d3a901a0>
+
+    def test_clean_markdown_fences(self):
+        """Test removal of markdown fences"""
+        input_json = '```json\\n{"code": "line1\\\\nline2"}\\n```'
+        result = code_utils.clean_json_response(input_json)
+        # Should be valid JSON string
+>       parsed = json.loads(result)
+                 ^^^^^^^^^^^^^^^^^^
+
+tests/test_code_utils.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7ae8d596cd10>, s = '\n{"code": "line1\\\nline2"}\n', idx = 1
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           json.decoder.JSONDecodeError: Invalid \escape: line 2 column 16 (char 16)
+
+/usr/lib/python3.12/json/decoder.py:353: JSONDecodeError
+______________________________________ TestFixCommonCodeIssues.test_newline_normalization ______________________________________
+
+self = <test_code_utils.TestFixCommonCodeIssues object at 0x7ae8d3a91280>
+
+    def test_newline_normalization(self):
+        """Test normalization of different newline types"""
+        input_code = "line1\\r\\nline2\\rline3\\nline4"
+        result = code_utils.fix_common_code_issues(input_code)
+        expected = "line1\nline2\nline3\nline4\n"
+>       assert result == expected
+E       AssertionError: assert 'line1 line2 line3 line4\n' == 'line1\nline2\nline3\nline4\n'
+E         
+E         + line1 line2 line3 line4
+E         - line1
+E         - line2
+E         - line3
+E         - line4
+
+tests/test_code_utils.py:219: AssertionError
+__________________________________ TestFixCommonCodeIssues.test_excessive_whitespace_cleanup ___________________________________
+
+self = <test_code_utils.TestFixCommonCodeIssues object at 0x7ae8d3a909b0>
+
+    def test_excessive_whitespace_cleanup(self):
+        """Test cleanup of excessive whitespace"""
+        input_code = "def hello():    \\n    \\n    pass\\n"
+        result = code_utils.fix_common_code_issues(input_code)
+>       assert result.strip() == "def hello():\n    pass"
+E       AssertionError: assert 'def hello(): pass' == 'def hello():\n    pass'
+E         
+E         - def hello():
+E         ?             ^
+E         + def hello(): pass
+E         ?             ^^^^^
+E         -     pass
+
+tests/test_code_utils.py:232: AssertionError
+________________________________________ TestExtractCodeFromResponse.test_no_code_found ________________________________________
+
+self = <test_code_utils.TestExtractCodeFromResponse object at 0x7ae8d3a91cd0>
+
+    def test_no_code_found(self):
+        """Test fallback when no clear code is found"""
+        response = 'This is just some explanation text without any code.'
+        result = code_utils.extract_code_from_response(response)
+>       assert result == response
+E       AssertionError: assert 'This is just...t any code.\n' == 'This is just...out any code.'
+E         
+E         - This is just some explanation text without any code.
+E         + This is just some explanation text without any code.
+E         ?                                                     +
+
+tests/test_code_utils.py:290: AssertionError
+______________________________________ TestBuildComponents.test_build_components_success _______________________________________
+
+args = (<test_factory_manager.TestBuildComponents object at 0x7ae8d3ab8ef0>,), keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+>       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+/usr/lib/python3.12/unittest/mock.py:1387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1369: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1442: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ironclad_ai_guardrails.factory_manager.ironclad'
+
+    def resolve_name(name):
+        """
+        Resolve a name to an object.
+    
+        It is expected that `name` will be a string in one of the following
+        formats, where W is shorthand for a valid Python identifier and dot stands
+        for a literal period in these pseudo-regexes:
+    
+        W(.W)*
+        W(.W)*:(W(.W)*)?
+    
+        The first form is intended for backward compatibility only. It assumes that
+        some part of the dotted name is a package, and the rest is an object
+        somewhere within that package, possibly nested inside other objects.
+        Because the place where the package stops and the object hierarchy starts
+        can't be inferred by inspection, repeated attempts to import must be done
+        with this form.
+    
+        In the second form, the caller makes the division point clear through the
+        provision of a single colon: the dotted name to the left of the colon is a
+        package to be imported, and the dotted name to the right is the object
+        hierarchy within that package. Only one import is needed in this form. If
+        it ends with the colon, then a module object is returned.
+    
+        The function will return an object (which might be a module), or raise one
+        of the following exceptions:
+    
+        ValueError - if `name` isn't in a recognised format
+        ImportError - if an import failed when it shouldn't have
+        AttributeError - if a failure occurred when traversing the object hierarchy
+                         within the imported package to get to the desired object.
+        """
+        global _NAME_PATTERN
+        if _NAME_PATTERN is None:
+            # Lazy import to speedup Python startup time
+            import re
+            dotted_words = r'(?!\d)(\w+)(\.(?!\d)(\w+))*'
+            _NAME_PATTERN = re.compile(f'^(?P<pkg>{dotted_words})'
+                                       f'(?P<cln>:(?P<obj>{dotted_words})?)?$',
+                                       re.UNICODE)
+    
+        m = _NAME_PATTERN.match(name)
+        if not m:
+            raise ValueError(f'invalid format: {name!r}')
+        gd = m.groupdict()
+        if gd.get('cln'):
+            # there is a colon - a one-step import is all that's needed
+            mod = importlib.import_module(gd['pkg'])
+            parts = gd.get('obj')
+            parts = parts.split('.') if parts else []
+        else:
+            # no colon - have to iterate to find the package boundary
+            parts = name.split('.')
+            modname = parts.pop(0)
+            # first part *must* be a module/package.
+            mod = importlib.import_module(modname)
+            while parts:
+                p = parts[0]
+                s = f'{modname}.{p}'
+                try:
+                    mod = importlib.import_module(s)
+                    parts.pop(0)
+                    modname = s
+                except ImportError:
+                    break
+        # if we reach this point, mod is the module, already imported, and
+        # parts is the list of parts in the object hierarchy to be traversed, or
+        # an empty list if just the module is wanted.
+        result = mod
+        for p in parts:
+>           result = getattr(result, p)
+                     ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+
+/usr/lib/python3.12/pkgutil.py:528: AttributeError
+______________________________ TestBuildComponents.test_build_components_smart_mode_existing_dir _______________________________
+
+args = (<test_factory_manager.TestBuildComponents object at 0x7ae8d3ab9190>,), keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+>       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+/usr/lib/python3.12/unittest/mock.py:1387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1369: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1442: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ironclad_ai_guardrails.factory_manager.ironclad'
+
+    def resolve_name(name):
+        """
+        Resolve a name to an object.
+    
+        It is expected that `name` will be a string in one of the following
+        formats, where W is shorthand for a valid Python identifier and dot stands
+        for a literal period in these pseudo-regexes:
+    
+        W(.W)*
+        W(.W)*:(W(.W)*)?
+    
+        The first form is intended for backward compatibility only. It assumes that
+        some part of the dotted name is a package, and the rest is an object
+        somewhere within that package, possibly nested inside other objects.
+        Because the place where the package stops and the object hierarchy starts
+        can't be inferred by inspection, repeated attempts to import must be done
+        with this form.
+    
+        In the second form, the caller makes the division point clear through the
+        provision of a single colon: the dotted name to the left of the colon is a
+        package to be imported, and the dotted name to the right is the object
+        hierarchy within that package. Only one import is needed in this form. If
+        it ends with the colon, then a module object is returned.
+    
+        The function will return an object (which might be a module), or raise one
+        of the following exceptions:
+    
+        ValueError - if `name` isn't in a recognised format
+        ImportError - if an import failed when it shouldn't have
+        AttributeError - if a failure occurred when traversing the object hierarchy
+                         within the imported package to get to the desired object.
+        """
+        global _NAME_PATTERN
+        if _NAME_PATTERN is None:
+            # Lazy import to speedup Python startup time
+            import re
+            dotted_words = r'(?!\d)(\w+)(\.(?!\d)(\w+))*'
+            _NAME_PATTERN = re.compile(f'^(?P<pkg>{dotted_words})'
+                                       f'(?P<cln>:(?P<obj>{dotted_words})?)?$',
+                                       re.UNICODE)
+    
+        m = _NAME_PATTERN.match(name)
+        if not m:
+            raise ValueError(f'invalid format: {name!r}')
+        gd = m.groupdict()
+        if gd.get('cln'):
+            # there is a colon - a one-step import is all that's needed
+            mod = importlib.import_module(gd['pkg'])
+            parts = gd.get('obj')
+            parts = parts.split('.') if parts else []
+        else:
+            # no colon - have to iterate to find the package boundary
+            parts = name.split('.')
+            modname = parts.pop(0)
+            # first part *must* be a module/package.
+            mod = importlib.import_module(modname)
+            while parts:
+                p = parts[0]
+                s = f'{modname}.{p}'
+                try:
+                    mod = importlib.import_module(s)
+                    parts.pop(0)
+                    modname = s
+                except ImportError:
+                    break
+        # if we reach this point, mod is the module, already imported, and
+        # parts is the list of parts in the object hierarchy to be traversed, or
+        # an empty list if just the module is wanted.
+        result = mod
+        for p in parts:
+>           result = getattr(result, p)
+                     ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+
+/usr/lib/python3.12/pkgutil.py:528: AttributeError
+____________________________________ TestBuildComponents.test_build_components_with_repair _____________________________________
+
+args = (<test_factory_manager.TestBuildComponents object at 0x7ae8d3ab9430>,), keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+>       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+/usr/lib/python3.12/unittest/mock.py:1387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1369: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1442: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ironclad_ai_guardrails.factory_manager.ironclad'
+
+    def resolve_name(name):
+        """
+        Resolve a name to an object.
+    
+        It is expected that `name` will be a string in one of the following
+        formats, where W is shorthand for a valid Python identifier and dot stands
+        for a literal period in these pseudo-regexes:
+    
+        W(.W)*
+        W(.W)*:(W(.W)*)?
+    
+        The first form is intended for backward compatibility only. It assumes that
+        some part of the dotted name is a package, and the rest is an object
+        somewhere within that package, possibly nested inside other objects.
+        Because the place where the package stops and the object hierarchy starts
+        can't be inferred by inspection, repeated attempts to import must be done
+        with this form.
+    
+        In the second form, the caller makes the division point clear through the
+        provision of a single colon: the dotted name to the left of the colon is a
+        package to be imported, and the dotted name to the right is the object
+        hierarchy within that package. Only one import is needed in this form. If
+        it ends with the colon, then a module object is returned.
+    
+        The function will return an object (which might be a module), or raise one
+        of the following exceptions:
+    
+        ValueError - if `name` isn't in a recognised format
+        ImportError - if an import failed when it shouldn't have
+        AttributeError - if a failure occurred when traversing the object hierarchy
+                         within the imported package to get to the desired object.
+        """
+        global _NAME_PATTERN
+        if _NAME_PATTERN is None:
+            # Lazy import to speedup Python startup time
+            import re
+            dotted_words = r'(?!\d)(\w+)(\.(?!\d)(\w+))*'
+            _NAME_PATTERN = re.compile(f'^(?P<pkg>{dotted_words})'
+                                       f'(?P<cln>:(?P<obj>{dotted_words})?)?$',
+                                       re.UNICODE)
+    
+        m = _NAME_PATTERN.match(name)
+        if not m:
+            raise ValueError(f'invalid format: {name!r}')
+        gd = m.groupdict()
+        if gd.get('cln'):
+            # there is a colon - a one-step import is all that's needed
+            mod = importlib.import_module(gd['pkg'])
+            parts = gd.get('obj')
+            parts = parts.split('.') if parts else []
+        else:
+            # no colon - have to iterate to find the package boundary
+            parts = name.split('.')
+            modname = parts.pop(0)
+            # first part *must* be a module/package.
+            mod = importlib.import_module(modname)
+            while parts:
+                p = parts[0]
+                s = f'{modname}.{p}'
+                try:
+                    mod = importlib.import_module(s)
+                    parts.pop(0)
+                    modname = s
+                except ImportError:
+                    break
+        # if we reach this point, mod is the module, already imported, and
+        # parts is the list of parts in the object hierarchy to be traversed, or
+        # an empty list if just the module is wanted.
+        result = mod
+        for p in parts:
+>           result = getattr(result, p)
+                     ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+
+/usr/lib/python3.12/pkgutil.py:528: AttributeError
+________________________________ TestBuildComponents.test_build_components_max_retries_exceeded ________________________________
+
+args = (<test_factory_manager.TestBuildComponents object at 0x7ae8d3ab96d0>,), keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+>       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+/usr/lib/python3.12/unittest/mock.py:1387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1369: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1442: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ironclad_ai_guardrails.factory_manager.ironclad'
+
+    def resolve_name(name):
+        """
+        Resolve a name to an object.
+    
+        It is expected that `name` will be a string in one of the following
+        formats, where W is shorthand for a valid Python identifier and dot stands
+        for a literal period in these pseudo-regexes:
+    
+        W(.W)*
+        W(.W)*:(W(.W)*)?
+    
+        The first form is intended for backward compatibility only. It assumes that
+        some part of the dotted name is a package, and the rest is an object
+        somewhere within that package, possibly nested inside other objects.
+        Because the place where the package stops and the object hierarchy starts
+        can't be inferred by inspection, repeated attempts to import must be done
+        with this form.
+    
+        In the second form, the caller makes the division point clear through the
+        provision of a single colon: the dotted name to the left of the colon is a
+        package to be imported, and the dotted name to the right is the object
+        hierarchy within that package. Only one import is needed in this form. If
+        it ends with the colon, then a module object is returned.
+    
+        The function will return an object (which might be a module), or raise one
+        of the following exceptions:
+    
+        ValueError - if `name` isn't in a recognised format
+        ImportError - if an import failed when it shouldn't have
+        AttributeError - if a failure occurred when traversing the object hierarchy
+                         within the imported package to get to the desired object.
+        """
+        global _NAME_PATTERN
+        if _NAME_PATTERN is None:
+            # Lazy import to speedup Python startup time
+            import re
+            dotted_words = r'(?!\d)(\w+)(\.(?!\d)(\w+))*'
+            _NAME_PATTERN = re.compile(f'^(?P<pkg>{dotted_words})'
+                                       f'(?P<cln>:(?P<obj>{dotted_words})?)?$',
+                                       re.UNICODE)
+    
+        m = _NAME_PATTERN.match(name)
+        if not m:
+            raise ValueError(f'invalid format: {name!r}')
+        gd = m.groupdict()
+        if gd.get('cln'):
+            # there is a colon - a one-step import is all that's needed
+            mod = importlib.import_module(gd['pkg'])
+            parts = gd.get('obj')
+            parts = parts.split('.') if parts else []
+        else:
+            # no colon - have to iterate to find the package boundary
+            parts = name.split('.')
+            modname = parts.pop(0)
+            # first part *must* be a module/package.
+            mod = importlib.import_module(modname)
+            while parts:
+                p = parts[0]
+                s = f'{modname}.{p}'
+                try:
+                    mod = importlib.import_module(s)
+                    parts.pop(0)
+                    modname = s
+                except ImportError:
+                    break
+        # if we reach this point, mod is the module, already imported, and
+        # parts is the list of parts in the object hierarchy to be traversed, or
+        # an empty list if just the module is wanted.
+        result = mod
+        for p in parts:
+>           result = getattr(result, p)
+                     ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+
+/usr/lib/python3.12/pkgutil.py:528: AttributeError
+________________________________ TestBuildComponentsResume.test_resume_mode_existing_components ________________________________
+
+args = (<test_factory_manager.TestBuildComponentsResume object at 0x7ae8d3abae10>,), keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+>       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+/usr/lib/python3.12/unittest/mock.py:1387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1369: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1442: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ironclad_ai_guardrails.factory_manager.ironclad'
+
+    def resolve_name(name):
+        """
+        Resolve a name to an object.
+    
+        It is expected that `name` will be a string in one of the following
+        formats, where W is shorthand for a valid Python identifier and dot stands
+        for a literal period in these pseudo-regexes:
+    
+        W(.W)*
+        W(.W)*:(W(.W)*)?
+    
+        The first form is intended for backward compatibility only. It assumes that
+        some part of the dotted name is a package, and the rest is an object
+        somewhere within that package, possibly nested inside other objects.
+        Because the place where the package stops and the object hierarchy starts
+        can't be inferred by inspection, repeated attempts to import must be done
+        with this form.
+    
+        In the second form, the caller makes the division point clear through the
+        provision of a single colon: the dotted name to the left of the colon is a
+        package to be imported, and the dotted name to the right is the object
+        hierarchy within that package. Only one import is needed in this form. If
+        it ends with the colon, then a module object is returned.
+    
+        The function will return an object (which might be a module), or raise one
+        of the following exceptions:
+    
+        ValueError - if `name` isn't in a recognised format
+        ImportError - if an import failed when it shouldn't have
+        AttributeError - if a failure occurred when traversing the object hierarchy
+                         within the imported package to get to the desired object.
+        """
+        global _NAME_PATTERN
+        if _NAME_PATTERN is None:
+            # Lazy import to speedup Python startup time
+            import re
+            dotted_words = r'(?!\d)(\w+)(\.(?!\d)(\w+))*'
+            _NAME_PATTERN = re.compile(f'^(?P<pkg>{dotted_words})'
+                                       f'(?P<cln>:(?P<obj>{dotted_words})?)?$',
+                                       re.UNICODE)
+    
+        m = _NAME_PATTERN.match(name)
+        if not m:
+            raise ValueError(f'invalid format: {name!r}')
+        gd = m.groupdict()
+        if gd.get('cln'):
+            # there is a colon - a one-step import is all that's needed
+            mod = importlib.import_module(gd['pkg'])
+            parts = gd.get('obj')
+            parts = parts.split('.') if parts else []
+        else:
+            # no colon - have to iterate to find the package boundary
+            parts = name.split('.')
+            modname = parts.pop(0)
+            # first part *must* be a module/package.
+            mod = importlib.import_module(modname)
+            while parts:
+                p = parts[0]
+                s = f'{modname}.{p}'
+                try:
+                    mod = importlib.import_module(s)
+                    parts.pop(0)
+                    modname = s
+                except ImportError:
+                    break
+        # if we reach this point, mod is the module, already imported, and
+        # parts is the list of parts in the object hierarchy to be traversed, or
+        # an empty list if just the module is wanted.
+        result = mod
+        for p in parts:
+>           result = getattr(result, p)
+                     ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+
+/usr/lib/python3.12/pkgutil.py:528: AttributeError
+________________________________________ TestMainValidation.test_repair_main_candidate _________________________________________
+
+self = <MagicMock name='chat' id='135140395831840'>
+
+    def assert_called_once(self):
+        """assert that the mock was called only once.
+        """
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'chat' to have been called once. Called 0 times.
+
+/usr/lib/python3.12/unittest/mock.py:923: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_factory_manager.TestMainValidation object at 0x7ae8d3abb200>
+mock_chat = <MagicMock name='chat' id='135140395831840'>
+
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
+    def test_repair_main_candidate(self, mock_chat):
+        """Test main.py repair functionality"""
+        mock_chat.return_value = {
+            'message': {
+                'content': 'def main(): pass  # Fixed'
+            }
+        }
+    
+        candidate_code = "def main(: pass"  # Broken code
+        error_logs = "Syntax error: invalid syntax"
+        components = ['test_func']
+        module_dir = '/tmp/test'
+    
+        repaired_code = factory_manager.repair_main_candidate(candidate_code, error_logs, components, module_dir)
+    
+        assert "def main():" in repaired_code
+>       mock_chat.assert_called_once()
+E       AssertionError: Expected 'chat' to have been called once. Called 0 times.
+
+tests/test_factory_manager.py:608: AssertionError
+_______________________________________ TestMainValidation.test_generate_main_candidate ________________________________________
+
+self = <test_factory_manager.TestMainValidation object at 0x7ae8d3abb4a0>
+mock_chat = <MagicMock name='chat' id='135140395481664'>
+
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
+    def test_generate_main_candidate(self, mock_chat):
+        """Test main.py generation"""
+        mock_chat.return_value = {
+            'message': {
+                'content': '{"filename": "main.py", "code": "def main(): pass"}'
+            }
+        }
+    
+        blueprint = {
+            'module_name': 'test_module',
+            'main_logic_description': 'Test main logic'
+        }
+        components = ['test_func']
+    
+        code = factory_manager.generate_main_candidate(blueprint, components)
+    
+>       assert code == "def main(): pass"
+E       AssertionError: assert 'from test_fu...n    main()\n' == 'def main(): pass'
+E         
+E         + from test_func import *
+E         + import sys
+E         + import inspect
+E         + 
+E         + 
+E         - def main(): pass...
+E         
+E         ...Full output truncated (25 lines hidden), use '-vv' to show
+
+tests/test_factory_manager.py:627: AssertionError
+___________________________ TestNewlineHandlingIntegration.test_main_candidate_with_escaped_newlines ___________________________
+
+self = <test_factory_manager.TestNewlineHandlingIntegration object at 0x7ae8d3abb770>
+mock_chat = <MagicMock name='chat' id='135140395475712'>
+
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
+    def test_main_candidate_with_escaped_newlines(self, mock_chat):
+        """Test main candidate generation with escaped newlines"""
+        # Mock response with escaped newlines
+        mock_response = {
+            'message': {
+                'content': '''```json
+                {
+                    "filename": "main.py",
+                    "code": "import sys\\nfrom utils import helper\\n\\ndef main():\\n    helper()\\n    print(\\"done\\")\\n\\nif __name__ == \\"__main__\\":\\n    main()"
+                }
+                ```'''
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        blueprint = {
+            'module_name': 'test_module',
+            'main_logic_description': 'Test main logic'
+        }
+        components = ['helper']
+    
+        code = factory_manager.generate_main_candidate(blueprint, components)
+    
+        # Verify escaped newlines are converted to actual newlines
+        assert '\n' in code
+        assert '\\n' not in code
+>       assert 'import sys\nfrom utils import helper' in code
+E       assert 'import sys\nfrom utils import helper' in 'import sys\nimport helper\n\n\ndef main():\n    try:\n        print("Testing helper functions:")\n        for name in dir(helper):\n            if name.startswith("_"):\n                continue\n            attr = getattr(helper, name)\n            if callable(attr):\n                try:\n                    print(f"Calling {name}()", end=" ")\n                    result = attr()\n                    print("=>", result)\n                except Exception as e:\n                    print("failed:", e)\n    except Exception as e:\n        print("Unexpected error:", e, file=sys.stderr)\n        sys.exit(1)\n\nif __name__ == "__main__":\n    main()\n'
+
+tests/test_factory_manager.py:661: AssertionError
+___________________________ TestNewlineHandlingIntegration.test_repair_main_candidate_with_newlines ____________________________
+
+self = <test_factory_manager.TestNewlineHandlingIntegration object at 0x7ae8d3abba10>
+mock_chat = <MagicMock name='chat' id='135140395470768'>
+
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
+    def test_repair_main_candidate_with_newlines(self, mock_chat):
+        """Test main candidate repair with newline handling"""
+        # Mock repair response
+        mock_chat.return_value = {
+            'message': {
+                'content': 'def main():\\n    print(\\"fixed\\")\\n    return True'
+            }
+        }
+    
+        broken_code = 'def main():\\n    print("broken"\\n    return False'
+        error_logs = 'Syntax error'
+        components = ['helper']
+        module_dir = '/tmp/test'
+    
+        repaired_code = factory_manager.repair_main_candidate(
+            broken_code, error_logs, components, module_dir
+        )
+    
+        # Verify newlines are properly handled
+        assert '\n' in repaired_code
+        assert '\\n' not in repaired_code
+>       assert 'print("fixed")' in repaired_code
+E       assert 'print("fixed")' in 'import helper\n\ndef main():\n    print("broken")\n    return False\n'
+
+tests/test_factory_manager.py:687: AssertionError
+____________________________ TestNewlineHandlingIntegration.test_component_saving_with_cleaned_code ____________________________
+
+args = (<test_factory_manager.TestNewlineHandlingIntegration object at 0x7ae8d3abbcb0>,), keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+>       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+/usr/lib/python3.12/unittest/mock.py:1387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1369: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+/usr/lib/python3.12/unittest/mock.py:1442: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ironclad_ai_guardrails.factory_manager.ironclad'
+
+    def resolve_name(name):
+        """
+        Resolve a name to an object.
+    
+        It is expected that `name` will be a string in one of the following
+        formats, where W is shorthand for a valid Python identifier and dot stands
+        for a literal period in these pseudo-regexes:
+    
+        W(.W)*
+        W(.W)*:(W(.W)*)?
+    
+        The first form is intended for backward compatibility only. It assumes that
+        some part of the dotted name is a package, and the rest is an object
+        somewhere within that package, possibly nested inside other objects.
+        Because the place where the package stops and the object hierarchy starts
+        can't be inferred by inspection, repeated attempts to import must be done
+        with this form.
+    
+        In the second form, the caller makes the division point clear through the
+        provision of a single colon: the dotted name to the left of the colon is a
+        package to be imported, and the dotted name to the right is the object
+        hierarchy within that package. Only one import is needed in this form. If
+        it ends with the colon, then a module object is returned.
+    
+        The function will return an object (which might be a module), or raise one
+        of the following exceptions:
+    
+        ValueError - if `name` isn't in a recognised format
+        ImportError - if an import failed when it shouldn't have
+        AttributeError - if a failure occurred when traversing the object hierarchy
+                         within the imported package to get to the desired object.
+        """
+        global _NAME_PATTERN
+        if _NAME_PATTERN is None:
+            # Lazy import to speedup Python startup time
+            import re
+            dotted_words = r'(?!\d)(\w+)(\.(?!\d)(\w+))*'
+            _NAME_PATTERN = re.compile(f'^(?P<pkg>{dotted_words})'
+                                       f'(?P<cln>:(?P<obj>{dotted_words})?)?$',
+                                       re.UNICODE)
+    
+        m = _NAME_PATTERN.match(name)
+        if not m:
+            raise ValueError(f'invalid format: {name!r}')
+        gd = m.groupdict()
+        if gd.get('cln'):
+            # there is a colon - a one-step import is all that's needed
+            mod = importlib.import_module(gd['pkg'])
+            parts = gd.get('obj')
+            parts = parts.split('.') if parts else []
+        else:
+            # no colon - have to iterate to find the package boundary
+            parts = name.split('.')
+            modname = parts.pop(0)
+            # first part *must* be a module/package.
+            mod = importlib.import_module(modname)
+            while parts:
+                p = parts[0]
+                s = f'{modname}.{p}'
+                try:
+                    mod = importlib.import_module(s)
+                    parts.pop(0)
+                    modname = s
+                except ImportError:
+                    break
+        # if we reach this point, mod is the module, already imported, and
+        # parts is the list of parts in the object hierarchy to be traversed, or
+        # an empty list if just the module is wanted.
+        result = mod
+        for p in parts:
+>           result = getattr(result, p)
+                     ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+
+/usr/lib/python3.12/pkgutil.py:528: AttributeError
+____________________________________ TestGenerateCandidate.test_generate_candidate_success _____________________________________
+
+self = <test_ironclad.TestGenerateCandidate object at 0x7ae8d3ad2cc0>, mock_chat = <MagicMock name='chat' id='135140395296976'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_generate_candidate_success(self, mock_chat):
+        """Test successful candidate generation"""
+        mock_response = {
+            'message': {
+                'content': '{"filename": "test_func", "code": "def test_func(): pass", "test": "def test_test_func(): assert test_func() is None"}'
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        result = ironclad.generate_candidate("test request")
+    
+        assert result is not None
+>       assert result['filename'] == "test_func"
+E       AssertionError: assert 'validate_request' == 'test_func'
+E         
+E         - test_func
+E         + validate_request
+
+tests/test_ironclad.py:67: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Generating candidate for: 'test request'...
+_______________________________ TestGenerateCandidate.test_generate_candidate_json_decode_error ________________________________
+
+self = <test_ironclad.TestGenerateCandidate object at 0x7ae8d3ad2f60>, mock_chat = <MagicMock name='chat' id='135140395290640'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_generate_candidate_json_decode_error(self, mock_chat):
+        """Test handling of JSON decode error"""
+        mock_response = {
+            'message': {
+                'content': 'invalid json content'
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        with patch('builtins.print') as mock_print:
+            result = ironclad.generate_candidate("test request")
+>           assert result is None
+E           assert {'code': 'def validate_request(request):\n    """\n    Validate a simplified HTTP request represented as a dictionary.\n\n    Parameters\n    ----------\n    request : dict\n        The request dictionary which must contain the keys:\n        - "method": one of \'GET\', \'POST\', \'PUT\', \'DELETE\'\n        - "path": a string starting with \'/\'\n        - "headers": a dictionary of header names to values\n\n    Returns\n    -------\n    bool\n        True if the request is valid, False otherwise.\n    """\n    if not isinstance(request, dict):\n        return False\n\n    required_keys = {"method", "path", "headers"}\n    if not required_keys.issubset(request.keys()):\n        return False\n\n    method = request["method"]\n    if not isinstance(method, str) or method not in {"GET", "POST", "PUT", "DELETE"}:\n        return False\n\n    path = request["path"]\n    if not isinstance(path, str) or not path.startswith("/"):\n        return False\n\n    headers = request["headers"]\n    if not isinstance(headers, dict):\n        return False\n    for k, v in headers.items():\n        if not isinstance(k, str) or not isinstance(v, str):\n            return False\n\n    return True',..."method": 123,\n    "path": "/api/items",\n    "headers": {}\n}\n\nwrong_path_type = {\n    "method": "GET",\n    "path": 456,\n    "headers": {}\n}\n\nwrong_headers_type = {\n    "method": "GET",\n    "path": "/api/items",\n    "headers": "not a dict"\n}\n\n# Invalid method\ninvalid_method = {\n    "method": "FETCH",\n    "path": "/api/items",\n    "headers": {}\n}\n\n# Path not starting with slash\ninvalid_path = {\n    "method": "GET",\n    "path": "api/items",\n    "headers": {}\n}\n\n# Header key/value not strings\ninvalid_header = {\n    "method": "GET",\n    "path": "/api/items",\n    "headers": {123: "value", "Key": 456}\n}\n\n# Non-dict request\nnon_dict_request = ["method", "GET", "path", "/api/items"]\n\n@pytest.mark.parametrize("req,expected", [\n    (valid_request, True),\n    (missing_method, False),\n    (missing_path, False),\n    (missing_headers, False),\n    (wrong_method_type, False),\n    (wrong_path_type, False),\n    (wrong_headers_type, False),\n    (invalid_method, False),\n    (invalid_path, False),\n    (invalid_header, False),\n    (non_dict_request, False),\n])\ndef test_validate_request(req, expected):\n    assert validate_request(req) == expected\n'} is None
+
+tests/test_ironclad.py:84: AssertionError
+__________________________________ TestGenerateCandidate.test_generate_candidate_ollama_error __________________________________
+
+self = <test_ironclad.TestGenerateCandidate object at 0x7ae8d3ad3200>, mock_chat = <MagicMock name='chat' id='135140395356656'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_generate_candidate_ollama_error(self, mock_chat):
+        """Test handling of ollama connection error"""
+        mock_chat.side_effect = Exception("Connection error")
+    
+        with patch('builtins.print') as mock_print:
+            result = ironclad.generate_candidate("test request")
+>           assert result is None
+E           assert {'code': 'def fibonacci(n):\n    if not isinstance(n, int):\n        raise TypeError("n must be an integer")\n    if n < 0:\n        raise ValueError("n must be non-negative")\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n    a, b = 0, 1\n    for _ in range(2, n + 1):\n        a, b = b, a + b\n    return b', 'filename': 'fibonacci', 'test': 'import pytest\nfrom fibonacci import fibonacci\n\ndef test_fibonacci_basic():\n    assert fibonacci(0) == 0\n    assert fibonacci(1) == 1\n    assert fibonacci(2) == 1\n    assert fibonacci(3) == 2\n    assert fibonacci(10) == 55\n\ndef test_fibonacci_large():\n    # 50th Fibonacci number\n    assert fibonacci(50) == 12586269025\n\ndef test_fibonacci_negative():\n    with pytest.raises(ValueError):\n        fibonacci(-1)\n\ndef test_fibonacci_non_int():\n    with pytest.raises(TypeError):\n        fibonacci(3.5)\n    with pytest.raises(TypeError):\n        fibonacci("10")'} is None
+
+tests/test_ironclad.py:94: AssertionError
+_____________________________ TestGenerateCandidate.test_generate_candidate_with_markdown_response _____________________________
+
+self = <test_ironclad.TestGenerateCandidate object at 0x7ae8d3ad34a0>, mock_chat = <MagicMock name='chat' id='135140401400240'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_generate_candidate_with_markdown_response(self, mock_chat):
+        """Test candidate generation when AI returns markdown-wrapped JSON"""
+        mock_response = {
+            'message': {
+                'content': '```json\n{"filename": "test_func", "code": "def test_func(): pass", "test": "def test_test_func(): pass"}\n```'
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        result = ironclad.generate_candidate("test request")
+    
+        assert result is not None
+>       assert result['filename'] == "test_func"
+E       AssertionError: assert 'process_request' == 'test_func'
+E         
+E         - test_func
+E         + process_request
+
+tests/test_ironclad.py:110: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Generating candidate for: 'test request'...
+_________________________________ TestValidateCandidate.test_validate_candidate_none_candidate _________________________________
+
+self = <test_ironclad.TestValidateCandidate object at 0x7ae8d3ad37a0>
+
+    def test_validate_candidate_none_candidate(self):
+        """Test validation with None candidate - should raise AttributeError"""
+>       with pytest.raises(AttributeError):
+E       Failed: DID NOT RAISE <class 'AttributeError'>
+
+tests/test_ironclad.py:118: Failed
+_______________________________________________ TestMain.test_main_success_flow ________________________________________________
+
+self = <MagicMock name='generate_candidate' id='135140396206464'>
+args = ('test request', 'gpt-oss:20b', '\nYou are a strict code generator. You do not talk. You output JSON only.\nYour goal ..._1()..."\n}\n\nThe code and test fields must contain properly formatted Python code with actual newline characters.\n')
+kwargs = {}, msg = "Expected 'generate_candidate' to be called once. Called 0 times."
+
+    def assert_called_once_with(self, /, *args, **kwargs):
+        """assert that the mock was called exactly once and that that call was
+        with the specified arguments."""
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to be called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'generate_candidate' to be called once. Called 0 times.
+
+/usr/lib/python3.12/unittest/mock.py:955: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_ironclad.TestMain object at 0x7ae8d3ad31a0>, mock_save = <MagicMock name='save_brick' id='135140395356560'>
+mock_validate = <MagicMock name='validate_candidate' id='135140395353056'>
+mock_generate = <MagicMock name='generate_candidate' id='135140396206464'>
+
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.save_brick')
+    def test_main_success_flow(self, mock_save, mock_validate, mock_generate):
+        """Test main function with successful flow"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        mock_validate.return_value = (True, "Tests passed")
+    
+        with patch('builtins.print'):
+            ironclad.main()
+    
+>       mock_generate.assert_called_once_with("test request", "gpt-oss:20b", ironclad.DEFAULT_SYSTEM_PROMPT)
+E       AssertionError: Expected 'generate_candidate' to be called once. Called 0 times.
+
+tests/test_ironclad.py:300: AssertionError
+____________________________________________ TestMain.test_main_generation_failure _____________________________________________
+
+self = <test_ironclad.TestMain object at 0x7ae8d3ad2ba0>
+mock_generate = <MagicMock name='generate_candidate' id='135140395291984'>
+
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    def test_main_generation_failure(self, mock_generate):
+        """Test main function when generation fails"""
+        mock_generate.return_value = None
+    
+        with patch('builtins.print') as mock_print:
+>           with pytest.raises(SystemExit) as exc_info:
+E           Failed: DID NOT RAISE <class 'SystemExit'>
+
+tests/test_ironclad.py:311: Failed
+____________________________________________ TestMain.test_main_validation_failure _____________________________________________
+
+self = <test_ironclad.TestMain object at 0x7ae8d3ad27e0>, mock_repair = <MagicMock name='repair_candidate' id='135140395804016'>
+mock_validate = <MagicMock name='validate_candidate' id='135140395804928'>
+mock_generate = <MagicMock name='generate_candidate' id='135140395467744'>
+
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.repair_candidate')
+    def test_main_validation_failure(self, mock_repair, mock_validate, mock_generate):
+        """Test main function when validation fails and repair also fails"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        mock_validate.return_value = (False, "Tests failed")
+        mock_repair.return_value = None  # Repair fails
+    
+        with patch('builtins.print') as mock_print:
+>           with pytest.raises(SystemExit) as exc_info:
+E           Failed: DID NOT RAISE <class 'SystemExit'>
+
+tests/test_ironclad.py:331: Failed
+______________________________________________ TestMain.test_main_repair_success _______________________________________________
+
+self = <MagicMock name='generate_candidate' id='135140401428144'>
+
+    def assert_called_once(self):
+        """assert that the mock was called only once.
+        """
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'generate_candidate' to have been called once. Called 0 times.
+
+/usr/lib/python3.12/unittest/mock.py:923: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_ironclad.TestMain object at 0x7ae8d3ad24e0>, mock_save = <MagicMock name='save_brick' id='135140401393984'>
+mock_repair = <MagicMock name='repair_candidate' id='135140401428000'>
+mock_validate = <MagicMock name='validate_candidate' id='135140401414512'>
+mock_generate = <MagicMock name='generate_candidate' id='135140401428144'>
+
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.repair_candidate')
+    @patch('ironclad.save_brick')
+    def test_main_repair_success(self, mock_save, mock_repair, mock_validate, mock_generate):
+        """Test main function when validation fails but repair succeeds"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        # First validation fails, second succeeds after repair
+        mock_validate.side_effect = [
+            (False, "Tests failed"),
+            (True, "Tests passed")
+        ]
+        mock_repair.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'fixed'",
+            "test": "def test_test_func(): assert test_func() == 'fixed'"
+        }
+    
+        with patch('builtins.print') as mock_print:
+            ironclad.main()
+    
+>       mock_generate.assert_called_once()
+E       AssertionError: Expected 'generate_candidate' to have been called once. Called 0 times.
+
+tests/test_ironclad.py:362: AssertionError
+___________________________________________ TestMain.test_main_max_retries_exceeded ____________________________________________
+
+self = <test_ironclad.TestMain object at 0x7ae8d3abbce0>, mock_repair = <MagicMock name='repair_candidate' id='135140401143616'>
+mock_validate = <MagicMock name='validate_candidate' id='135140401142128'>
+mock_generate = <MagicMock name='generate_candidate' id='135140401139440'>
+
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.repair_candidate')
+    def test_main_max_retries_exceeded(self, mock_repair, mock_validate, mock_generate):
+        """Test main function when max retries are exceeded"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        # Always fails validation
+        mock_validate.return_value = (False, "Tests failed")
+        mock_repair.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'still broken'",
+            "test": "def test_test_func(): assert test_func() == 'still broken'"
+        }
+    
+        with patch('builtins.print') as mock_print:
+>           with pytest.raises(SystemExit) as exc_info:
+E           Failed: DID NOT RAISE <class 'SystemExit'>
+
+tests/test_ironclad.py:388: Failed
+_____________________________________________ TestMain.test_main_repair_json_error _____________________________________________
+
+self = <test_ironclad.TestMain object at 0x7ae8d3abb470>, mock_repair = <MagicMock name='repair_candidate' id='135140399736800'>
+mock_validate = <MagicMock name='validate_candidate' id='135140399742128'>
+mock_generate = <MagicMock name='generate_candidate' id='135140399388944'>
+
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.repair_candidate')
+    def test_main_repair_json_error(self, mock_repair, mock_validate, mock_generate):
+        """Test main function when repair returns invalid JSON"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        mock_validate.return_value = (False, "Tests failed")
+        mock_repair.return_value = None  # Invalid JSON
+    
+        with patch('builtins.print') as mock_print:
+>           with pytest.raises(SystemExit) as exc_info:
+E           Failed: DID NOT RAISE <class 'SystemExit'>
+
+tests/test_ironclad.py:412: Failed
+____________________________________________ TestMainExecution.test_main_as_script _____________________________________________
+
+self = <MagicMock name='generate_candidate' id='135140399730128'>
+args = ('test request', 'gpt-oss:20b', '\nYou are a strict code generator. You do not talk. You output JSON only.\nYour goal ..._1()..."\n}\n\nThe code and test fields must contain properly formatted Python code with actual newline characters.\n')
+kwargs = {}, msg = "Expected 'generate_candidate' to be called once. Called 0 times."
+
+    def assert_called_once_with(self, /, *args, **kwargs):
+        """assert that the mock was called exactly once and that that call was
+        with the specified arguments."""
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to be called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'generate_candidate' to be called once. Called 0 times.
+
+/usr/lib/python3.12/unittest/mock.py:955: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_ironclad.TestMainExecution object at 0x7ae8d3af4500>
+mock_save = <MagicMock name='save_brick' id='135140399733488'>
+mock_validate = <MagicMock name='validate_candidate' id='135140399728400'>
+mock_generate = <MagicMock name='generate_candidate' id='135140399730128'>
+
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.save_brick')
+    def test_main_as_script(self, mock_save, mock_validate, mock_generate):
+        """Test main function when called as script"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        mock_validate.return_value = (True, "Tests passed")
+    
+        with patch('builtins.print'):
+            # Test calling main directly (simulates __main__ execution)
+            ironclad.main()
+    
+>       mock_generate.assert_called_once_with("test request", "gpt-oss:20b", ironclad.DEFAULT_SYSTEM_PROMPT)
+E       AssertionError: Expected 'generate_candidate' to be called once. Called 0 times.
+
+tests/test_ironclad.py:442: AssertionError
+_____________________________________ TestMainExecution.test_main_execution_via_main_block _____________________________________
+
+self = <test_ironclad.TestMainExecution object at 0x7ae8d3af4260>
+
+    def test_main_execution_via_main_block(self):
+        """Test that main() is called when __name__ == '__main__'"""
+        # This is a simple test to verify the __main__ block calls main()
+        # We can't easily test the actual __main__ execution without complex mocking
+        # But we can verify the structure is correct by checking the source
+>       with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src', 'ironclad.py'), 'r') as f:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/mnt/storage/repos/ai-guardrails/ironclad/src/ironclad.py'
+
+tests/test_ironclad.py:451: FileNotFoundError
+______________________________________ TestMainExecution.test_main_with_custom_parameters ______________________________________
+
+self = <test_ironclad.TestMainExecution object at 0x7ae8d3af4920>
+mock_save = <MagicMock name='save_brick' id='135140401147984'>
+mock_validate = <MagicMock name='validate_candidate' id='135140401137808'>
+mock_generate = <MagicMock name='generate_candidate' id='135140401144288'>
+
+    @patch('ironclad.generate_candidate')
+    @patch('ironclad.validate_candidate')
+    @patch('ironclad.save_brick')
+    def test_main_with_custom_parameters(self, mock_save, mock_validate, mock_generate):
+        """Test main function with custom parameters"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        mock_validate.return_value = (True, "Tests passed")
+    
+        with patch('builtins.print'):
+>           ironclad.main(
+                request="custom request",
+                model_name="custom_model",
+                output_dir="custom_output",
+                system_prompt="custom prompt"
+            )
+
+tests/test_ironclad.py:469: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+request = 'custom request', model_name = 'custom_model', output_dir = 'custom_output', system_prompt = 'custom prompt'
+
+    def main(request=None, model_name=None, output_dir=None, system_prompt=None):
+        """
+        Main function that can be called with parameters or from CLI
+        """
+        # Handle CLI mode if no parameters provided
+        if request is None:
+            if len(sys.argv) < 2:
+                print("Usage: python ironclad.py 'Your request here'")
+                print("Example: python ironclad.py 'extract phone numbers from a string'")
+                sys.exit(1)
+            request = sys.argv[1]
+    
+        # Set defaults if not provided
+        model_name = model_name or DEFAULT_MODEL_NAME
+        output_dir = output_dir or DEFAULT_OUTPUT_DIR
+        system_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
+    
+        # 1. Generate
+        candidate = generate_candidate(request, model_name, system_prompt)
+    
+        if not candidate:
+            print("[X] INCINERATED: Output invalid.")
+>           sys.exit(1)
+E           SystemExit: 1
+
+src/ironclad_ai_guardrails/ironclad.py:189: SystemExit
+__________________________________________ TestIntegration.test_full_workflow_success __________________________________________
+
+self = <test_ironclad.TestIntegration object at 0x7ae8d3af4c50>, mock_run = <MagicMock name='run' id='135140401422528'>
+mock_chat = <MagicMock name='chat' id='135140401426848'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    @patch('subprocess.run')
+    def test_full_workflow_success(self, mock_run, mock_chat):
+        """Test complete workflow from generation to saving"""
+        # Mock ollama response
+        mock_response = {
+            'message': {
+                'content': '{"filename": "test_func", "code": "def test_func(): return \\"test\\"", "test": "def test_test_func(): assert test_func() == \\"test\\""}'
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        # Mock successful test execution
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_result.stdout = "1 passed"
+        mock_run.return_value = mock_result
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch('builtins.print'):
+                # Test generate_candidate
+                candidate = ironclad.generate_candidate("test request")
+                assert candidate is not None
+    
+                # Test validate_candidate
+                is_valid, logs = ironclad.validate_candidate(candidate)
+                assert is_valid is True
+    
+                # Test save_brick
+                ironclad.save_brick(candidate, temp_dir)
+    
+                # Verify files exist directly in output_dir
+>               assert os.path.exists(os.path.join(temp_dir, "test_func.py"))
+E               AssertionError: assert False
+E                +  where False = <function exists at 0x7ae8d61f3600>('/mnt/storage/tmp/tmpzlgzdduz/test_func.py')
+E                +    where <function exists at 0x7ae8d61f3600> = <module 'posixpath' (frozen)>.exists
+E                +      where <module 'posixpath' (frozen)> = os.path
+E                +    and   '/mnt/storage/tmp/tmpzlgzdduz/test_func.py' = <function join at 0x7ae8d6014cc0>('/mnt/storage/tmp/tmpzlgzdduz', 'test_func.py')
+E                +      where <function join at 0x7ae8d6014cc0> = <module 'posixpath' (frozen)>.join
+E                +        where <module 'posixpath' (frozen)> = os.path
+
+tests/test_ironclad.py:516: AssertionError
+_______________________________________ TestDraftBlueprint.test_draft_blueprint_success ________________________________________
+
+self = <test_module_designer.TestDraftBlueprint object at 0x7ae8d3af4800>
+mock_chat = <MagicMock name='chat' id='135140395476960'>
+
+    @patch('ironclad_ai_guardrails.module_designer.ollama.chat')
+    def test_draft_blueprint_success(self, mock_chat):
+        """Test successful blueprint drafting"""
+        mock_response = {
+            'message': {
+                'content': '{"module_name": "test_module", "functions": []}'
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        result = module_designer.draft_blueprint("test request")
+    
+        assert result is not None
+>       assert result['module_name'] == 'test_module'
+E       AssertionError: assert 'test_request_handler' == 'test_module'
+E         
+E         - test_module
+E         + test_request_handler
+
+tests/test_module_designer.py:64: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Architecting solution for: 'test request'...
+____________________________________ TestModuleDesignerMain.test_draft_blueprint_json_error ____________________________________
+
+self = <test_module_designer.TestModuleDesignerMain object at 0x7ae8d3af6360>
+mock_chat = <MagicMock name='chat' id='135140396219616'>
+
+    @patch('ironclad_ai_guardrails.module_designer.ollama.chat')
+    def test_draft_blueprint_json_error(self, mock_chat):
+        """Test blueprint drafting with JSON error (lines 44-47)"""
+        mock_chat.return_value = {
+            'response': 'invalid json response'
+        }
+    
+        result = module_designer.draft_blueprint("test request")
+    
+>       assert result is None
+E       AssertionError: assert {'dependencies': ['typing', 're'], 'functions': [{'description': 'Parses the raw request string into a dictionary of key-value pairs. Supports URL-encoded query strings or JSON payloads. Handles malformed input by raising a ValueError. Edge cases: empty strings, missing keys, nested structures; these are either omitted from the result or stored as None.', 'name': 'parse_request', 'signature': 'def parse_request(request_str: str) -> dict'}, {'description': 'Validates the parsed request dictionary against a predefined schema. Checks required keys, data types, and value ranges. Returns True if validation passes, otherwise raises a ValidationError. Edge cases include missing keys, incorrect types, out-of-range numeric values, and unsupported enum values.', 'name': 'validate_request', 'signature': 'def validate_request(parsed: dict) -> bool'}, {'description': 'Implements the core business logic based on the validated request. This could involve calculations, database lookups, or calling external APIs. Returns a dictionary of results. Handles exceptions by logging and returning a standardized error response. Edge cases: division by zero, network timeouts, and unsupported operation codes.', 'name': 'process_request', 'signature': 'def process_request(parsed: dict) -> dict'}, {'description': 'Formats the result dictionary into a JSON string suitable for HTTP response. Includes HTTP status code and content type headers. Handles serialization errors by returning an error JSON with status 500. Edge cases: non-serializable objects, large payloads, and Unicode characters.', 'name': 'format_response', 'signature': 'def format_response(result: dict, status: int=200) -> str'}], 'main_logic_description': 'The main block orchestrates the flow: it receives the raw request string, calls parse_request to convert it to a dict, then validate_request to ensure it meets the schema. If validation succeeds, it passes the dict to process_request for business logic, capturing the result. Finally, format_response generates the JSON string and HTTP status code. Errors at any stage raise exceptions that can be caught by the caller to return appropriate error responses.', 'module_name': 'test_request_handler'} is None
+
+tests/test_module_designer.py:123: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Architecting solution for: 'test request'...
+___________________________________ TestModuleDesignerMain.test_draft_blueprint_ollama_error ___________________________________
+
+self = <test_module_designer.TestModuleDesignerMain object at 0x7ae8d3af6600>
+mock_chat = <MagicMock name='chat' id='135140396220336'>
+
+    @patch('ironclad_ai_guardrails.module_designer.ollama.chat')
+    def test_draft_blueprint_ollama_error(self, mock_chat):
+        """Test blueprint drafting with ollama error (lines 50-61)"""
+        mock_chat.side_effect = Exception("Ollama error")
+    
+        result = module_designer.draft_blueprint("test request")
+    
+>       assert result is None
+E       AssertionError: assert {'dependencies': [], 'functions': [{'description': 'Returns the reverse of the input string. Handles empty strings by returning an empty string. Uses slicing for efficient reversal. Raises TypeError if the input is not a string.', 'name': 'reverse_string', 'signature': 'def reverse_string(s: str) -> str'}, {'description': 'Checks whether the input string is a palindrome, ignoring case and non‑alphanumeric characters. Returns True for an empty string. Raises TypeError if the input is not a string.', 'name': 'is_palindrome', 'signature': 'def is_palindrome(s: str) -> bool'}, {'description': 'Counts the number of vowels (a, e, i, o, u) in the input string, case‑insensitive. Returns 0 for an empty string. Raises TypeError if the input is not a string.', 'name': 'count_vowels', 'signature': 'def count_vowels(s: str) -> int'}], 'main_logic_description': 'The module provides three standalone string utility functions. Consumers can import the functions and use them directly. A main block is optional; if included, it could demonstrate simple usage examples or basic unit‑test prints.', 'module_name': 'string_utilities'} is None
+
+tests/test_module_designer.py:132: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Architecting solution for: 'test request'...
+______________________________________ TestRepairCandidate.test_repair_candidate_success _______________________________________
+
+self = <test_repair.TestRepairCandidate object at 0x7ae8d39305c0>, mock_chat = <MagicMock name='chat' id='135140398010624'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_repair_candidate_success(self, mock_chat):
+        """Test successful repair of candidate"""
+        mock_response = {
+            'message': {
+                'content': '{"filename": "fixed_func", "code": "def fixed_func(): return \'fixed\'", "test": "def test_fixed_func(): assert fixed_func() == \'fixed\'"}'
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        candidate = {
+            "filename": "broken_func",
+            "code": "def broken_func(): return 'broken'",
+            "test": "def test_broken_func(): assert broken_func() == 'broken'"
+        }
+        traceback_log = "NameError: name 'broken_func' is not defined"
+    
+        result = ironclad.repair_candidate(candidate, traceback_log)
+    
+        assert result is not None
+>       assert result['filename'] == "fixed_func"
+E       AssertionError: assert 'reverse_string' == 'fixed_func'
+E         
+E         - fixed_func
+E         + reverse_string
+
+tests/test_repair.py:34: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Attempting repair...
+_________________________________ TestRepairCandidate.test_repair_candidate_with_custom_model __________________________________
+
+self = <test_repair.TestRepairCandidate object at 0x7ae8d3930860>, mock_chat = <MagicMock name='chat' id='135140395837456'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_repair_candidate_with_custom_model(self, mock_chat):
+        """Test repair with custom model and system prompt"""
+        mock_response = {
+            'message': {
+                'content': '{"filename": "repaired_func", "code": "def repaired_func(): pass", "test": "def test_repaired_func(): pass"}'
+            }
+        }
+        mock_chat.return_value = mock_response
+    
+        candidate = {"filename": "func", "code": "broken", "test": "broken"}
+        traceback = "error"
+    
+        result = ironclad.repair_candidate(
+            candidate,
+            traceback,
+            model_name="custom_model",
+            system_prompt="custom prompt"
+        )
+    
+>       assert result is not None
+E       assert None is not None
+
+tests/test_repair.py:59: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Attempting repair...
+[!] Repair Error: model 'custom_model' not found (status code: 404)
+_________________________________ TestRepairCandidate.test_repair_candidate_json_decode_error __________________________________
+
+self = <test_repair.TestRepairCandidate object at 0x7ae8d3930b00>, mock_chat = <MagicMock name='chat' id='135140397584592'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_repair_candidate_json_decode_error(self, mock_chat):
+        """Test repair when AI returns invalid JSON"""
+        mock_chat.return_value = {
+            'message': {
+                'content': 'invalid json content'
+            }
+        }
+    
+        with patch('builtins.print') as mock_print:
+            result = ironclad.repair_candidate(
+                {"filename": "func", "code": "broken", "test": "broken"},
+                "error"
+            )
+>           assert result is None
+E           assert {'code': 'def factorial(n):\n    if not isinstance(n, int):\n        raise TypeError("n must be an integer")\n    if n < 0:\n        raise ValueError("n must be non-negative")\n    if n == 0:\n        return 1\n    return n * factorial(n-1)', 'filename': 'factorial', 'test': 'import pytest\nfrom factorial import factorial\n\ndef test_factorial_basic():\n    assert factorial(0) == 1\n    assert factorial(5) == 120\n\ndef test_factorial_negative():\n    with pytest.raises(ValueError):\n        factorial(-1)\n\ndef test_factorial_nonint():\n    with pytest.raises(TypeError):\n        factorial(3.5)'} is None
+
+tests/test_repair.py:80: AssertionError
+____________________________________ TestRepairCandidate.test_repair_candidate_ollama_error ____________________________________
+
+self = <test_repair.TestRepairCandidate object at 0x7ae8d3930da0>, mock_chat = <MagicMock name='chat' id='135140398238368'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    def test_repair_candidate_ollama_error(self, mock_chat):
+        """Test repair when ollama connection fails"""
+        mock_chat.side_effect = Exception("Connection error")
+    
+        with patch('builtins.print') as mock_print:
+            result = ironclad.repair_candidate(
+                {"filename": "func", "code": "broken", "test": "broken"},
+                "error"
+            )
+>           assert result is None
+E           assert {'code': 'def is_palindrome(s):\n    """Return True if s is a palindrome ignoring non-alphanumeric chars and case."""\n    filtered = \'\'.join(ch.lower() for ch in s if ch.isalnum())\n    return filtered == filtered[::-1]', 'filename': 'is_palindrome', 'test': "import pytest\nfrom is_palindrome import is_palindrome\n\n\ndef test_empty_string():\n    assert is_palindrome('') is True\n\ndef test_single_char():\n    assert is_palindrome('A') is True\n\ndef test_simple_palindrome():\n    assert is_palindrome('racecar') is True\n\ndef test_non_palindrome():\n    assert is_palindrome('hello') is False\n\ndef test_with_non_alnum():\n    assert is_palindrome('A man, a plan, a canal: Panama') is True\n\ndef test_case_insensitivity():\n    assert is_palindrome('RaceCar') is True\n"} is None
+
+tests/test_repair.py:95: AssertionError
+____________________________________ TestRepairIntegration.test_repair_workflow_integration ____________________________________
+
+self = <test_repair.TestRepairIntegration object at 0x7ae8d3af51c0>
+mock_validate = <MagicMock name='validate_candidate' id='135140398240192'>
+mock_chat = <MagicMock name='chat' id='135140395426032'>
+
+    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    @patch('ironclad.validate_candidate')
+    def test_repair_workflow_integration(self, mock_validate, mock_chat):
+        """Test repair in context of validation failure"""
+        # Setup validation to fail first time
+        mock_validate.return_value = (False, "Test failed")
+    
+        # Setup repair to succeed
+        mock_chat.return_value = {
+            'message': {
+                'content': '{"filename": "fixed_func", "code": "def fixed_func(): return \'success\'", "test": "def test_fixed_func(): assert fixed_func() == \'success\'"}'
+            }
+        }
+    
+        candidate = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'broken'",
+            "test": "def test_test_func(): assert test_func() == 'broken'"
+        }
+    
+        # Initial generation
+        initial_candidate = ironclad.generate_candidate("test request")
+    
+        # Validation fails
+        is_valid, logs = ironclad.validate_candidate(initial_candidate)
+>       assert not is_valid
+E       assert not True
+
+tests/test_repair.py:139: AssertionError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Generating candidate for: 'test request'...
+[*] Executing tests in sandbox: /mnt/storage/tmp/tmp_cpxtjb7...
+[+] PASS: Tests passed successfully.
+_____________________________________ TestRepairIntegration.test_repair_prompt_formatting ______________________________________
+
+self = <test_repair.TestRepairIntegration object at 0x7ae8d3af4a70>
+
+    def test_repair_prompt_formatting(self):
+        """Test that repair prompt is correctly formatted"""
+        candidate = {
+            "filename": "broken_func",
+            "code": "def broken_func():\n    return undefined_var",
+            "test": "def test_broken_func(): assert broken_func() == 'value'"
+        }
+        traceback = "NameError: name 'undefined_var' is not defined"
+    
+        with patch('ironclad_ai_guardrails.ironclad.ollama.chat') as mock_chat:
+            mock_chat.return_value = {
+                'message': {
+                    'content': '{"filename": "fixed_func", "code": "def fixed_func(): return \'value\'", "test": "def test_fixed_func(): assert fixed_func() == \'value\'"}'
+                }
+            }
+    
+            ironclad.repair_candidate(candidate, traceback)
+    
+            # Check that the prompt was formatted correctly
+            call_args = mock_chat.call_args
+>           user_message = call_args[1]['messages'][1]['content']
+                           ^^^^^^^^^^^^
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_repair.py:167: TypeError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+[*] Attempting repair...
+_____________________________________________ TestUIGenerator.test_generate_web_ui _____________________________________________
+
+self = <test_ui_generator.TestUIGenerator object at 0x7ae8d3933440>
+
+    def test_generate_web_ui(self):
+        """Test generating web UI"""
+        ui_spec = self.create_sample_ui_spec(UIType.WEB)
+        generator = UIGenerator(ui_spec)
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+    
+            # Should generate web UI files
+            assert "index.html" in files
+            assert "styles.css" in files
+            assert "app.js" in files
+            assert "package.json" in files
+    
+            # Check HTML content
+            html_content = files["index.html"]
+            assert "Test Interface" in html_content
+            assert "text_input" in html_content
+            assert "number_input" in html_content
+            assert "select_choice" in html_content
+            assert "checkbox_option" in html_content
+            assert '<form id="mainForm"' in html_content
+    
+            # Check CSS content
+            css_content = files["styles.css"]
+            assert "container" in css_content
+            assert "form-control" in css_content
+>           assert "#3498db" in css_content  # Blue color scheme
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           assert '#3498db' in "* {\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box;\n}\n\nbody {\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    background-color: #f5f5f5;\n    color: #333;\n    line-height: 1.6;\n}\n\n.container {\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n}\n\nheader h1 {\n    color: #2c3e50;\n    border-bottom: 2px solid #007bff;\n    padding-bottom: 10px;\n    margin-bottom: 30px;\n}\n\n.ui-form {\n    background: white;\n    padding: 30px;\n    border-radius: 8px;\n    box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n}\n\n.form-group {\n    margin-bottom: 20px;\n}\n\n.form-group label {\n    display: block;\n    margin-bottom: 8px;\n    font-weight: 600;\n    color: #555;\n}\n\n.form-control {\n    width: 100%;\n    padding: 12px;\n    border: 2px solid #ddd;\n    border-radius: 4px;\n    font-size: 16px;\n    transition: border-color 0.3s;\n}\n\n.form-control:focus {\n    outline: none;\n    border-color: #007bff;\n    box-shadow: 0 0 5px rgba(52,152,219,0.2);\n}\n\n.btn {\n    background: #007bff;\n    color: white;\n    padding: 12px 24px;\n    border: none;\n    border-radius: 4px;\n    cursor: pointer;\n    font-size: 16px;\n    font-weight: 600;\n    transition: background-color 0.3s;\n}\n\n.btn:hover {\n    background: #0056b3;\n}\n\n.btn-primary {\n    background: #28a745;\n}\n\n.btn-primary:hover {\n    background: #218838;\n}\n\nfooter {\n    margin-top: 30px;\n    text-align: center;\n}\n\n.results {\n    margin-top: 20px;\n    padding: 15px;\n    background: #d4edda;\n    border: 1px solid #c3e6cb;\n    border-radius: 4px;\n    display: none;\n}\n\n.checkbox-label {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.form-checkbox {\n    margin: 0;\n}\n\n.radio-group {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n\n.radio-label {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.form-radio {\n    margin: 0;\n}"
+
+tests/test_ui_generator.py:97: AssertionError
+____________________________________________ TestUIGenerator.test_generate_cli_gui _____________________________________________
+
+self = <test_ui_generator.TestUIGenerator object at 0x7ae8d3954230>
+
+    def test_generate_cli_gui(self):
+        """Test generating CLI GUI (Tkinter)"""
+        ui_spec = self.create_sample_ui_spec(UIType.CLI_GUI)
+        generator = UIGenerator(ui_spec)
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+    
+            # Should generate CLI GUI files
+            assert "gui.py" in files
+            assert "requirements.txt" in files
+    
+            # Check GUI content
+            gui_content = files["gui.py"]
+>           assert "import tkinter as tk" in gui_content
+E           assert 'import tkinter as tk' in '\n#!/usr/bin/env python3\n# Generated GUI for Test Interface\n\ntkinter as tk\nfrom tkinter import ttk\njson\nsys\n\nclass TestInterfaceGUI:\n    def __init__(self, master=None):\n        super().__init__(master)\n        self.master = master\n        self.master.title("Test Interface")\n        self.create_widgets()\n        \n    def create_widgets(self):\n        main_frame = ttk.Frame(self.master, padding="10")\n        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))\n        \n                ttk.Label(main_frame, text="Text Parameter:").grid(row=0, column=0, sticky=tk.W, pady=2)\n        self.text_input_var = tk.StringVar()\n        text_input_entry = ttk.Entry(main_frame, textvariable=self.text_input_var)\n        text_input_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), pady=2)\n        ttk.Label(main_frame, text="Number Parameter:").grid(row=1, column=0, sticky=tk.W, pady=2)\n        self.number_input_var = tk.StringVar()\n        number_input_entry = ttk.Entry(main_frame, textvariable=self.number_input_var)\n        number_input_entry.grid(row=1, column=1, sticky=(tk.W, tk.E), pady=2)\n        ttk.Label(main_frame, text="Choice:").grid(row=2, column...X").grid(row=3, column=1, sticky=tk.W)\n        \n        # Execute button\n        execute_btn = ttk.Button(main_frame, text="Execute", command=self.execute_module)\n        execute_btn.grid(row=4, column=0, pady=10)\n        \n        # Results display\n        self.results_text = tk.Text(main_frame, height=10, width=50)\n        self.results_text.grid(row=5, column=0, pady=5, sticky=(tk.W, tk.E, tk.N, tk.S))\n        \n    def execute_module(self):\n        # Collect data from form\n        data = {}\n        \n                data["text_input"] = self.text_input_var.get()\n        data["number_input"] = self.number_input_var.get()\n        \n        try:\n            # Here you would call the actual module\n            results = f"Module executed with data: {json.dumps(data, indent=2)}"\n            self.results_text.delete(1.0, tk.END)\n            self.results_text.insert(tk.END, results)\n        except Exception as e:\n            error_msg = f"Error: {str(e)}"\n            self.results_text.delete(1.0, tk.END)\n            self.results_text.insert(tk.END, error_msg)\n\nif __name__ == "__main__":\n    root = tk.Tk()\n    app = TestInterfaceGUI(root)\n    root.mainloop()\n'
+
+tests/test_ui_generator.py:119: AssertionError
+___________________________________________ TestUIGenerator.test_generate_desktop_ui ___________________________________________
+
+self = <test_ui_generator.TestUIGenerator object at 0x7ae8d3954380>
+
+    def test_generate_desktop_ui(self):
+        """Test generating desktop UI (Electron)"""
+        ui_spec = self.create_sample_ui_spec(UIType.DESKTOP)
+        generator = UIGenerator(ui_spec)
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+    
+            # Should generate desktop UI files
+            assert "main.js" in files
+            assert "preload.js" in files
+            assert "index.html" in files
+            assert "package.json" in files
+    
+            # Check Electron main file
+            main_content = files["main.js"]
+>           assert "const { app, BrowserWindow } = require('electron')" in main_content
+E           assert "const { app, BrowserWindow } = require('electron')" in "const { app, BrowserWindow, Menu } = require('electron');\nconst path = require('path');\n\nlet mainWindow;\n\nfunction createWindow() {\n    mainWindow = new BrowserWindow({\n        width: 1200,\n        height: 800,\n        webPreferences: {\n            nodeIntegration: true,\n            contextIsolation: false\n        }\n    });\n    \n    mainWindow.loadFile(path.join(__dirname, 'index.html'));\n    mainWindow.on('closed', () => {\n        mainWindow = null;\n    });\n}\n\napp.whenReady().then(createWindow);"
+
+tests/test_ui_generator.py:144: AssertionError
+____________________________________________ TestUIGenerator.test_generate_cli_tui _____________________________________________
+
+self = <test_ui_generator.TestUIGenerator object at 0x7ae8d3954aa0>
+
+    def test_generate_cli_tui(self):
+        """Test generating CLI TUI (Rich/Textual)"""
+        ui_spec = self.create_sample_ui_spec(UIType.CLI_TUI)
+        generator = UIGenerator(ui_spec)
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+    
+            # Should generate TUI files
+            assert "tui.py" in files
+            assert "requirements.txt" in files
+    
+            # Check TUI content
+            tui_content = files["tui.py"]
+>           assert "from rich.console import Console" in tui_content
+E           assert 'from rich.console import Console' in '\n#!/usr/bin/env python3\n# Generated Terminal UI for Test Interface\n\nimport json\nfrom .rich.console import Console\nfrom .rich.table import Table\nfrom .rich.panel import Panel\nfrom .rich.prompt import Prompt, IntPrompt, FloatPrompt, Confirm\n\nclass TestInterfaceTUI:\n    def __init__(self):\n        self.console = Console()\n        \n    def run(self):\n        self.console.print(Panel(f"[bold blue]Test Interface[/bold blue]", expand=False))\n        \n        data = {}\n        \n                data["text_input"] = Prompt.ask("[bold]Text Parameter[/bold]")\n        data["number_input"] = Prompt.ask("[bold]Number Parameter[/bold]")\n        data["checkbox_option"] = Confirm.ask("[bold]Enable Feature[/bold]")\n        \n        # Execute module\n        self.console.print("\\n[bold green]Executing module...[/bold green]")\n        \n        try:\n            # Here you would call the actual module\n            result = json.dumps(data, indent=2)\n            self.console.print(Panel(result, title="Results", border_style="green"))\n        except Exception as e:\n            self.console.print(f"[bold red]Error: {str(e)}[/bold red]")\n    \n    \n\nif __name__ == "__main__":\n    app = TestInterfaceTUI()\n    app.run()\n'
+
+tests/test_ui_generator.py:191: AssertionError
+______________________________________ TestWebUIGeneration.test_html_component_generation ______________________________________
+
+self = <test_ui_generator.TestWebUIGeneration object at 0x7ae8d39550a0>
+
+    def test_html_component_generation(self):
+        """Test HTML generation for different component types"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Component Test",
+            components=[
+                UIComponent(
+                    name="email_field",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.email",
+                    label="Email",
+                    validation={"type": "email"}
+                ),
+                UIComponent(
+                    name="description",
+                    type=ComponentType.TEXT_AREA,
+                    data_binding="main.desc",
+                    label="Description"
+                ),
+                UIComponent(
+                    name="priority",
+                    type=ComponentType.RADIO,
+                    data_binding="main.priority",
+                    label="Priority",
+                    options=["Low", "Medium", "High"],
+                    default_value="Medium"
+                )
+            ],
+            layout=UILayout(type="vertical")
+        )
+    
+        generator = UIGenerator(ui_spec)
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            html_content = files["index.html"]
+    
+            # Check email input
+            assert 'type="email"' in html_content
+            assert 'name="email_field"' in html_content
+>           assert 'id="email_field"' in html_content
+E           assert 'id="email_field"' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Component Test</title>\n    <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n    <div class="container">\n        <header>\n            <h1>Component Test</h1>\n        </header>\n        <main>\n            <form id="mainForm" class="ui-form">\n                \n            <div class="form-group">\n                <label for="email_field">Email:</label>\n                <input type="email" id=\'email_field\' name="email_field" required  class="form-control">\n            </div>\n\n            <div class="form-group">\n                <label for="description">Description:</label>\n                <textarea id=\'description\' name="description" required  class="form-control" rows="4"></textarea>\n            </div>\n\n            <div class="form-group">\n                <div>Priority:</div>\n                <div class="radio-group">\n                    \n                <label class="radio-label">\n                    <input type="radio" name="priority" value="Low"  class="form-radio">\n                    Low\n                </label>\n                <label class="radio-label">\n                    <input type="radio" name="priority" value="Medium" checked class="form-radio">\n                    Medium\n                </label>\n                <label class="radio-label">\n                    <input type="radio" name="priority" value="High"  class="form-radio">\n                    High\n                </label>\n                </div>\n            </div>\n            </form>\n        </main>\n        <footer>\n            <button type="button" id="executeBtn" class="btn btn-primary">Execute</button>\n            <div id="results" class="results"></div>\n        </footer>\n    </div>\n    <script src="app.js"></script>\n</body>\n</html>'
+
+tests/test_ui_generator.py:263: AssertionError
+__________________________________ TestWebUIGeneration.test_javascript_interaction_generation __________________________________
+
+self = <test_ui_generator.TestWebUIGeneration object at 0x7ae8d3955910>
+
+    def test_javascript_interaction_generation(self):
+        """Test JavaScript interaction generation"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Interaction Test",
+            components=[
+                UIComponent(
+                    name="test_field",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.test",
+                    label="Test"
+                )
+            ],
+            layout=UILayout(type="vertical"),
+            interactions=[
+                UIInteraction(
+                    trigger="on_change",
+                    action="validate_input",
+                    target="test"
+                )
+            ]
+        )
+    
+        generator = UIGenerator(ui_spec)
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            js_content = files["app.js"]
+    
+            # Should have change handler
+            assert "addEventListener('change'" in js_content
+            assert "test" in js_content
+>           assert "validate_input" in js_content
+E           assert 'validate_input' in '// Generated UI logic for Interaction Test\ndocument.addEventListener(\'DOMContentLoaded\', function() {\n    const form = document.getElementById(\'mainForm\');\n    const executeBtn = document.getElementById(\'executeBtn\');\n    const resultsDiv = document.getElementById(\'results\');\n    \n    \n    \n        document.addEventListener(\'change\', function(e) {\n        if (e.target && e.target.name.includes(\'test\')) {\n            // Real-time validation for test\n            if (e.target.id.includes(\'test\')) {\n                validate_test();\n            }\n        }\n    });\n    \n    executeBtn.addEventListener(\'click\', function() {\n        if (validateForm()) {\n            executeModule();\n        }\n    });\n    \n    function validateForm() {\n        let isValid = true;\n        const errors = [];\n        \n        \n        \n        if (errors.length > 0) {\n            showErrors(errors);\n            return false;\n        }\n        \n        hideErrors();\n        return true;\n    }\n    \n    function showErrors(errors) {\n        resultsDiv.innerHTML = \'<div class="error">\' + errors.join(\'<br>\') + \'</div>\';\n        resultsDiv.style.display = \'block\';\n    }\n    \n    function hideErrors() {\n        resultsDiv.style.display = \'none\';\n    }\n    \n    function executeModule() {\n        const formData = new FormData(form);\n        const data = {};\n        \n        for (let [key, value] of formData.entries()) {\n            data[key] = value;\n        }\n        \n        // Call backend API\n        fetch(\'/api/execute\', {\n            method: \'POST\',\n            headers: {\n                \'Content-Type\': \'application/json\',\n            },\n            body: JSON.stringify(data)\n        })\n        .then(response => response.json())\n        .then(result => {\n            if (result.success) {\n                showResults(result.data);\n            } else {\n                showErrors([result.error]);\n            }\n        })\n        .catch(error => {\n            showErrors([\'Network error: \' + error.message]);\n        });\n    }\n    \n    function showResults(data) {\n        resultsDiv.innerHTML = \'<div class="success">\' + JSON.stringify(data, null, 2) + \'</div>\';\n        resultsDiv.style.display = \'block\';\n    }\n});'
+
+tests/test_ui_generator.py:403: AssertionError
+___________________________________________ TestEdgeCases.test_custom_css_in_styling ___________________________________________
+
+self = <test_ui_generator.TestEdgeCases object at 0x7ae8d39557c0>
+
+    def test_custom_css_in_styling(self):
+        """Test custom CSS in styling"""
+        custom_css = "body { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); }"
+    
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Custom CSS",
+            components=[
+                UIComponent(
+                    name="test",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.test",
+                    label="Test"
+                )
+            ],
+            layout=UILayout(type="vertical"),
+            styling=UIStyling(custom_css=custom_css)
+        )
+    
+        generator = UIGenerator(ui_spec)
+    
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            css_content = files["styles.css"]
+    
+            # Should include custom CSS
+>           assert custom_css in css_content
+E           assert 'body { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); }' in "* {\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box;\n}\n\nbody {\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    background-color: #f5f5f5;\n    color: #333;\n    line-height: 1.6;\n}\n\n.container {\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n}\n\nheader h1 {\n    color: #2c3e50;\n    border-bottom: 2px solid #3498db;\n    padding-bottom: 10px;\n    margin-bottom: 30px;\n}\n\n.ui-form {\n    background: white;\n    padding: 30px;\n    border-radius: 8px;\n    box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n}\n\n.form-group {\n    margin-bottom: 20px;\n}\n\n.form-group label {\n    display: block;\n    margin-bottom: 8px;\n    font-weight: 600;\n    color: #555;\n}\n\n.form-control {\n    width: 100%;\n    padding: 12px;\n    border: 2px solid #ddd;\n    border-radius: 4px;\n    font-size: 16px;\n    transition: border-color 0.3s;\n}\n\n.form-control:focus {\n    outline: none;\n    border-color: #3498db;\n    box-shadow: 0 0 5px rgba(52,152,219,0.2);\n}\n\n.btn {\n    background: #3498db;\n    color: white;\n    padding: 12px 24px;\n    border: none;\n    border-radius: 4px;\n    cursor: pointer;\n    font-size: 16px;\n    font-weight: 600;\n    transition: background-color 0.3s;\n}\n\n.btn:hover {\n    background: #2980b9;\n}\n\n.btn-primary {\n    background: #28a745;\n}\n\n.btn-primary:hover {\n    background: #218838;\n}\n\nfooter {\n    margin-top: 30px;\n    text-align: center;\n}\n\n.results {\n    margin-top: 20px;\n    padding: 15px;\n    background: #d4edda;\n    border: 1px solid #c3e6cb;\n    border-radius: 4px;\n    display: none;\n}\n\n.checkbox-label {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.form-checkbox {\n    margin: 0;\n}\n\n.radio-group {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n\n.radio-label {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.form-radio {\n    margin: 0;\n}"
+
+tests/test_ui_generator.py:605: AssertionError
+_____________________________________ TestUIComponent.test_component_validation_empty_name _____________________________________
+
+self = <test_ui_spec.TestUIComponent object at 0x7ae8d3957410>
+
+    def test_component_validation_empty_name(self):
+        """Test validation of component with empty name"""
+        component = UIComponent(
+            name="",
+            type=ComponentType.FORM_INPUT,
+            data_binding="main.test",
+            label="Test"
+        )
+    
+        errors = validate_component(component)
+>       assert len(errors) == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len(['Component name cannot be empty', 'Invalid data binding format: main.test'])
+
+tests/test_ui_spec.py:62: AssertionError
+_______________________________ TestUIComponent.test_component_validation_select_without_options _______________________________
+
+self = <test_ui_spec.TestUIComponent object at 0x7ae8d39307d0>
+
+    def test_component_validation_select_without_options(self):
+        """Test validation of SELECT component without options"""
+        component = UIComponent(
+            name="test_select",
+            type=ComponentType.SELECT,
+            data_binding="main.choice",
+            label="Choice"
+        )
+    
+        errors = validate_component(component)
+>       assert len(errors) == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len(['Invalid data binding format: main.choice', 'select component requires options'])
+
+tests/test_ui_spec.py:101: AssertionError
+_______________________________ TestUIComponent.test_component_validation_radio_without_options ________________________________
+
+self = <test_ui_spec.TestUIComponent object at 0x7ae8d3957710>
+
+    def test_component_validation_radio_without_options(self):
+        """Test validation of RADIO component without options"""
+        component = UIComponent(
+            name="test_radio",
+            type=ComponentType.RADIO,
+            data_binding="main.choice",
+            label="Choice"
+        )
+    
+        errors = validate_component(component)
+>       assert len(errors) == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len(['Invalid data binding format: main.choice', 'radio component requires options'])
+
+tests/test_ui_spec.py:114: AssertionError
+____________________________________ TestUISpec.test_ui_spec_validation_invalid_layout_type ____________________________________
+
+self = <test_ui_spec.TestUISpec object at 0x7ae8d3980c50>
+
+    def test_ui_spec_validation_invalid_layout_type(self):
+        """Test validation of UI spec with invalid layout type"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Test",
+            components=[
+                UIComponent(
+                    name="test",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.test",
+                    label="Test"
+                )
+            ],
+            layout=UILayout(type="invalid_layout")
+        )
+    
+        errors = validate_ui_spec(ui_spec)
+>       assert "Invalid layout type" in errors
+E       AssertionError: assert 'Invalid layout type' in ['Component 0 (test): Invalid data binding format: main.test', 'Invalid layout type: invalid_layout']
+
+tests/test_ui_spec.py:294: AssertionError
+______________________________ TestModuleSpecTransformation.test_transform_module_spec_to_web_ui _______________________________
+
+self = <test_ui_spec.TestModuleSpecTransformation object at 0x7ae8d3980f50>
+
+    def test_transform_module_spec_to_web_ui(self):
+        """Test transforming module spec to web UI"""
+        module_spec = self.sample_module_spec()
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+    
+        assert ui_spec.ui_type == UIType.WEB
+        assert ui_spec.title == "Calculator Interface"
+        assert len(ui_spec.components) > 0
+>       assert ui_spec.layout.type == "grid"
+E       AssertionError: assert 'flex' == 'grid'
+E         
+E         - grid
+E         + flex
+
+tests/test_ui_spec.py:332: AssertionError
+______________________________ TestUISpecSerialization.test_ui_spec_from_dict_invalid_enum_value _______________________________
+
+data = {'components': [], 'layout': {'type': 'vertical'}, 'title': 'Test', 'ui_type': 'invalid_type'}
+
+    def ui_spec_from_dict(data: Dict[str, Any]) -> UISpec:
+        """Create UISpec from dictionary (for loading from JSON)"""
+        try:
+>           ui_type = UIType(data['ui_type'])
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+src/ironclad_ai_guardrails/ui_spec.py:463: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/enum.py:757: in __call__
+    return cls.__new__(cls, value)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <enum 'UIType'>, value = 'invalid_type'
+
+    def __new__(cls, value):
+        # all enum instances are actually created during class construction
+        # without calling this method; this method is called by the metaclass'
+        # __call__ (i.e. Color(3) ), and by pickle
+        if type(value) is cls:
+            # For lookups like Color(Color.RED)
+            return value
+        # by-value search for a matching enum member
+        # see if it's in the reverse mapping (for hashable values)
+        try:
+            return cls._value2member_map_[value]
+        except KeyError:
+            # Not found, no need to do long O(n) search
+            pass
+        except TypeError:
+            # not there, now do long search -- O(n) behavior
+            for member in cls._member_map_.values():
+                if member._value_ == value:
+                    return member
+        # still not found -- verify that members exist, in-case somebody got here mistakenly
+        # (such as via super when trying to override __new__)
+        if not cls._member_map_:
+            raise TypeError("%r has no members defined" % cls)
+        #
+        # still not found -- try _missing_ hook
+        try:
+            exc = None
+            result = cls._missing_(value)
+        except Exception as e:
+            exc = e
+            result = None
+        try:
+            if isinstance(result, cls):
+                return result
+            elif (
+                    Flag is not None and issubclass(cls, Flag)
+                    and cls._boundary_ is EJECT and isinstance(result, int)
+                ):
+                return result
+            else:
+                ve_exc = ValueError("%r is not a valid %s" % (value, cls.__qualname__))
+                if result is None and exc is None:
+>                   raise ve_exc
+E                   ValueError: 'invalid_type' is not a valid UIType
+
+/usr/lib/python3.12/enum.py:1171: ValueError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_ui_spec.TestUISpecSerialization object at 0x7ae8d39817f0>
+
+    def test_ui_spec_from_dict_invalid_enum_value(self):
+        """Test creating UISpec from dict with invalid enum value"""
+        invalid_data = {
+            "ui_type": "invalid_type",
+            "title": "Test",
+            "components": [],
+            "layout": {"type": "vertical"}
+        }
+    
+        with pytest.raises(ValueError) as exc_info:
+>           ui_spec_from_dict(invalid_data)
+
+tests/test_ui_spec.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+data = {'components': [], 'layout': {'type': 'vertical'}, 'title': 'Test', 'ui_type': 'invalid_type'}
+
+    def ui_spec_from_dict(data: Dict[str, Any]) -> UISpec:
+        """Create UISpec from dictionary (for loading from JSON)"""
+        try:
+            ui_type = UIType(data['ui_type'])
+            layout_data = data['layout']
+            layout = UILayout(
+                type=layout_data['type'],
+                columns=layout_data.get('columns'),
+                spacing=layout_data.get('spacing'),
+                alignment=layout_data.get('alignment'),
+                responsive=layout_data.get('responsive', True)
+            )
+    
+            styling_data = data.get('styling')
+            styling = UIStyling(
+                theme=styling_data.get('theme', 'default'),
+                color_scheme=styling_data.get('color_scheme'),
+                font_size=styling_data.get('font_size'),
+                custom_css=styling_data.get('custom_css')
+            ) if styling_data else None
+    
+            components = []
+            for comp_data in data['components']:
+                component = UIComponent(
+                    name=comp_data['name'],
+                    type=ComponentType(comp_data['type']),
+                    data_binding=comp_data['data_binding'],
+                    label=comp_data['label'],
+                    placeholder=comp_data.get('placeholder'),
+                    validation=comp_data.get('validation'),
+                    layout=comp_data.get('layout'),
+                    default_value=comp_data.get('default_value'),
+                    required=comp_data.get('required', True),
+                    options=comp_data.get('options')
+                )
+                components.append(component)
+    
+            interactions = []
+            for inter_data in data.get('interactions', []):
+                interaction = UIInteraction(
+                    trigger=inter_data['trigger'],
+                    action=inter_data['action'],
+                    target=inter_data['target'],
+                    parameters=inter_data.get('parameters')
+                )
+                interactions.append(interaction)
+    
+            return UISpec(
+                ui_type=ui_type,
+                title=data['title'],
+                components=components,
+                layout=layout,
+                interactions=interactions,
+                styling=styling,
+                metadata=data.get('metadata', {})
+            )
+    
+        except KeyError as e:
+            raise UISpecValidationError(f"Missing required field in UISpec data: {e}")
+        except Exception as e:
+>           raise UISpecValidationError(f"Error creating UISpec from data: {e}")
+E           ironclad_ai_guardrails.ui_spec.UISpecValidationError: Error creating UISpec from data: 'invalid_type' is not a valid UIType
+
+src/ironclad_ai_guardrails/ui_spec.py:520: UISpecValidationError
+__________________________________________ TestUIValidator.test_validate_broken_html ___________________________________________
+
+self = <test_ui_validator.TestUIValidator object at 0x7ae8d3983ec0>
+
+        def test_validate_broken_html(self):
+            """Test validation with broken HTML"""
+            temp_dir = self.create_temp_ui_dir("web", {
+                "index.html": """<html>
+    <head><title>Broken</title></head>
+    <body>
+    <!-- Missing DOCTYPE and proper structure -->
+    <form>
+    <input name="test">
+    </form>
+    """,
+                "styles.css": "body { color: red; }",
+                "app.js": "// No validation functions"
+            })
+    
+            try:
+                validator = UIValidator(temp_dir, "web")
+                result = validator.validate_all()
+    
+                # Should have errors for missing DOCTYPE and other structure issues
+                error_issues = [i for i in result.issues if i.level == ValidationLevel.ERROR]
+>               assert len(error_issues) >= 2  # DOCTYPE and other structure issues
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: assert 1 >= 2
+E                +  where 1 = len([ValidationIssue(level=<ValidationLevel.ERROR: 'error'>, message='Missing DOCTYPE declaration', file_path='/mnt/storage/tmp/tmp0bi5rw5_/index.html', line_number=None, suggestion='Add <!DOCTYPE html> at the beginning')])
+
+tests/test_ui_validator.py:332: AssertionError
+_____________________________________ TestUIValidator.test_validate_missing_css_properties _____________________________________
+
+self = <test_ui_validator.TestUIValidator object at 0x7ae8d39ac4a0>
+
+        def test_validate_missing_css_properties(self):
+            """Test validation with minimal CSS"""
+            temp_dir = self.create_temp_ui_dir("web", {
+                "index.html": """<!DOCTYPE html>
+    <html>
+    <head><title>Test</title></head>
+    <body>
+    <form><input name="test"></form>
+    </body>
+    </html>""",
+                "styles.css": ".minimal { color: blue; }",
+                "app.js": "console.log('test');",
+                "package.json": json.dumps({"name": "test", "version": "1.0.0"})
+            })
+    
+            try:
+                validator = UIValidator(temp_dir, "web")
+                result = validator.validate_all()
+    
+                # Should have info level issues for missing CSS properties
+                info_issues = [i for i in result.issues if i.level == ValidationLevel.INFO]
+>               assert any("missing common CSS properties" in issue.message for issue in info_issues)
+E               assert False
+E                +  where False = any(<generator object TestUIValidator.test_validate_missing_css_properties.<locals>.<genexpr> at 0x7ae8d3665d80>)
+
+tests/test_ui_validator.py:378: AssertionError
+____________________________________ TestUIValidator.test_validate_security_sensitive_data _____________________________________
+
+self = <test_ui_validator.TestUIValidator object at 0x7ae8d3983b60>
+
+        def test_validate_security_sensitive_data(self):
+            """Test security validation with sensitive data"""
+            temp_dir = self.create_temp_ui_dir("web", {
+                "index.html": """<!DOCTYPE html>
+    <html>
+    <head><title>Test</title></head>
+    <body>
+    <script>
+        const apiKey = 'sk-1234567890abcdef';
+        const password = 'secret123';
+    </script>
+    </body>
+    </html>""",
+                "styles.css": "body { margin: 0; }",
+                "app.js": "// JavaScript",
+                "package.json": json.dumps({"name": "test", "version": "1.0.0"})
+            })
+    
+            try:
+                validator = UIValidator(temp_dir, "web")
+                result = validator.validate_all()
+    
+                # Should have critical issues for sensitive data
+                critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+                sensitive_issues = [i for i in critical_issues if "Sensitive data found" in i.message]
+>               assert len(sensitive_issues) >= 2  # API key and password
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: assert 1 >= 2
+E                +  where 1 = len([ValidationIssue(level=<ValidationLevel.CRITICAL: 'critical'>, message='Sensitive data found: Hardcoded password', file_path='/mnt/storage/tmp/tmpmyqb1fxz/index.html', line_number=None, suggestion='Remove sensitive data and use environment variables')])
+
+tests/test_ui_validator.py:433: AssertionError
+________________________________ TestConvenienceFunctions.test_print_validation_report_function ________________________________
+
+self = <test_ui_validator.TestConvenienceFunctions object at 0x7ae8d3980290>
+capsys = <_pytest.capture.CaptureFixture object at 0x7ae8d3440920>
+
+    def test_print_validation_report_function(self, capsys):
+        """Test print_validation_report function"""
+        issues = [
+            ValidationIssue(ValidationLevel.ERROR, "Test error", "/test/file.html"),
+            ValidationIssue(ValidationLevel.WARNING, "Test warning", suggestion="Fix it")
+        ]
+    
+        result = ValidationResult(
+            status=ValidationStatus.WARNING,
+            issues=issues,
+            execution_time=0.5,
+            metadata={"total_issues": 2, "error_issues": 1, "warning_issues": 1}
+        )
+    
+>       print_validation_report(result)
+
+tests/test_ui_validator.py:480: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = ValidationResult(status=<ValidationStatus.WARNING: 'warning'>, issues=[ValidationIssue(level=<ValidationLevel.ERROR: '...=None, suggestion='Fix it')], execution_time=0.5, metadata={'total_issues': 2, 'error_issues': 1, 'warning_issues': 1})
+
+    def print_validation_report(result: ValidationResult):
+        """Print a formatted validation report"""
+        print(f"\n{'='*60}")
+        print(f"UI VALIDATION REPORT")
+        print(f"{'='*60}")
+        print(f"Status: {result.status.value.upper()}")
+        print(f"Execution Time: {result.execution_time:.2f}s")
+        print(f"Total Issues: {result.metadata['total_issues']}")
+>       print(f"Critical: {result.metadata['critical_issues']}")
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'critical_issues'
+
+src/ironclad_ai_guardrails/ui_validator.py:897: KeyError
+----------------------------------------------------- Captured stdout call -----------------------------------------------------
+
+============================================================
+UI VALIDATION REPORT
+============================================================
+Status: WARNING
+Execution Time: 0.50s
+Total Issues: 2
+_________________________________________ TestEdgeCases.test_validate_unknown_ui_type __________________________________________
+
+self = <test_ui_validator.TestEdgeCases object at 0x7ae8d3982570>
+
+    def test_validate_unknown_ui_type(self):
+        """Test validation with unknown UI type (should still run common validations)"""
+>       temp_dir = self.create_temp_ui_dir("web")
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'TestEdgeCases' object has no attribute 'create_temp_ui_dir'
+
+tests/test_ui_validator.py:509: AttributeError
+_______________________________________ TestEdgeCases.test_validate_file_reading_errors ________________________________________
+
+self = <test_ui_validator.TestEdgeCases object at 0x7ae8d3956c00>
+
+    def test_validate_file_reading_errors(self):
+        """Test handling of file reading errors"""
+>       temp_dir = self.create_temp_ui_dir("web")
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'TestEdgeCases' object has no attribute 'create_temp_ui_dir'
+
+tests/test_ui_validator.py:524: AttributeError
+______________________________________ TestEdgeCases.test_validate_malformed_requirements ______________________________________
+
+self = <test_ui_validator.TestEdgeCases object at 0x7ae8d3955ac0>
+
+    def test_validate_malformed_requirements(self):
+        """Test validation of malformed requirements.txt"""
+>       temp_dir = self.create_temp_ui_dir("cli_gui", {
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+            "gui.py": "#!/usr/bin/env python3\nprint('test')",
+            "requirements.txt": "package_without_version\nanother_package"
+        })
+E       AttributeError: 'TestEdgeCases' object has no attribute 'create_temp_ui_dir'
+
+tests/test_ui_validator.py:545: AttributeError
+======================================================== tests coverage ========================================================
+_______________________________________ coverage: platform linux, python 3.12.3-final-0 ________________________________________
+
+Name                                            Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------
+src/ironclad_ai_guardrails/__init__.py              3      0   100%
+src/ironclad_ai_guardrails/cli.py                  36      0   100%
+src/ironclad_ai_guardrails/code_utils.py           82      7    91%   34, 44, 99-100, 108, 139, 148
+src/ironclad_ai_guardrails/factory_manager.py     164     72    56%   20-100, 131-133, 245, 282-304
+src/ironclad_ai_guardrails/fix_all.py              16     16     0%   1-33
+src/ironclad_ai_guardrails/ironclad.py            106      9    92%   63-64, 201-202, 213-217
+src/ironclad_ai_guardrails/module_designer.py      30      3    90%   44-46
+src/ironclad_ai_guardrails/module_forge.py         58      0   100%
+src/ironclad_ai_guardrails/ui_cli.py              135    135     0%   6-279
+src/ironclad_ai_guardrails/ui_generator.py        237     14    94%   189, 240, 244, 246, 397-402, 612-613, 742, 759, 811
+src/ironclad_ai_guardrails/ui_spec.py             217     17    92%   212, 219, 227-228, 252-253, 260-265, 301, 358, 374, 381, 386, 404
+src/ironclad_ai_guardrails/ui_validator.py        361     95    74%   89-90, 181, 191, 206, 215, 218, 232, 247-264, 282-283, 332, 339, 377-378, 423-424, 471-472, 494, 502, 520-528, 544, 575-576, 589, 606-607, 615-646, 654-667, 681, 698-699, 713, 720, 727, 735-748, 761, 770-778, 798, 810-811, 840-842, 863-871, 898-927
+-----------------------------------------------------------------------------
+TOTAL                                            1445    368    75%
+=================================================== short test summary info ====================================================
+FAILED tests/test_code_utils.py::TestCleanJsonResponse::test_clean_markdown_fences - json.decoder.JSONDecodeError: Invalid \escape: line 2 column 16 (char 16)
+FAILED tests/test_code_utils.py::TestFixCommonCodeIssues::test_newline_normalization - AssertionError: assert 'line1 line2 line3 line4\n' == 'line1\nline2\nline3\nline4\n'
+FAILED tests/test_code_utils.py::TestFixCommonCodeIssues::test_excessive_whitespace_cleanup - AssertionError: assert 'def hello(): pass' == 'def hello():\n    pass'
+FAILED tests/test_code_utils.py::TestExtractCodeFromResponse::test_no_code_found - AssertionError: assert 'This is just...t any code.\n' == 'This is just...out any code.'
+FAILED tests/test_factory_manager.py::TestBuildComponents::test_build_components_success - AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+FAILED tests/test_factory_manager.py::TestBuildComponents::test_build_components_smart_mode_existing_dir - AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+FAILED tests/test_factory_manager.py::TestBuildComponents::test_build_components_with_repair - AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+FAILED tests/test_factory_manager.py::TestBuildComponents::test_build_components_max_retries_exceeded - AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+FAILED tests/test_factory_manager.py::TestBuildComponentsResume::test_resume_mode_existing_components - AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+FAILED tests/test_factory_manager.py::TestMainValidation::test_repair_main_candidate - AssertionError: Expected 'chat' to have been called once. Called 0 times.
+FAILED tests/test_factory_manager.py::TestMainValidation::test_generate_main_candidate - AssertionError: assert 'from test_fu...n    main()\n' == 'def main(): pass'
+FAILED tests/test_factory_manager.py::TestNewlineHandlingIntegration::test_main_candidate_with_escaped_newlines - assert 'import sys\nfrom utils import helper' in 'import sys\nimport helper\n\n\ndef main():\n    try:\n        print("Test...
+FAILED tests/test_factory_manager.py::TestNewlineHandlingIntegration::test_repair_main_candidate_with_newlines - assert 'print("fixed")' in 'import helper\n\ndef main():\n    print("broken")\n    return False\n'
+FAILED tests/test_factory_manager.py::TestNewlineHandlingIntegration::test_component_saving_with_cleaned_code - AttributeError: module 'ironclad_ai_guardrails.factory_manager' has no attribute 'ironclad'
+FAILED tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_success - AssertionError: assert 'validate_request' == 'test_func'
+FAILED tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_json_decode_error - assert {'code': 'def validate_request(request):\n    """\n    Validate a simplified HTTP request represented as a dictionar...
+FAILED tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_ollama_error - assert {'code': 'def fibonacci(n):\n    if not isinstance(n, int):\n        raise TypeError("n must be an integer")\n    if...
+FAILED tests/test_ironclad.py::TestGenerateCandidate::test_generate_candidate_with_markdown_response - AssertionError: assert 'process_request' == 'test_func'
+FAILED tests/test_ironclad.py::TestValidateCandidate::test_validate_candidate_none_candidate - Failed: DID NOT RAISE <class 'AttributeError'>
+FAILED tests/test_ironclad.py::TestMain::test_main_success_flow - AssertionError: Expected 'generate_candidate' to be called once. Called 0 times.
+FAILED tests/test_ironclad.py::TestMain::test_main_generation_failure - Failed: DID NOT RAISE <class 'SystemExit'>
+FAILED tests/test_ironclad.py::TestMain::test_main_validation_failure - Failed: DID NOT RAISE <class 'SystemExit'>
+FAILED tests/test_ironclad.py::TestMain::test_main_repair_success - AssertionError: Expected 'generate_candidate' to have been called once. Called 0 times.
+FAILED tests/test_ironclad.py::TestMain::test_main_max_retries_exceeded - Failed: DID NOT RAISE <class 'SystemExit'>
+FAILED tests/test_ironclad.py::TestMain::test_main_repair_json_error - Failed: DID NOT RAISE <class 'SystemExit'>
+FAILED tests/test_ironclad.py::TestMainExecution::test_main_as_script - AssertionError: Expected 'generate_candidate' to be called once. Called 0 times.
+FAILED tests/test_ironclad.py::TestMainExecution::test_main_execution_via_main_block - FileNotFoundError: [Errno 2] No such file or directory: '/mnt/storage/repos/ai-guardrails/ironclad/src/ironclad.py'
+FAILED tests/test_ironclad.py::TestMainExecution::test_main_with_custom_parameters - SystemExit: 1
+FAILED tests/test_ironclad.py::TestIntegration::test_full_workflow_success - AssertionError: assert False
+FAILED tests/test_module_designer.py::TestDraftBlueprint::test_draft_blueprint_success - AssertionError: assert 'test_request_handler' == 'test_module'
+FAILED tests/test_module_designer.py::TestModuleDesignerMain::test_draft_blueprint_json_error - AssertionError: assert {'dependencies': ['typing', 're'], 'functions': [{'description': 'Parses the raw request string into...
+FAILED tests/test_module_designer.py::TestModuleDesignerMain::test_draft_blueprint_ollama_error - AssertionError: assert {'dependencies': [], 'functions': [{'description': 'Returns the reverse of the input string. Handles...
+FAILED tests/test_repair.py::TestRepairCandidate::test_repair_candidate_success - AssertionError: assert 'reverse_string' == 'fixed_func'
+FAILED tests/test_repair.py::TestRepairCandidate::test_repair_candidate_with_custom_model - assert None is not None
+FAILED tests/test_repair.py::TestRepairCandidate::test_repair_candidate_json_decode_error - assert {'code': 'def factorial(n):\n    if not isinstance(n, int):\n        raise TypeError("n must be an integer")\n    if...
+FAILED tests/test_repair.py::TestRepairCandidate::test_repair_candidate_ollama_error - assert {'code': 'def is_palindrome(s):\n    """Return True if s is a palindrome ignoring non-alphanumeric chars and case.""...
+FAILED tests/test_repair.py::TestRepairIntegration::test_repair_workflow_integration - assert not True
+FAILED tests/test_repair.py::TestRepairIntegration::test_repair_prompt_formatting - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_ui_generator.py::TestUIGenerator::test_generate_web_ui - assert '#3498db' in "* {\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box;\n}\n\nbody {\n    font-family: 'Sego...
+FAILED tests/test_ui_generator.py::TestUIGenerator::test_generate_cli_gui - assert 'import tkinter as tk' in '\n#!/usr/bin/env python3\n# Generated GUI for Test Interface\n\ntkinter as tk\nfrom tkint...
+FAILED tests/test_ui_generator.py::TestUIGenerator::test_generate_desktop_ui - assert "const { app, BrowserWindow } = require('electron')" in "const { app, BrowserWindow, Menu } = require('electron');\n...
+FAILED tests/test_ui_generator.py::TestUIGenerator::test_generate_cli_tui - assert 'from rich.console import Console' in '\n#!/usr/bin/env python3\n# Generated Terminal UI for Test Interface\n\nimpor...
+FAILED tests/test_ui_generator.py::TestWebUIGeneration::test_html_component_generation - assert 'id="email_field"' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewpo...
+FAILED tests/test_ui_generator.py::TestWebUIGeneration::test_javascript_interaction_generation - assert 'validate_input' in '// Generated UI logic for Interaction Test\ndocument.addEventListener(\'DOMContentLoaded\', fun...
+FAILED tests/test_ui_generator.py::TestEdgeCases::test_custom_css_in_styling - assert 'body { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); }' in "* {\n    margin: 0;\n    padding: 0;\n    box-s...
+FAILED tests/test_ui_spec.py::TestUIComponent::test_component_validation_empty_name - AssertionError: assert 2 == 1
+FAILED tests/test_ui_spec.py::TestUIComponent::test_component_validation_select_without_options - AssertionError: assert 2 == 1
+FAILED tests/test_ui_spec.py::TestUIComponent::test_component_validation_radio_without_options - AssertionError: assert 2 == 1
+FAILED tests/test_ui_spec.py::TestUISpec::test_ui_spec_validation_invalid_layout_type - AssertionError: assert 'Invalid layout type' in ['Component 0 (test): Invalid data binding format: main.test', 'Invalid lay...
+FAILED tests/test_ui_spec.py::TestModuleSpecTransformation::test_transform_module_spec_to_web_ui - AssertionError: assert 'flex' == 'grid'
+FAILED tests/test_ui_spec.py::TestUISpecSerialization::test_ui_spec_from_dict_invalid_enum_value - ironclad_ai_guardrails.ui_spec.UISpecValidationError: Error creating UISpec from data: 'invalid_type' is not a valid UIType
+FAILED tests/test_ui_validator.py::TestUIValidator::test_validate_broken_html - AssertionError: assert 1 >= 2
+FAILED tests/test_ui_validator.py::TestUIValidator::test_validate_missing_css_properties - assert False
+FAILED tests/test_ui_validator.py::TestUIValidator::test_validate_security_sensitive_data - AssertionError: assert 1 >= 2
+FAILED tests/test_ui_validator.py::TestConvenienceFunctions::test_print_validation_report_function - KeyError: 'critical_issues'
+FAILED tests/test_ui_validator.py::TestEdgeCases::test_validate_unknown_ui_type - AttributeError: 'TestEdgeCases' object has no attribute 'create_temp_ui_dir'
+FAILED tests/test_ui_validator.py::TestEdgeCases::test_validate_file_reading_errors - AttributeError: 'TestEdgeCases' object has no attribute 'create_temp_ui_dir'
+FAILED tests/test_ui_validator.py::TestEdgeCases::test_validate_malformed_requirements - AttributeError: 'TestEdgeCases' object has no attribute 'create_temp_ui_dir'
+ERROR tests/test_factory_manager.py::TestAssembleMainRepair::test_full_workflow_integration
+===================================== 58 failed, 147 passed, 1 error in 645.56s (0:10:45) ======================================
