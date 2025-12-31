@@ -1,23 +1,10 @@
-import urllib.request
-from typing import Optional
-
-def get_http_status(url: str) -> Optional[int]:
-    """Return the HTTP status code for a GET request to *url*.
-
-    Parameters
-    ----------
-    url : str
-        The URL to request.
-
-    Returns
-    -------
-    Optional[int]
-        The HTTP status code if the request succeeds; otherwise ``None``.
-    """
-    if not url:
-        return None
-    try:
-        with urllib.request.urlopen(url, timeout=5) as response:
-            return response.getcode()
-    except Exception:
-        return None
+def function_name(n):
+    """Return factorial of n (non-negative integer)."""
+    if not isinstance(n, int):
+        raise TypeError("n must be an integer")
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result

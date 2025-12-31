@@ -9,6 +9,7 @@ import subprocess
 # We import logic from your existing Ironclad tool
 from ironclad_ai_guardrails.code_utils import clean_json_response as utils_clean_json, clean_code_content, validate_python_syntax
 from ironclad_ai_guardrails.ironclad import generate_candidate, validate_candidate, repair_candidate, save_brick
+from ironclad_ai_guardrails import ironclad
 
 MODEL_NAME = "gpt-oss:20b"
 
@@ -103,35 +104,35 @@ def build_components(blueprint, resume_mode="smart"):
 def generate_main_candidate(blueprint, components):
     """Generate main.py candidate with enhanced prompt"""
     assembler_prompt = f"""
-    You are the Lead Integrator.
-    We have verified Python files in the current directory: {components}.
-    
-    Your Job: Write a `main.py` script that imports these functions and implements this logic:
-    "{blueprint['main_logic_description']}"
-    
-    Requirements:
-    1. Import all component functions from their respective files
-    2. Implement the main logic using these functions
-    3. Include proper error handling
-    4. Add a main() function and if __name__ == "__main__" guard
-    5. Ensure the code is syntactically correct Python
-    6. CRITICAL: Use actual newline characters in your code, not escaped \\n sequences
-    
-    Output JSON with "filename": "main.py" and "code" fields only.
-    The code field must contain properly formatted Python code with real newlines.
-    """
-    
-    # Use ollama.generate instead of chat to avoid hanging with gpt-oss models
-    full_prompt = "You output valid JSON only. All code fields must contain actual newline characters, not escaped sequences.\n\n" + assembler_prompt
-    response = ollama.generate(model=MODEL_NAME, prompt=full_prompt)
-    
+You are the Lead Integrator.
+We have verified Python files in the current directory: {components}.
+
+Your Job: Write a main.py script that imports these functions and implements this logic:
+"{blueprint['main_logic_description']}"
+
+Requirements:
+1. Import all component functions from their respective files
+2. Implement the main logic using these functions
+3. Include proper error handling
+4. Add a main() function and if __name__ == "__main__" guard
+5. Ensure the code is syntactically correct Python
+6. CRITICAL: Use actual newline characters in your code, not escaped \\n sequences
+
+Output JSON with "filename": "main.py" and "code" fields only.
+The code field must contain properly formatted Python code with real newlines.
+""".strip()
+
+    full_prompt = "You output valid JSON only.\n\n" + assembler_prompt
+    resp = ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": full_prompt}])
+
     try:
-        data = json.loads(clean_json(response['response']))
-        code = clean_code_content(data.get('code', ''))
-        return code
+        data = json.loads(clean_json(resp["message"]["content"]))
+        code = clean_code_content(data.get("code", ""))
+        return code.strip("\n")
     except (json.JSONDecodeError, KeyError) as e:
         print(f"   [!] Failed to parse main.py generation response: {e}")
         return None
+
 
 def validate_main_candidate(candidate_code, components, module_dir):
     """Test that main.py works with actual components"""
@@ -205,33 +206,25 @@ def validate_main_candidate(candidate_code, components, module_dir):
 def repair_main_candidate(candidate_code, error_logs, components, module_dir):
     """Use Ironclad to repair main.py based on validation failures"""
     repair_prompt = f"""
-    The following main.py code has errors that need to be fixed:
-    
-    ERRORS: {error_logs}
-    
-    CURRENT CODE:
-    {candidate_code}
-    
-    Available components: {components}
-    
-    Please fix the errors and return a corrected version of the main.py code.
-    Focus on:
-    1. Fixing syntax errors
-    2. Correcting import statements
-    3. Ensuring proper integration with available components
-    4. Maintaining the original functionality
-    5. CRITICAL: Ensure all code uses actual newline characters, not \\n escape sequences
-    
-    Return only the corrected Python code, no JSON formatting.
-    The code must be properly formatted with real newlines.
-    """
-    
-    # Use ollama.generate instead of chat to avoid hanging with gpt-oss models
-    full_prompt = "You are a Python code repair specialist. Return only corrected Python code with actual newlines.\n\n" + repair_prompt
-    response = ollama.generate(model=MODEL_NAME, prompt=full_prompt)
-    
-    repaired_code = clean_code_content(response['response'])
-    return repaired_code
+The following main.py code has errors that need to be fixed.
+
+ERRORS: {error_logs}
+
+CURRENT CODE:
+{candidate_code}
+
+Available components: {components}
+
+Please fix the errors and return a corrected version of the main.py code.
+CRITICAL: Ensure all code uses actual newline characters, not \\n escape sequences.
+
+Return only the corrected Python code, no JSON formatting.
+""".strip()
+
+    resp = ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": repair_prompt}])
+    repaired_code = clean_code_content(resp["message"]["content"])
+    return repaired_code.strip("\n")
+
 
 def assemble_main(blueprint, module_dir, components):
     """
