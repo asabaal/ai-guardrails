@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brick Verification: stop_daemon()</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #f5576c;
+            border-bottom: 3px solid #f093fb;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #f093fb;
+            margin-top: 30px;
+        }
+
+        .description {
+            background: #fff0f5;
+            border-left: 4px solid #f5576c;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .preset-btn {
+            background: #f5576c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .preset-btn:hover {
+            background: #d94a60;
+        }
+
+        button.execute-btn {
+            background: #f093fb;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.3s;
+            margin-bottom: 10px;
+        }
+
+        button.execute-btn:hover {
+            background: #d877d8;
+        }
+
+        button.stop-btn {
+            background: #dc3545;
+        }
+
+        button.stop-btn:hover {
+            background: #bd2130;
+        }
+
+        .output {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+
+        .output.visible {
+            display: block;
+        }
+
+        .output.success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .output.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .process-status {
+            background: #e2e3e5;
+            border: 2px solid #adb5bd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .process-status.visible {
+            display: block;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧱 Brick Verification: stop_daemon()</h1>
+
+        <div class="description">
+            <h3>What this function does:</h3>
+            <p><strong>stop_daemon(process: PyrightProcess) -> None</strong></p>
+            <p>This function stops a running Pyright daemon process. It:</p>
+            <ul>
+                <li>Validates that process is a PyrightProcess object</li>
+                <li>Checks if process is already stopped</li>
+                <li>Attempts graceful termination (SIGTERM)</li>
+                <li>Waits up to 5 seconds for graceful shutdown</li>
+                <li>Force kills (SIGKILL) if graceful fails</li>
+                <li>Guarantees cleanup even on errors</li>
+            </ul>
+        </div>
+
+        <h2>Step 1: Start a Daemon First</h2>
+
+        <div class="form-group">
+            <label for="repoPath">Repository Path (absolute path to Python repository)</label>
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="setRepoPath('/mnt/storage/repos/ai-guardrails/codebase-evolver/sample_repos/small_repo')">Small Test Repo</button>
+            </div>
+            <input type="text" id="repoPath" placeholder="/absolute/path/to/repo">
+        </div>
+
+        <div class="form-group">
+            <label for="port">Port Number (1024-65535)</label>
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="setPort(55500)">Test Port 55500</button>
+                <button class="preset-btn" onclick="setPort(55501)">Test Port 55501</button>
+            </div>
+            <input type="number" id="port" placeholder="55500" min="1024" max="65535">
+        </div>
+
+        <button class="execute-btn" onclick="startDaemon()">Start Pyright Daemon</button>
+        <button class="execute-btn stop-btn" onclick="stopDaemon()">Stop Daemon</button>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="process-status" id="processStatus">
+            <h3>Running Process</h3>
+            <div id="processInfo">No daemon running</div>
+        </div>
+
+        <div class="output" id="output"></div>
+
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <p>To test this function interactively:</p>
+            <ol>
+                <li>Enter repository path and port (or use presets)</li>
+                <li>Click "Start Pyright Daemon" to start a daemon</li>
+                <li>View process status - you'll see PID and port</li>
+                <li>Click "Stop Daemon" to gracefully stop the daemon</li>
+                <li>View result - you'll see confirmation of successful stop</li>
+            </ol>
+            <p><strong>Note:</strong> This requires Pyright to be installed (npm install -g pyright)</p>
+        </div>
+    </div>
+
+    <script>
+        let currentProcess = null;
+
+        function setRepoPath(path) {
+            document.getElementById('repoPath').value = path;
+        }
+
+        function setPort(port) {
+            document.getElementById('port').value = port;
+        }
+
+        function startDaemon() {
+            const repoPath = document.getElementById('repoPath').value;
+            const port = document.getElementById('port').value;
+
+            const outputDiv = document.getElementById('output');
+            const errorDiv = document.getElementById('errorMessage');
+            outputDiv.className = 'output';
+            outputDiv.textContent = 'Starting Pyright daemon...\nPlease wait...';
+            outputDiv.classList.add('visible');
+            errorDiv.classList.remove('visible');
+
+            fetch('/api/brick/start_daemon_for_stop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    repo_path: repoPath,
+                    port: parseInt(port),
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentProcess = {
+                        pid: data.result.pid,
+                        port: data.result.port,
+                    };
+
+                    outputDiv.textContent = formatStartOutput(data.result);
+                    outputDiv.classList.add('success');
+                    outputDiv.classList.remove('error');
+
+                    updateProcessStatus();
+                } else {
+                    outputDiv.textContent = 'Error: ' + data.error;
+                    outputDiv.classList.add('error');
+                    outputDiv.classList.remove('success');
+                }
+            })
+            .catch(error => {
+                outputDiv.textContent = 'Error calling API: ' + error.message;
+                outputDiv.classList.add('error');
+                outputDiv.classList.remove('success');
+            });
+        }
+
+        function stopDaemon() {
+            if (!currentProcess) {
+                alert('No running daemon to stop! Start a daemon first.');
+                return;
+            }
+
+            const outputDiv = document.getElementById('output');
+            const errorDiv = document.getElementById('errorMessage');
+            outputDiv.className = 'output';
+            outputDiv.textContent = 'Stopping Pyright daemon...\nPlease wait...';
+            errorDiv.classList.remove('visible');
+
+            fetch('/api/brick/stop_daemon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pid: currentProcess.pid,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    outputDiv.textContent = formatStopOutput(data.result);
+                    outputDiv.classList.add('success');
+                    outputDiv.classList.remove('error');
+
+                    currentProcess = null;
+                    updateProcessStatus();
+                } else {
+                    outputDiv.textContent = 'Error: ' + data.error;
+                    outputDiv.classList.add('error');
+                    outputDiv.classList.remove('success');
+                }
+            })
+            .catch(error => {
+                outputDiv.textContent = 'Error calling API: ' + error.message;
+                outputDiv.classList.add('error');
+                outputDiv.classList.remove('success');
+            });
+        }
+
+        function formatStartOutput(result) {
+            return `Pyright daemon started successfully!
+
+{
+  "pid": ${result.pid},
+  "port": ${result.port}
+}
+
+The daemon is now running.
+You can now click "Stop Daemon" to stop it.`;
+        }
+
+        function formatStopOutput(result) {
+            return `Pyright daemon stopped successfully!
+
+Process with PID ${result.pid} has been terminated.
+Graceful shutdown attempted and completed successfully.`;
+        }
+
+        function updateProcessStatus() {
+            const statusDiv = document.getElementById('processStatus');
+            const infoDiv = document.getElementById('processInfo');
+
+            if (currentProcess) {
+                statusDiv.classList.add('visible');
+                infoDiv.innerHTML = `
+                    <p><strong>PID:</strong> ${currentProcess.pid}</p>
+                    <p><strong>Port:</strong> ${currentProcess.port}</p>
+                    <p><strong>Status:</strong> Running</p>
+                `;
+            } else {
+                statusDiv.classList.remove('visible');
+                infoDiv.textContent = 'No daemon running';
+            }
+        }
+    </script>
+</body>
+</html>

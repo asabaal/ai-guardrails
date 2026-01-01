@@ -1,0 +1,8 @@
+DESIGN_PLAN.md
+pyproject.toml
+semantic_agent/__init__.py
+semantic_agent.egg-info/PKG-INFO
+semantic_agent.egg-info/SOURCES.txt
+semantic_agent.egg-info/dependency_links.txt
+semantic_agent.egg-info/requires.txt
+semantic_agent.egg-info/top_level.txt

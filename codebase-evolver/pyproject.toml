@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "semantic-agent"
+version = "0.1.0"
+description = "A codebase-aware change evaluator and executor using Pyright as a semantic oracle"
+readme = "DESIGN_PLAN.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "opencode"}
+]
+
+dependencies = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ai-guardrails/codebase-evolver"
+
+[tool.setuptools]
+packages = ["semantic_agent"]

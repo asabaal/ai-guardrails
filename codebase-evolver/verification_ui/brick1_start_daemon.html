@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brick Verification: start_daemon()</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #764ba2;
+            margin-top: 30px;
+        }
+
+        .description {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .preset-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .preset-btn:hover {
+            background: #5568d3;
+        }
+
+        button.execute-btn {
+            background: #764ba2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        button.execute-btn:hover {
+            background: #5a3a85;
+        }
+
+        .output {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+
+        .output.visible {
+            display: block;
+        }
+
+        .output.success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .output.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧱 Brick Verification: start_daemon()</h1>
+
+        <div class="description">
+            <h3>What this function does:</h3>
+            <p><strong>start_daemon(repo_path: str, port: int) -> PyrightProcess</strong></p>
+            <p>This function starts the Pyright language server as a daemon process. It:</p>
+            <ul>
+                <li>Validates that repo_path is absolute and exists</li>
+                <li>Checks that the port is in valid range (1024-65535)</li>
+                <li>Ensures the port is not already in use</li>
+                <li>Starts Pyright with detached stdout/stderr</li>
+                <li>Returns a PyrightProcess object with process handle and metadata</li>
+            </ul>
+        </div>
+
+        <h2>Inputs</h2>
+
+        <div class="form-group">
+            <label for="repoPath">Repository Path (absolute path to Python repository)</label>
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="setRepoPath('/mnt/storage/repos/ai-guardrails/codebase-evolver')">Current Project</button>
+                <button class="preset-btn" onclick="setRepoPath('/tmp/test_repo')">Test Temp Repo</button>
+            </div>
+            <input type="text" id="repoPath" placeholder="/absolute/path/to/repo">
+        </div>
+
+        <div class="form-group">
+            <label for="port">Port Number (1024-65535)</label>
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="setPort(55440)">Test Port 55440</button>
+                <button class="preset-btn" onclick="setPort(55450)">Test Port 55450</button>
+                <button class="preset-btn" onclick="setPort(55460)">Test Port 55460</button>
+            </div>
+            <input type="number" id="port" placeholder="55440" min="1024" max="65535">
+        </div>
+
+        <button class="execute-btn" onclick="executeFunction()">Start Pyright Daemon</button>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="output" id="output"></div>
+
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <p>To test this function interactively:</p>
+            <ol>
+                <li>Enter the absolute path to a Python repository</li>
+                <li>Enter a port number (or use a preset)</li>
+                <li>Click "Start Pyright Daemon"</li>
+                <li>View the result - you'll see process information if successful</li>
+            </ol>
+            <p><strong>Note:</strong> This requires Pyright to be installed (npm install -g pyright)</p>
+        </div>
+    </div>
+
+    <script>
+        function setRepoPath(path) {
+            document.getElementById('repoPath').value = path;
+        }
+
+        function setPort(port) {
+            document.getElementById('port').value = port;
+        }
+
+        function executeFunction() {
+            const repoPath = document.getElementById('repoPath').value;
+            const port = document.getElementById('port').value;
+
+            // Hide previous output
+            const outputDiv = document.getElementById('output');
+            const errorDiv = document.getElementById('errorMessage');
+            outputDiv.className = 'output';
+            outputDiv.textContent = 'Starting Pyright daemon...\nPlease wait...';
+            outputDiv.classList.add('visible');
+            errorDiv.classList.remove('visible');
+
+            // Call the backend API
+            fetch('/api/brick/start_daemon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    repo_path: repoPath,
+                    port: parseInt(port),
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    outputDiv.textContent = formatOutput(data.result);
+                    outputDiv.classList.add('success');
+                    outputDiv.classList.remove('error');
+                } else {
+                    outputDiv.textContent = 'Error: ' + data.error;
+                    outputDiv.classList.add('error');
+                    outputDiv.classList.remove('success');
+                }
+            })
+            .catch(error => {
+                outputDiv.textContent = 'Error calling API: ' + error.message;
+                outputDiv.classList.add('error');
+                outputDiv.classList.remove('success');
+            });
+        }
+
+        function formatOutput(result) {
+            return `PyrightProcess object created successfully!
+
+{
+  "process": Popen(${result.pid}),
+  "port": ${result.port},
+  "pid": ${result.pid}
+}
+
+The Pyright daemon is now running on port ${result.port}.
+Process ID: ${result.pid}`;
+        }
+    </script>
+</body>
+</html>
