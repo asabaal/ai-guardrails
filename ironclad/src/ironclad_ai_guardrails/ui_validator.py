@@ -361,15 +361,15 @@ class UIValidator:
             # Check for script references
             if not re.search(r'<script[^>]*src=.*\.js[^>]*>', content, re.IGNORECASE):
                 self.issues.append(ValidationIssue(
-                    level=ValidationLevel.WARNING,
+                    level=ValidationLevel.ERROR,
                     message="No external JavaScript files referenced",
                     file_path=str(file_path)
                 ))
             
             # Check for CSS references
-            if not re.search(r'<link[^>]*href=.*\.css[^>]*>', content, re.IGNORECASE):
+            if not re.search(r'<link[^>]*rel=.*stylesheet[^>]*>', content, re.IGNORECASE):
                 self.issues.append(ValidationIssue(
-                    level=ValidationLevel.WARNING,
+                    level=ValidationLevel.ERROR,
                     message="No external CSS files referenced",
                     file_path=str(file_path)
                 ))
@@ -395,6 +395,23 @@ class UIValidator:
                     suggestion="Add CSS classes for styling"
                 ))
             
+            # Check for basic styling properties
+            required_properties = ['color', 'background', 'font-size', 'margin', 'padding']
+            missing_properties = []
+            
+            for prop in required_properties:
+                # Check for property as word boundary or at start of line
+                if not re.search(rf'(^|[^a-zA-Z0-9_-]){prop}\s*:', content, re.IGNORECASE):
+                    missing_properties.append(prop)
+            
+            if missing_properties and len(missing_properties) >= 3:
+                self.issues.append(ValidationIssue(
+                    level=ValidationLevel.INFO,
+                    message=f"Missing common CSS properties: {', '.join(missing_properties)}",
+                    file_path=str(file_path),
+                    suggestion="Consider adding these properties for better styling"
+                ))
+            
             # Check for responsive design
             if not re.search(r'@media', content, re.IGNORECASE):
                 self.issues.append(ValidationIssue(
@@ -402,22 +419,6 @@ class UIValidator:
                     message="No responsive design media queries found",
                     file_path=str(file_path),
                     suggestion="Consider adding responsive design for mobile devices"
-                ))
-            
-            # Check for basic styling properties
-            required_properties = ['color', 'background', 'font-size', 'margin', 'padding']
-            missing_properties = []
-            
-            for prop in required_properties:
-                if not re.search(rf'{prop}\s*:', content, re.IGNORECASE):
-                    missing_properties.append(prop)
-            
-            if missing_properties:
-                self.issues.append(ValidationIssue(
-                    level=ValidationLevel.INFO,
-                    message=f"Missing common CSS properties: {', '.join(missing_properties)}",
-                    file_path=str(file_path),
-                    suggestion="Consider adding these properties for better styling"
                 ))
                 
         except Exception as e:
@@ -894,9 +895,12 @@ def print_validation_report(result: ValidationResult):
     print(f"Status: {result.status.value.upper()}")
     print(f"Execution Time: {result.execution_time:.2f}s")
     print(f"Total Issues: {result.metadata['total_issues']}")
-    print(f"Critical: {result.metadata['critical_issues']}")
-    print(f"Errors: {result.metadata['error_issues']}")
-    print(f"Warnings: {result.metadata['warning_issues']}")
+    if 'critical_issues' in result.metadata:
+        print(f"Critical: {result.metadata['critical_issues']}")
+    if 'error_issues' in result.metadata:
+        print(f"Errors: {result.metadata['error_issues']}")
+    if 'warning_issues' in result.metadata:
+        print(f"Warnings: {result.metadata['warning_issues']}")
     
     if result.issues:
         print(f"\n{'-'*60}")
