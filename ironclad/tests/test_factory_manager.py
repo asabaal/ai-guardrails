@@ -234,9 +234,16 @@ class TestCleanJson:
 class TestAssembleMainRepair:
     """Test assemble_main repair functionality"""
     
-    @patch('ironclad_ai_guardrails.factory_manager.repair_main_candidate')
     @patch('ironclad_ai_guardrails.factory_manager.validate_main_candidate')
     @patch('ironclad_ai_guardrails.factory_manager.generate_main_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.repair_main_candidate')
+    @patch('os.makedirs')
+    @patch('os.path.exists')
+    @patch('os.path.join')
+    @patch('builtins.open', create=True)
+    @patch('builtins.print')
     @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
     def test_full_workflow_integration(self, mock_chat, mock_print, mock_open, mock_join, mock_exists, mock_makedirs, mock_repair, mock_validate, mock_generate_ironclad, mock_generate_main, mock_validate_main):
         """Test complete workflow from blueprint to assembled module"""
@@ -280,7 +287,7 @@ class TestAssembleMainRepair:
         mock_join.side_effect = lambda *args: '/'.join(args)
         
         # Execute workflow
-        with patch('factory_manager.ollama.chat') as mock_chat:
+        with patch('ironclad_ai_guardrails.factory_manager.ollama.chat') as mock_chat:
             mock_chat.return_value = {
                 'message': {
                     'content': '{"filename": "main.py", "code": "def main(): test_func()"}'
