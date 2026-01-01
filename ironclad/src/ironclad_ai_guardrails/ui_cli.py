@@ -7,12 +7,12 @@ import argparse
 import sys
 import json
 import os
-from ironclad_ai_guardrails.pathlib import Path
+from pathlib import Path
 
 # Import UI generation components
 from ironclad_ai_guardrails.ui_spec import UIType, transform_module_spec_to_ui_spec
-from ..ui_generator import save_ui_artifacts
-from ..ui_validator import validate_ui_directory, print_validation_report
+from ironclad_ai_guardrails.ui_generator import save_ui_artifacts
+from ironclad_ai_guardrails.ui_validator import validate_ui_directory, print_validation_report
 
 
 def load_module_spec(spec_file):
