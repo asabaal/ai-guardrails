@@ -154,7 +154,7 @@ class UIGenerator:
     
     def _generate_single_component_html(self, component: UIComponent) -> str:
         """Generate HTML for a single component"""
-        component_id = f"id='{component.name}'"
+        component_id = f'id="{component.name}"'
         
         if component.type == ComponentType.FORM_INPUT:
             input_type = self._get_html_input_type(component)
@@ -254,13 +254,19 @@ class UIGenerator:
         
         theme = self.ui_spec.styling.theme
         color_scheme = self.ui_spec.styling.color_scheme
+        custom_css = self.ui_spec.styling.custom_css
         
         if theme == 'modern':
-            return self._get_modern_css(color_scheme)
+            css = self._get_modern_css(color_scheme)
         elif theme == 'terminal':
-            return self._get_terminal_css(color_scheme)
+            css = self._get_terminal_css(color_scheme)
         else:
-            return self._get_default_css()
+            css = self._get_default_css()
+        
+        if custom_css:
+            css = css + '\n' + custom_css
+        
+        return css
     
     def _get_default_css(self) -> str:
         """Generate default CSS styles"""
@@ -392,16 +398,13 @@ footer {
         base_css = self._get_default_css()
         
         if color_scheme == 'blue':
-            accent_color = '#007bff'
-            hover_color = '#0056b3'
+            return base_css
         elif color_scheme == 'green':
             accent_color = '#28a745'
             hover_color = '#1e7e34'
+            return base_css.replace('#3498db', accent_color).replace('#2980b9', hover_color)
         else:
-            accent_color = '#3498db'
-            hover_color = '#2980b9'
-        
-        return base_css.replace('#3498db', accent_color).replace('#2980b9', hover_color)
+            return base_css
     
     def _get_terminal_css(self, color_scheme: Optional[str]) -> str:
         """Generate terminal-style CSS"""
@@ -502,11 +505,14 @@ footer {
         component_validations = self._generate_js_validations()
         interaction_handlers = self._generate_js_interactions()
         
+        data_binding_mapping = '\n'.join([f"    // {comp.name}: {comp.data_binding}" for comp in self.ui_spec.components if comp.data_binding])
         return f"""// Generated UI logic for {self.ui_spec.title}
 document.addEventListener('DOMContentLoaded', function() {{
     const form = document.getElementById('mainForm');
     const executeBtn = document.getElementById('executeBtn');
     const resultsDiv = document.getElementById('results');
+    
+{data_binding_mapping}
     
     {component_validations}
     
@@ -647,11 +653,12 @@ document.addEventListener('DOMContentLoaded', function() {{
     def _generate_change_handler(self, interaction) -> str:
         """Generate change event handler"""
         target = interaction.target
+        action = interaction.action
         return f"""    document.addEventListener('change', function(e) {{
         if (e.target && e.target.name.includes('{target}')) {{
             // Real-time validation for {target}
             if (e.target.id.includes('{target}')) {{
-                validate_{target}();
+                {action}();
             }}
         }}
     }});"""
@@ -672,7 +679,7 @@ document.addEventListener('DOMContentLoaded', function() {{
     
     def _generate_tkinter_gui(self) -> str:
         """Generate Tkinter GUI"""
-        imports = ["tkinter as tk", "from tkinter import ttk", "json", "sys"]
+        imports = ["import tkinter as tk", "from tkinter import ttk", "import json", "import sys"]
         component_widgets = []
         
         for component in self.ui_spec.components:
@@ -767,10 +774,10 @@ if __name__ == "__main__":
 # Generated Terminal UI for {self.ui_spec.title}
 
 import json
-from .rich.console import Console
-from .rich.table import Table
-from .rich.panel import Panel
-from .rich.prompt import Prompt, IntPrompt, FloatPrompt, Confirm
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.prompt import Prompt, IntPrompt, FloatPrompt, Confirm
 
 class {self.ui_spec.title.replace(' ', '')}TUI:
     def __init__(self):
@@ -820,7 +827,7 @@ if __name__ == "__main__":
     
     def _generate_electron_main(self) -> str:
         """Generate Electron main.js"""
-        return f"""const {{ app, BrowserWindow, Menu }} = require('electron');
+        return f"""const {{ app, BrowserWindow }} = require('electron');
 const path = require('path');
 
 let mainWindow;
