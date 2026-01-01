@@ -369,7 +369,7 @@ class UIValidator:
             # Check for CSS references
             if not re.search(r'<link[^>]*rel=.*stylesheet[^>]*>', content, re.IGNORECASE):
                 self.issues.append(ValidationIssue(
-                    level=ValidationLevel.ERROR,
+                    level=ValidationLevel.WARNING,
                     message="No external CSS files referenced",
                     file_path=str(file_path)
                 ))
