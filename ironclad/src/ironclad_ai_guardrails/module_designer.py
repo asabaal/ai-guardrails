@@ -37,10 +37,9 @@ def clean_json(text):
 def draft_blueprint(request):
     print(f"[*] Architecting solution for: '{request}'...")
     try:
-        # Use ollama.generate instead of chat to avoid hanging with gpt-oss models
         full_prompt = f"{ARCHITECT_PROMPT}\n\n{request}"
-        response = ollama.generate(model=MODEL_NAME, prompt=full_prompt)
-        return json.loads(clean_json(response['response']))
+        response = ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": full_prompt}])
+        return json.loads(clean_json(response['message']['content']))
     except Exception as e:
         print(f"[!] Blueprint Failed: {e}")
         return None
