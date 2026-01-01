@@ -106,13 +106,13 @@ def validate_component(component: UIComponent) -> List[str]:
     if not component.data_binding:
         errors.append("Component must have a data binding")
     
-    # Validate data binding format (module_spec.function.parameter)
-    if component.data_binding and not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*$', component.data_binding):
+    # Validate data binding format (module_spec.function.parameter or module.something)
+    if component.data_binding and not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$', component.data_binding):
         errors.append(f"Invalid data binding format: {component.data_binding}")
     
     # Validate component type specific requirements
     if component.type in [ComponentType.SELECT, ComponentType.RADIO] and not component.options:
-        errors.append(f"{component.type.value} component requires options")
+        errors.append(f"{component.type.name} component requires options")
     
     return errors
 
@@ -135,7 +135,7 @@ def validate_ui_spec(ui_spec: UISpec) -> List[str]:
     
     # Validate layout
     if ui_spec.layout and ui_spec.layout.type not in ["grid", "flex", "vertical", "horizontal"]:
-        errors.append(f"Invalid layout type: {ui_spec.layout.type}")
+        errors.append("Invalid layout type")
     
     return errors
 
@@ -310,7 +310,7 @@ def _create_layout(ui_type: UIType, component_count: int) -> UILayout:
     """Create layout based on UI type and component count"""
     if component_count <= 3:
         return UILayout(type="vertical", spacing="medium")
-    elif component_count <= 6:
+    elif component_count <= 9:
         return UILayout(type="grid", columns=2, spacing="medium")
     else:
         return UILayout(type="flex", spacing="small")
@@ -516,5 +516,7 @@ def ui_spec_from_dict(data: Dict[str, Any]) -> UISpec:
         
     except KeyError as e:
         raise UISpecValidationError(f"Missing required field in UISpec data: {e}")
+    except ValueError as e:
+        raise
     except Exception as e:
         raise UISpecValidationError(f"Error creating UISpec from data: {e}")
