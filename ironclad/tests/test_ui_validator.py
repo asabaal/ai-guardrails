@@ -487,7 +487,7 @@ class TestConvenienceFunctions:
         assert "Test warning" in captured.out
 
 
-class TestEdgeCases:
+class TestEdgeCases(TestUIValidator):
     """Test edge cases and error conditions"""
     
     def test_validate_empty_directory(self):
