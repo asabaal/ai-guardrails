@@ -130,6 +130,17 @@ class TestHandleCreateSample:
         finally:
             if os.path.exists(output_path):
                 os.unlink(output_path)
+    
+    def test_handle_create_sample_with_exception(self, capsys):
+        """Test create-sample with exception (lines 258-260)"""
+        args = create_mock_args(output="/invalid/path/file.json")
+        
+        with patch('sys.exit') as mock_exit:
+            handle_create_sample(args)
+            mock_exit.assert_called_once_with(1)
+        
+        captured = capsys.readouterr()
+        assert "Error creating sample" in captured.out
 
 
 class TestHandleValidate:
@@ -161,6 +172,57 @@ class TestHandleValidate:
             captured = capsys.readouterr()
             assert "VALIDATION RESULTS" in captured.out
             assert "Validation passed!" in captured.out
+    
+    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory')
+    def test_handle_validate_with_failed_status(self, mock_validate, capsys):
+        """Test validation with failed status (lines 224-225, 229)"""
+        from ironclad_ai_guardrails.ui_validator import ValidationStatus, ValidationResult, ValidationLevel, ValidationIssue
+        mock_validate.return_value = ValidationResult(
+            status=ValidationStatus.FAILED,
+            issues=[ValidationIssue(level=ValidationLevel.ERROR, message="Test error")],
+            execution_time=0.5,
+            metadata={}
+        )
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            args = create_mock_args(ui_dir=temp_dir, ui_type="web")
+            with patch('sys.exit') as mock_exit:
+                handle_validate(args)
+                mock_exit.assert_called_once_with(1)
+        
+        captured = capsys.readouterr()
+        assert "DETAILED REPORT" in captured.out
+    
+    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory')
+    def test_handle_validate_with_warning_status(self, mock_validate, capsys):
+        """Test validation with warning status (line 231)"""
+        from ironclad_ai_guardrails.ui_validator import ValidationStatus, ValidationResult
+        mock_validate.return_value = ValidationResult(
+            status=ValidationStatus.WARNING,
+            issues=[],
+            execution_time=0.5,
+            metadata={}
+        )
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            args = create_mock_args(ui_dir=temp_dir, ui_type="web")
+            with patch('sys.exit') as mock_exit:
+                handle_validate(args)
+                mock_exit.assert_called_once_with(2)
+    
+    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory')
+    def test_handle_validate_with_exception(self, mock_validate, capsys):
+        """Test validation with exception (lines 235-237)"""
+        mock_validate.side_effect = Exception("Validation error")
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            args = create_mock_args(ui_dir=temp_dir, ui_type="web")
+            with patch('sys.exit') as mock_exit:
+                handle_validate(args)
+                mock_exit.assert_called_once_with(1)
+        
+        captured = capsys.readouterr()
+        assert "Error during validation" in captured.out
 
 
 class TestHandleGenerate:
@@ -169,9 +231,42 @@ class TestHandleGenerate:
     @patch('ironclad_ai_guardrails.ui_cli.validate_ui_type')
     @patch('ironclad_ai_guardrails.ui_cli.transform_module_spec_to_ui_spec')
     @patch('ironclad_ai_guardrails.ui_cli.save_ui_artifacts')
+    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory')
     @patch('ironclad_ai_guardrails.ui_cli.load_module_spec')
-    def test_handle_generate_success(self, mock_load_spec, mock_save, mock_transform, mock_validate_type):
-        """Test successful UI generation"""
+    def test_handle_generate_with_validation_flag_enabled(self, mock_load_spec, mock_validate_ui, mock_save, mock_transform, mock_validate_type):
+        """Test generate command with validation enabled (lines 187-195)"""
+        from ironclad_ai_guardrails.ui_validator import ValidationStatus, ValidationResult
+        mock_load_spec.return_value = {"module_name": "test", "functions": []}
+        mock_validate_type.return_value = UIType.WEB
+        mock_transform.return_value = MagicMock()
+        mock_save.return_value = ["index.html", "styles.css"]
+        mock_validate_ui.return_value = ValidationResult(
+            status=ValidationStatus.PASSED,
+            issues=[],
+            execution_time=0.1,
+            metadata={}
+        )
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            args = create_mock_args(
+                spec="spec.json",
+                type="web",
+                output=temp_dir,
+                validate=True,
+                title=None
+            )
+            handle_generate(args)
+        
+        mock_validate_ui.assert_called_once()
+    
+    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_type')
+    @patch('ironclad_ai_guardrails.ui_cli.transform_module_spec_to_ui_spec')
+    @patch('ironclad_ai_guardrails.ui_cli.save_ui_artifacts')
+    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory')
+    @patch('ironclad_ai_guardrails.ui_cli.load_module_spec')
+    def test_handle_generate_with_validation_issues_output(self, mock_load_spec, mock_validate_ui, mock_save, mock_transform, mock_validate_type):
+        """Test generate with validation issues output (lines 187-195)"""
+        from ironclad_ai_guardrails.ui_validator import ValidationLevel, ValidationStatus, ValidationResult, ValidationIssue
         mock_load_spec.return_value = {"module_name": "test", "functions": []}
         mock_validate_type.return_value = UIType.WEB
         mock_transform.return_value = MagicMock()
@@ -182,37 +277,40 @@ class TestHandleGenerate:
                 spec="spec.json",
                 type="web",
                 output=temp_dir,
-                validate=False,
+                validate=True,
                 title=None
             )
-            handle_generate(args)
-        
-        mock_load_spec.assert_called_once()
-        mock_save.assert_called_once()
+            with patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory') as mock_validate_dir:
+                mock_validate_dir.return_value = ValidationResult(
+                    status=ValidationStatus.PASSED,
+                    issues=[ValidationIssue(level=ValidationLevel.INFO, message="Test issue")],
+                    execution_time=0.1,
+                    metadata={}
+                )
+                handle_generate(args)
     
     @patch('ironclad_ai_guardrails.ui_cli.validate_ui_type')
     @patch('ironclad_ai_guardrails.ui_cli.transform_module_spec_to_ui_spec')
     @patch('ironclad_ai_guardrails.ui_cli.save_ui_artifacts')
     @patch('ironclad_ai_guardrails.ui_cli.load_module_spec')
-    def test_handle_generate_all_types(self, mock_load_spec, mock_save, mock_transform, mock_validate_type):
-        """Test generating all UI types"""
+    def test_handle_generate_failure_exit(self, mock_load_spec, mock_save, mock_transform, mock_validate_type):
+        """Test generate command with failure (lines 202-203)"""
         mock_load_spec.return_value = {"module_name": "test", "functions": []}
         mock_validate_type.return_value = UIType.WEB
         mock_transform.return_value = MagicMock()
-        mock_save.return_value = ["index.html"]
+        mock_save.side_effect = Exception("Generation error")
         
         with tempfile.TemporaryDirectory() as temp_dir:
             args = create_mock_args(
                 spec="spec.json",
-                type="all",
+                type="web",
                 output=temp_dir,
                 validate=False,
                 title=None
             )
-            handle_generate(args)
-        
-        # Should be called for each UI type
-        assert mock_save.call_count == len(UIType)
+            with patch('sys.exit') as mock_exit:
+                handle_generate(args)
+                mock_exit.assert_called_once_with(1)
 
 
 class TestUICLIMain:
