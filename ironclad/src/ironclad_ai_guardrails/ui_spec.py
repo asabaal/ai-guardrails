@@ -106,9 +106,15 @@ def validate_component(component: UIComponent) -> List[str]:
     if not component.data_binding:
         errors.append("Component must have a data binding")
     
-    # Validate data binding format (module_spec.function.parameter or module.something)
-    if component.data_binding and not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$', component.data_binding):
+    # Validate data binding format (module_spec.function.parameter or module.component)
+    if component.data_binding and not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)+$', component.data_binding):
         errors.append(f"Invalid data binding format: {component.data_binding}")
+    
+    # Check for reserved keywords in the last part of the binding
+    if component.data_binding:
+        parts = component.data_binding.split('.')
+        if parts and parts[-1] in ['self', 'class', 'def', 'return', 'import', 'from']:
+            errors.append(f"Reserved keyword '{parts[-1]}' cannot be used in data binding")
     
     # Validate component type specific requirements
     if component.type in [ComponentType.SELECT, ComponentType.RADIO] and not component.options:
