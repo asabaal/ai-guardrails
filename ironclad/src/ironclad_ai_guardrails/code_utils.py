@@ -16,11 +16,11 @@ def decode_newlines_in_text(text: str) -> str:
     """
     Decode escaped newline characters in text.
     Converts \\n to actual newline characters.
-    Also handles escaped quotes.
+    Also handles escaped quotes and carriage returns.
     """
     if not isinstance(text, str):
-        return str(text)
-    return text.replace("\\n", "\n").replace('\\"', '"')
+        return text
+    return text.replace("\\n", "\n").replace("\\r", "\r").replace('\\"', '"')
 
 
 def decode_newlines_recursive(obj: Any) -> Any:
@@ -36,8 +36,11 @@ def decode_newlines_recursive(obj: Any) -> Any:
 def _strip_markdown_fences(text: str) -> str:
     cleaned = text.strip()
     if cleaned.startswith("```"):
-        cleaned = re.sub(r"^```(?:json|python)?\s*", "", cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r"\s*```$", "", cleaned)
+        cleaned = re.sub(r"^```(?:json|python)?\\n?", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\\n?```$", "", cleaned)
+        # Also handle cases with real newlines
+        cleaned = re.sub(r"^```(?:json|python)?\n?", "", cleaned, flags=re.IGNORECASE | re.MULTILINE)
+        cleaned = re.sub(r"\n?```$", "", cleaned)
     return cleaned.strip()
 
 
@@ -127,7 +130,7 @@ def clean_json_response(response_text: str) -> str:
 
 def clean_code_content(code: str) -> str:
     if not isinstance(code, str):
-        code = str(code)
+        return str(code)
 
     cleaned = decode_newlines_in_text(code)
     cleaned = _strip_markdown_fences(cleaned)
@@ -148,6 +151,14 @@ def validate_python_syntax(code: str) -> tuple[bool, str]:
         return False, f"Validation error: {e}"
 
 
+def sanitize_json_content(obj: Any) -> Any:
+    """
+    Sanitize JSON content by decoding newlines recursively.
+    This is the same as decode_newlines_recursive but with a clearer name.
+    """
+    return decode_newlines_recursive(obj)
+
+
 def fix_common_code_issues(code: str) -> str:
     """
     Preserve real newlines and indentation.
@@ -162,14 +173,14 @@ def fix_common_code_issues(code: str) -> str:
     # Remove leading blank lines
     cleaned = re.sub(r"^\s*\n+", "", cleaned)
 
-    # Trim trailing spaces per line, keep indentation intact
-    lines = [ln.rstrip() for ln in cleaned.split("\n")]
+    # Trim trailing spaces per line and filter out whitespace-only lines
+    lines = [ln.rstrip() for ln in cleaned.split("\n") if ln.strip() != ""]
 
-    # Collapse 3+ blank lines into max 1 blank line
+    # Collapse multiple consecutive blank lines into max one
     out_lines = []
     blank_run = 0
     for ln in lines:
-        if ln.strip() == "":
+        if ln == "":
             blank_run += 1
             if blank_run <= 1:
                 out_lines.append("")
@@ -197,7 +208,8 @@ def extract_code_from_response(response: str) -> str:
     if code_blocks:
         return clean_code_content("\n".join(code_blocks))
 
-    pythonish = re.search(r"(?:^|\n)\s*(def\s+\w+|import\s+\w+|from\s+\w+\s+import)", response)
+    # Look for Python patterns anywhere in the text, including inline
+    pythonish = re.search(r"(?:^|\n|\s)(def\s+\w+|import\s+\w+|from\s+\w+\s+import)", response)
     if pythonish:
         return clean_code_content(response[pythonish.start():])
 
