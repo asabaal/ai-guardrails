@@ -120,10 +120,10 @@ Return only the fixed JSON structure.
         data["test"] = clean_code_content(data.get("test", ""))
         return data
     except json.JSONDecodeError:
-        print("[!] Validation Failed: Model output was not valid JSON.")
+        print("[!] Repair Error: Model output was not valid JSON.")
         return None
     except Exception as e:
-        print(f"[!] Repair produced invalid JSON. Aborting.")
+        print(f"[!] Repair Error: {e}")
         return None
 
 
