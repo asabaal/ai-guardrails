@@ -53,9 +53,6 @@ def generate_candidate(request: str, model_name=DEFAULT_MODEL_NAME, system_promp
 
 
 def validate_candidate(candidate):
-    if not candidate:
-        return False, "Empty candidate"
-
     filename = candidate.get("filename", "candidate")
     code = candidate.get("code", "")
     test = candidate.get("test", "")
