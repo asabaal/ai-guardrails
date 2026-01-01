@@ -446,12 +446,30 @@ class TestMainExecution:
     def test_main_execution_via_main_block(self):
         """Test that main() is called when __name__ == '__main__'"""
         # This is a simple test to verify the __main__ block calls main()
-        # We can't easily test the actual __main__ execution without complex mocking
+        # We can't easily test actual __main__ execution without complex mocking
         # But we can verify the structure is correct by checking the source
         with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src', 'ironclad.py'), 'r') as f:
             content = f.read()
             assert "if __name__ == \"__main__\":" in content
             assert "main()" in content
+
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.save_brick')
+    def test_main_block_execution(self, mock_save, mock_validate, mock_generate):
+        """Test execution of __main__ block in src/ironclad.py"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        mock_validate.return_value = (True, "Tests passed")
+        
+        script_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src', 'ironclad.py')
+        
+        with patch('builtins.print'), patch('sys.argv', ['ironclad', 'test request']):
+            import runpy
+            runpy.run_path(script_path, run_name='__main__')
     
     @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
     @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
