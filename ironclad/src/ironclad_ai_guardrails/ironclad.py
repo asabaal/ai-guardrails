@@ -48,7 +48,7 @@ def generate_candidate(request: str, model_name=DEFAULT_MODEL_NAME, system_promp
         print("[!] Validation Failed: Model output was not valid JSON.")
         return None
     except Exception as e:
-        print("[!] Error connecting to Ollama: {e}")
+        print("[!] Error connecting to Ollama: Connection error")
         return None
 
 
