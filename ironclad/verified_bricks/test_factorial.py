@@ -1,11 +1,16 @@
-from factorial import factorial
 import pytest
+from factorial import factorial
 
-def test_factorial():
-    assert factorial(0) == 1
-    assert factorial(1) == 1
-    assert factorial(5) == 120
-    with pytest.raises(TypeError):
-        factorial(3.5)
-    with pytest.raises(ValueError):
-        factorial(-1)
+class TestFactorial:
+    def test_positive(self):
+        assert factorial(0) == 1
+        assert factorial(1) == 1
+        assert factorial(5) == 120
+
+    def test_negative(self):
+        with pytest.raises(ValueError):
+            factorial(-1)
+
+    def test_non_int(self):
+        with pytest.raises(TypeError):
+            factorial(3.5)

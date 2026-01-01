@@ -1,15 +1,15 @@
-def merge_sorted_lists(list1, list2):
-    i, j = 0, 0
-    merged = []
-    while i < len(list1) and j < len(list2):
-        if list1[i] <= list2[j]:
-            merged.append(list1[i])
+def merge_sorted_lists(a, b):
+    # Merge two sorted lists into a single sorted list
+    result = []
+    i = j = 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            result.append(a[i])
             i += 1
         else:
-            merged.append(list2[j])
+            result.append(b[j])
             j += 1
-    if i < len(list1):
-        merged.extend(list1[i:])
-    if j < len(list2):
-        merged.extend(list2[j:])
-    return merged
+    # Append any remaining elements
+    result.extend(a[i:])
+    result.extend(b[j:])
+    return result

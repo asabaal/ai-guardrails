@@ -51,7 +51,7 @@ class TestCleanJsonResponse:
 class TestGenerateCandidate:
     """Test the generate_candidate function"""
     
-    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    @patch('ironclad.ironclad.ollama.chat')
     def test_generate_candidate_success(self, mock_chat):
         """Test successful candidate generation"""
         mock_response = {
@@ -69,7 +69,7 @@ class TestGenerateCandidate:
         assert 'test_test_func' in result['test']
         mock_chat.assert_called_once()
     
-    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    @patch('ironclad.ironclad.ollama.chat')
     def test_generate_candidate_json_decode_error(self, mock_chat):
         """Test handling of JSON decode error"""
         mock_response = {
@@ -84,7 +84,7 @@ class TestGenerateCandidate:
             assert result is None
             mock_print.assert_any_call("[!] Validation Failed: Model output was not valid JSON.")
     
-    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    @patch('ironclad.ironclad.ollama.chat')
     def test_generate_candidate_ollama_error(self, mock_chat):
         """Test handling of ollama connection error"""
         mock_chat.side_effect = Exception("Connection error")
@@ -94,7 +94,7 @@ class TestGenerateCandidate:
             assert result is None
             mock_print.assert_any_call("[!] Error connecting to Ollama: Connection error")
     
-    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    @patch('ironclad.ironclad.ollama.chat')
     def test_generate_candidate_with_markdown_response(self, mock_chat):
         """Test candidate generation when AI returns markdown-wrapped JSON"""
         mock_response = {
@@ -282,9 +282,9 @@ class TestMain:
             mock_print.assert_any_call("Usage: python ironclad.py 'Your request here'")
     
     @patch('sys.argv', ['ironclad.py', 'test request'])
-    @patch('ironclad.generate_candidate')
-    @patch('ironclad.validate_candidate')
-    @patch('ironclad.save_brick')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.save_brick')
     def test_main_success_flow(self, mock_save, mock_validate, mock_generate):
         """Test main function with successful flow"""
         mock_generate.return_value = {
@@ -302,7 +302,7 @@ class TestMain:
         mock_save.assert_called_once()
     
     @patch('sys.argv', ['ironclad.py', 'test request'])
-    @patch('ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
     def test_main_generation_failure(self, mock_generate):
         """Test main function when generation fails"""
         mock_generate.return_value = None
@@ -314,9 +314,9 @@ class TestMain:
             mock_print.assert_any_call("[X] INCINERATED: Output invalid.")
     
     @patch('sys.argv', ['ironclad.py', 'test request'])
-    @patch('ironclad.generate_candidate')
-    @patch('ironclad.validate_candidate')
-    @patch('ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
     def test_main_validation_failure(self, mock_repair, mock_validate, mock_generate):
         """Test main function when validation fails and repair also fails"""
         mock_generate.return_value = {
@@ -334,10 +334,10 @@ class TestMain:
             mock_print.assert_any_call("[!] Repair produced invalid JSON. Aborting.")
     
     @patch('sys.argv', ['ironclad.py', 'test request'])
-    @patch('ironclad.generate_candidate')
-    @patch('ironclad.validate_candidate')
-    @patch('ironclad.repair_candidate')
-    @patch('ironclad.save_brick')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.save_brick')
     def test_main_repair_success(self, mock_save, mock_repair, mock_validate, mock_generate):
         """Test main function when validation fails but repair succeeds"""
         mock_generate.return_value = {
@@ -366,9 +366,9 @@ class TestMain:
         mock_print.assert_any_call("[+] Verified after 1 repairs.")
     
     @patch('sys.argv', ['ironclad.py', 'test request'])
-    @patch('ironclad.generate_candidate')
-    @patch('ironclad.validate_candidate')
-    @patch('ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
     def test_main_max_retries_exceeded(self, mock_repair, mock_validate, mock_generate):
         """Test main function when max retries are exceeded"""
         mock_generate.return_value = {
@@ -395,9 +395,9 @@ class TestMain:
         mock_print.assert_any_call("[-] FINAL FAILURE.")
     
     @patch('sys.argv', ['ironclad.py', 'test request'])
-    @patch('ironclad.generate_candidate')
-    @patch('ironclad.validate_candidate')
-    @patch('ironclad.repair_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
     def test_main_repair_json_error(self, mock_repair, mock_validate, mock_generate):
         """Test main function when repair returns invalid JSON"""
         mock_generate.return_value = {
@@ -423,9 +423,9 @@ class TestMainExecution:
     """Test main execution when run as __main__"""
     
     @patch('sys.argv', ['ironclad.py', 'test request'])
-    @patch('ironclad.generate_candidate')
-    @patch('ironclad.validate_candidate')
-    @patch('ironclad.save_brick')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.save_brick')
     def test_main_as_script(self, mock_save, mock_validate, mock_generate):
         """Test main function when called as script"""
         mock_generate.return_value = {
@@ -453,9 +453,9 @@ class TestMainExecution:
             assert "if __name__ == \"__main__\":" in content
             assert "main()" in content
     
-    @patch('ironclad.generate_candidate')
-    @patch('ironclad.validate_candidate')
-    @patch('ironclad.save_brick')
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.save_brick')
     def test_main_with_custom_parameters(self, mock_save, mock_validate, mock_generate):
         """Test main function with custom parameters"""
         mock_generate.return_value = {
@@ -481,7 +481,7 @@ class TestMainExecution:
 class TestIntegration:
     """Integration tests for the complete workflow"""
     
-    @patch('ironclad_ai_guardrails.ironclad.ollama.chat')
+    @patch('ironclad.ironclad.ollama.chat')
     @patch('subprocess.run')
     def test_full_workflow_success(self, mock_run, mock_chat):
         """Test complete workflow from generation to saving"""

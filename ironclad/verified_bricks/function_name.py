@@ -1,10 +1,9 @@
-def function_name(n):
-    """Return factorial of n (non-negative integer)."""
-    if not isinstance(n, int):
-        raise TypeError("n must be an integer")
-    if n < 0:
-        raise ValueError("n must be non-negative")
-    result = 1
-    for i in range(2, n + 1):
-        result *= i
-    return result
+def is_palindrome(s):
+    '''
+    Return True if s is a palindrome, ignoring case and non-alphanumeric characters.
+    Raise TypeError if s is not a string.
+    '''
+    if not isinstance(s, str):
+        raise TypeError('Input must be a string')
+    cleaned = ''.join(ch.lower() for ch in s if ch.isalnum())
+    return cleaned == cleaned[::-1]

@@ -1,14 +1,11 @@
+from function_name import is_palindrome
 import pytest
 
-from function_name import function_name
-
-def test_function_name():
-    assert function_name(0) == 1
-    assert function_name(1) == 1
-    assert function_name(5) == 120
-    assert function_name(10) == 3628800
-    assert function_name(20) == 2432902008176640000
+def test_is_palindrome():
+    assert is_palindrome('') is True
+    assert is_palindrome('A') is True
+    assert is_palindrome('Racecar') is True
+    assert is_palindrome("Madam, I'm Adam") is True
+    assert is_palindrome('Hello') is False
     with pytest.raises(TypeError):
-        function_name(3.5)
-    with pytest.raises(ValueError):
-        function_name(-1)
+        is_palindrome(123)

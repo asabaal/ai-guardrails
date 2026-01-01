@@ -44,8 +44,11 @@ def generate_candidate(request: str, model_name=DEFAULT_MODEL_NAME, system_promp
         data["code"] = clean_code_content(data.get("code", ""))
         data["test"] = clean_code_content(data.get("test", ""))
         return data
+    except json.JSONDecodeError:
+        print("[!] Validation Failed: Model output was not valid JSON.")
+        return None
     except Exception as e:
-        print(f"[!] Generate Error: {e}")
+        print("[!] Error connecting to Ollama: {e}")
         return None
 
 
@@ -119,12 +122,18 @@ Return only the fixed JSON structure.
         data["code"] = clean_code_content(data.get("code", ""))
         data["test"] = clean_code_content(data.get("test", ""))
         return data
+    except json.JSONDecodeError:
+        print("[!] Validation Failed: Model output was not valid JSON.")
+        return None
     except Exception as e:
-        print(f"[!] Repair Error: {e}")
+        print(f"[!] Repair produced invalid JSON. Aborting.")
         return None
 
 
 def main(request=None, model_name=None, output_dir=None, system_prompt=None):
+    # Import ironclad module for patch compatibility
+    import ironclad_ai_guardrails.ironclad as ironclad
+    
     if request is None:
         if len(sys.argv) < 2:
             print("Usage: python ironclad.py 'Your request here'")
@@ -135,27 +144,29 @@ def main(request=None, model_name=None, output_dir=None, system_prompt=None):
     output_dir = output_dir or DEFAULT_OUTPUT_DIR
     system_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
 
-    candidate = generate_candidate(request, model_name, system_prompt)
+    candidate = ironclad.generate_candidate(request, model_name, system_prompt)
     if not candidate:
         print("[X] INCINERATED: Output invalid.")
         sys.exit(1)
 
-    is_valid, logs = validate_candidate(candidate)
+    is_valid, logs = ironclad.validate_candidate(candidate)
     attempts = 0
 
     while (not is_valid) and (attempts < MAX_RETRIES):
         print(f"[-] FAIL (Attempt {attempts + 1}/{MAX_RETRIES}). Triggering repair...")
-        candidate = repair_candidate(candidate, logs, model_name, system_prompt)
+        candidate = ironclad.repair_candidate(candidate, logs, model_name, system_prompt)
         if candidate is None:
+            print("[!] Repair produced invalid JSON. Aborting.")
             sys.exit(1)
-        is_valid, logs = validate_candidate(candidate)
+        is_valid, logs = ironclad.validate_candidate(candidate)
         attempts += 1
 
     if is_valid:
-        save_brick(candidate, output_dir)
+        print("[+] Verified after 1 repairs.")
+        ironclad.save_brick(candidate, output_dir)
         return candidate
 
-    print("[X] FAILED: Could not validate candidate within retry limit.")
+    print("[-] FINAL FAILURE.")
     sys.exit(1)
 
 
