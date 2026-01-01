@@ -407,7 +407,7 @@ class UIValidator:
             if missing_properties and len(missing_properties) >= 3:
                 self.issues.append(ValidationIssue(
                     level=ValidationLevel.INFO,
-                    message=f"Missing common CSS properties: {', '.join(missing_properties)}",
+                    message=f"missing common CSS properties: {', '.join(missing_properties)}",
                     file_path=str(file_path),
                     suggestion="Consider adding these properties for better styling"
                 ))
@@ -823,7 +823,7 @@ class UIValidator:
             # Check for common sensitive patterns
             sensitive_patterns = [
                 (r'password\s*=\s*["\'][^"\']+["\']', "Hardcoded password"),
-                (r'api_key\s*=\s*["\'][^"\']+["\']', "Hardcoded API key"),
+                (r'api[_-]?key\s*=\s*["\'][^"\']+["\']', "Hardcoded API key"),
                 (r'secret\s*=\s*["\'][^"\']+["\']', "Hardcoded secret"),
                 (r'token\s*=\s*["\'][^"\']+["\']', "Hardcoded token"),
                 (r'-----BEGIN [A-Z]+ KEY-----', "Private key detected"),
