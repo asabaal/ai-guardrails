@@ -51,7 +51,7 @@ class TestCleanJsonResponse:
 class TestGenerateCandidate:
     """Test the generate_candidate function"""
     
-    @patch('ironclad.ironclad.ollama.chat')
+    @patch('ironclad.ollama.chat')
     def test_generate_candidate_success(self, mock_chat):
         """Test successful candidate generation"""
         mock_response = {
@@ -69,7 +69,7 @@ class TestGenerateCandidate:
         assert 'test_test_func' in result['test']
         mock_chat.assert_called_once()
     
-    @patch('ironclad.ironclad.ollama.chat')
+    @patch('ironclad.ollama.chat')
     def test_generate_candidate_json_decode_error(self, mock_chat):
         """Test handling of JSON decode error"""
         mock_response = {
@@ -84,7 +84,7 @@ class TestGenerateCandidate:
             assert result is None
             mock_print.assert_any_call("[!] Validation Failed: Model output was not valid JSON.")
     
-    @patch('ironclad.ironclad.ollama.chat')
+    @patch('ironclad.ollama.chat')
     def test_generate_candidate_ollama_error(self, mock_chat):
         """Test handling of ollama connection error"""
         mock_chat.side_effect = Exception("Connection error")
@@ -94,7 +94,7 @@ class TestGenerateCandidate:
             assert result is None
             mock_print.assert_any_call("[!] Error connecting to Ollama: Connection error")
     
-    @patch('ironclad.ironclad.ollama.chat')
+    @patch('ironclad.ollama.chat')
     def test_generate_candidate_with_markdown_response(self, mock_chat):
         """Test candidate generation when AI returns markdown-wrapped JSON"""
         mock_response = {
@@ -481,7 +481,7 @@ class TestMainExecution:
 class TestIntegration:
     """Integration tests for the complete workflow"""
     
-    @patch('ironclad.ironclad.ollama.chat')
+    @patch('ironclad.ollama.chat')
     @patch('subprocess.run')
     def test_full_workflow_success(self, mock_run, mock_chat):
         """Test complete workflow from generation to saving"""
