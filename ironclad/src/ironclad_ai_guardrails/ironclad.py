@@ -109,10 +109,12 @@ Return only the fixed JSON structure.
 """.strip()
 
     try:
-        full_prompt = f"{system_prompt}\n\n{repair_prompt}"
         resp = ollama.chat(
             model=model_name,
-            messages=[{"role": "user", "content": full_prompt}],
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": repair_prompt}
+            ],
         )
         content = resp["message"]["content"]
         data = json.loads(clean_json_response(content))
