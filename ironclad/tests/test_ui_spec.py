@@ -596,6 +596,337 @@ class TestEdgeCases:
         if optional_component:
             # Optional parameter should not be required
             assert optional_component.required is False
+    
+    def test_validation_with_invalid_component(self):
+        """Test UI spec validation with invalid component"""
+        invalid_component = UIComponent(
+            name="",
+            type=ComponentType.FORM_INPUT,
+            data_binding="",
+            label="Test"
+        )
+        
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Test UI",
+            components=[invalid_component],
+            layout=UILayout(type="vertical")
+        )
+        
+        errors = validate_ui_spec(ui_spec)
+        # Should have error for component name being empty
+        assert any("Component 0" in error for error in errors)
+    
+    def test_ui_spec_from_dict_general_exception(self):
+        """Test ui_spec_from_dict with general exception"""
+        invalid_data = {
+            "ui_type": "web",
+            "title": "Test",
+            "components": [
+                {
+                    "name": "test",
+                    "type": "invalid_component_type",
+                    "data_binding": "main.test",
+                    "label": "Test"
+                }
+            ],
+            "layout": {"type": "vertical"}
+        }
+        
+        # ValueError is re-raised as-is, not wrapped in UISpecValidationError
+        with pytest.raises(ValueError):
+            ui_spec_from_dict(invalid_data)
+    
+    def test_empty_parameters_function(self):
+        """Test transformation with function that has no parameters"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "no_params",
+                    "signature": "def no_params():",
+                    "description": "Function with no parameters"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        # Should create UI spec even without parameters
+        assert ui_spec.ui_type == UIType.WEB
+        # Should have execution component only
+        assert len([c for c in ui_spec.components if "execute" in c.name]) > 0
+    
+    def test_function_with_self_parameter(self):
+        """Test function with self parameter is skipped in transformation"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "method",
+                    "signature": "def method(self, value: str):",
+                    "description": "Method with self parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        # Should create component for value, not self
+        param_components = [c for c in ui_spec.components if "method" in c.name]
+        assert len(param_components) == 1
+        assert "value" in param_components[0].name
+    
+    def test_parameter_without_type_annotation(self):
+        """Test parameter without type annotation defaults to str"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "untyped_func",
+                    "signature": "def untyped_func(param):",
+                    "description": "Function with untyped parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        # Should create component and default type is str
+        untyped_component = next((c for c in ui_spec.components if "param" in c.name), None)
+        assert untyped_component is not None
+        # Default type should be str (text_area component)
+        assert untyped_component.type == ComponentType.TEXT_AREA
+    
+    def test_string_parameter_with_path_name(self):
+        """Test string parameter with 'path' in name gets special placeholder"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "path_func",
+                    "signature": "def path_func(file_path: str):",
+                    "description": "Function with path parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        path_component = next((c for c in ui_spec.components if "file_path" in c.name), None)
+        assert path_component is not None
+        assert "path" in path_component.placeholder.lower()
+    
+    def test_list_parameter_handling(self):
+        """Test list type parameter gets textarea component"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "list_func",
+                    "signature": "def list_func(items: list):",
+                    "description": "Function with list parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        list_component = next((c for c in ui_spec.components if "items" in c.name), None)
+        assert list_component is not None
+        assert list_component.type == ComponentType.TEXT_AREA
+        assert list_component.placeholder is not None
+        assert "one per line" in list_component.placeholder
+    
+    def test_desktop_ui_type(self):
+        """Test transformation for DESKTOP UI type"""
+        module_spec = {
+            "module_name": "calculator",
+            "main_logic_description": "Simple calculator with basic operations",
+            "functions": [
+                {
+                    "name": "add",
+                    "signature": "def add(a: int, b: int) -> int:",
+                    "description": "Add two numbers"
+                },
+                {
+                    "name": "main",
+                    "signature": "def main(operation: str, a: int, b: int) -> int:",
+                    "description": "Main calculator function"
+                }
+            ]
+        }
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.DESKTOP)
+        
+        assert ui_spec.ui_type == UIType.DESKTOP
+        assert ui_spec.styling.theme == "default"
+    
+    def test_api_docs_ui_type(self):
+        """Test transformation for API_DOCS UI type"""
+        module_spec = {
+            "module_name": "calculator",
+            "main_logic_description": "Simple calculator with basic operations",
+            "functions": [
+                {
+                    "name": "add",
+                    "signature": "def add(a: int, b: int) -> int:",
+                    "description": "Add two numbers"
+                },
+                {
+                    "name": "main",
+                    "signature": "def main(operation: str, a: int, b: int) -> int:",
+                    "description": "Main calculator function"
+                }
+            ]
+        }
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.API_DOCS)
+        
+        assert ui_spec.ui_type == UIType.API_DOCS
+        assert ui_spec.styling.theme == "default"
+    
+    def test_cli_tui_ui_type(self):
+        """Test transformation for CLI_TUI UI type"""
+        module_spec = {
+            "module_name": "calculator",
+            "main_logic_description": "Simple calculator with basic operations",
+            "functions": [
+                {
+                    "name": "add",
+                    "signature": "def add(a: int, b: int) -> int:",
+                    "description": "Add two numbers"
+                },
+                {
+                    "name": "main",
+                    "signature": "def main(operation: str, a: int, b: int) -> int:",
+                    "description": "Main calculator function"
+                }
+            ]
+        }
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.CLI_TUI)
+        
+        assert ui_spec.ui_type == UIType.CLI_TUI
+        assert ui_spec.styling.theme == "default"
+    
+    def test_many_components_layout(self):
+        """Test layout with many components uses flex"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": f"func{i}",
+                    "signature": f"def func{i}(param{i}: str):",
+                    "description": f"Function {i}"
+                }
+                for i in range(12)
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        # With >9 components, should use flex layout
+        assert ui_spec.layout.type == "flex"
+        assert ui_spec.layout.spacing == "small"
+    
+    def test_float_parameter_validation(self):
+        """Test float parameter gets float validation rules"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "float_func",
+                    "signature": "def float_func(price: float):",
+                    "description": "Function with float parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        float_component = next((c for c in ui_spec.components if "price" in c.name), None)
+        assert float_component is not None
+        assert float_component.validation is not None
+        assert float_component.validation.get("type") == "float"
+        assert float_component.validation.get("min") == 0.0
+    
+    def test_email_parameter_validation(self):
+        """Test email parameter gets email validation rules"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "email_func",
+                    "signature": "def email_func(user_email: str):",
+                    "description": "Function with email parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        email_component = next((c for c in ui_spec.components if "user_email" in c.name), None)
+        assert email_component is not None
+        assert email_component.validation is not None
+        assert email_component.validation.get("type") == "email"
+    
+    def test_url_parameter_validation(self):
+        """Test url parameter gets url validation rules"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "url_func",
+                    "signature": "def url_func(website_url: str):",
+                    "description": "Function with url parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        url_component = next((c for c in ui_spec.components if "website_url" in c.name), None)
+        assert url_component is not None
+        assert url_component.validation is not None
+        assert url_component.validation.get("type") == "url"
+    
+    def test_path_parameter_validation(self):
+        """Test path/file parameter gets file_path validation"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "file_func",
+                    "signature": "def file_func(config_path: str):",
+                    "description": "Function with path parameter"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        path_component = next((c for c in ui_spec.components if "config_path" in c.name), None)
+        assert path_component is not None
+        assert path_component.validation is not None
+        assert path_component.validation.get("file_path") is True
+    
+    def test_unknown_parameter_type(self):
+        """Test parameter with unknown type defaults to form input"""
+        module_spec = {
+            "module_name": "test",
+            "functions": [
+                {
+                    "name": "custom_func",
+                    "signature": "def custom_func(data: dict):",
+                    "description": "Function with custom parameter type"
+                }
+            ]
+        }
+        
+        ui_spec = transform_module_spec_to_ui_spec(module_spec, UIType.WEB)
+        
+        custom_component = next((c for c in ui_spec.components if "data" in c.name), None)
+        assert custom_component is not None
+        # Unknown types default to FORM_INPUT
+        assert custom_component.type == ComponentType.FORM_INPUT
 
 
 if __name__ == "__main__":
