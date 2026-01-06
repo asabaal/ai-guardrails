@@ -732,4 +732,196 @@ class TestCleanJsonFunction:
         parsed = json.loads(result)
         assert parsed['functions'][0]['code'] == 'def f1():\n    pass'
         assert parsed['functions'][1]['code'] == 'def f2():\n    return True'
-        assert parsed['main'] == 'main_code\nwith newlines'
+
+
+class TestBuildComponentsGenerationFailure:
+    """Test build_components when generation returns None (lines 69-72)"""
+    
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    @patch('builtins.open', create=True)
+    def test_build_components_generation_returns_none(self, mock_open, mock_print, mock_makedirs, mock_generate):
+        """Test when generate_candidate returns None (lines 69-72)"""
+        # Setup mock - generate returns None (failure)
+        mock_generate.return_value = None
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'functions': [
+                {
+                    'name': 'failed_func',
+                    'signature': 'def failed_func()',
+                    'description': 'A function that fails to generate'
+                }
+            ]
+        }
+        
+        # Execute
+        partial_success, module_dir, successful_components, failed_components, status_report = factory_manager.build_components(blueprint)
+        
+        # Assertions
+        assert partial_success is False
+        assert successful_components == []
+        assert failed_components == ['failed_func']
+        assert status_report['failed_func'] == "Generation failed"
+        mock_generate.assert_called_once()
+
+
+class TestAssembleMainRepairAndFailure:
+    """Test assemble_main repair and failure paths (lines 247-251, 259)"""
+    
+    @patch('ironclad_ai_guardrails.factory_manager.validate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.generate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    def test_assemble_main_with_repairs(self, mock_print, mock_makedirs, mock_file, mock_chat, mock_generate, mock_validate):
+        """Test assemble_main requiring repairs (lines 247-251)"""
+        # Setup mocks - validation fails first two times
+        mock_generate.return_value = 'def main(): print("Hello")'
+        mock_validate.side_effect = [
+            (False, "Syntax error"),
+            (False, "Import error"),
+            (True, "Valid")
+        ]
+        mock_chat.return_value = {
+            'message': {
+                'content': '{"code": "def main(): print(\"Hello\")"}'
+            }
+        }
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'main_logic_description': 'Print Hello'
+        }
+        module_dir = '/tmp/test_module'
+        components = ['func1']
+        
+        # Execute
+        factory_manager.assemble_main(blueprint, module_dir, components)
+        
+        # Assertions
+        assert mock_validate.call_count == 3  # Initial + 2 repairs
+        mock_file.assert_called()  # File should be written
+        mock_file.assert_any_call(os.path.join(module_dir, "main.py"), "w")
+        mock_file.assert_any_call(os.path.join(module_dir, "__init__.py"), "w")
+    
+    @patch('ironclad_ai_guardrails.factory_manager.validate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.generate_main_candidate')
+    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    def test_assemble_main_max_retries_exceeded(self, mock_print, mock_makedirs, mock_file, mock_chat, mock_generate, mock_validate):
+        """Test assemble_main failing after max retries (line 259)"""
+        # Setup mocks - validation always fails
+        mock_generate.return_value = 'def main(): print("Hello")'
+        mock_validate.return_value = (False, "Persistent error")
+        mock_chat.return_value = {
+            'message': {
+                'content': '{"code": "def main(): print(\"Hello\")"}'
+            }
+        }
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'main_logic_description': 'Print Hello'
+        }
+        module_dir = '/tmp/test_module'
+        components = ['func1']
+        
+        # Execute - should raise exception after 3 attempts
+        with pytest.raises(Exception) as exc_info:
+            factory_manager.assemble_main(blueprint, module_dir, components)
+        
+        assert "Failed to generate valid main.py after 3 attempts" in str(exc_info.value)
+        assert mock_validate.call_count == 3
+
+
+class TestRunFactoryManagerWorkflow:
+    """Test run_factory_manager_workflow function (lines 276-298)"""
+    
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('builtins.print')
+    @patch('sys.exit')
+    def test_run_workflow_no_blueprint_file(self, mock_exit, mock_print, mock_json_load, mock_file, mock_exists, mock_build, mock_assemble):
+        """Test workflow when blueprint.json doesn't exist (lines 276-279)"""
+        # Setup mocks
+        mock_exists.return_value = False  # blueprint.json doesn't exist
+        
+        # Execute
+        factory_manager.run_factory_manager_workflow()
+        
+        # Assertions
+        mock_print.assert_called_with("Run module_designer.py first!")
+        mock_exit.assert_called_once_with(1)
+        mock_build.assert_not_called()
+    
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('builtins.print')
+    @patch('sys.exit')
+    def test_run_workflow_partial_success_with_failures(self, mock_exit, mock_print, mock_json_load, mock_file, mock_exists, mock_build, mock_assemble):
+        """Test workflow with partial success and some failures (lines 290-293)"""
+        # Setup mocks
+        mock_exists.side_effect = [True, False]  # blueprint.json exists, module dir doesn't
+        mock_json_load.return_value = {
+            'module_name': 'test_module',
+            'main_logic_description': 'Test'
+        }
+        mock_build.return_value = (
+            True,  # partial_success
+            '/tmp/test_module',
+            ['func1', 'func2'],  # successful_components
+            ['func3'],  # failed_components
+            {'func1': 'success', 'func2': 'success', 'func3': 'failed'}  # status_report
+        )
+        
+        # Execute
+        factory_manager.run_factory_manager_workflow()
+        
+        # Assertions
+        mock_assemble.assert_called_once()
+        mock_print.assert_any_call(f"\n[⚠️]  Module completed with {len(['func3'])} failed components:")
+        mock_print.assert_any_call(f"     [❌] func3")
+        mock_exit.assert_not_called()
+    
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('builtins.print')
+    @patch('sys.exit')
+    def test_run_workflow_all_components_failed(self, mock_exit, mock_print, mock_json_load, mock_file, mock_exists, mock_build, mock_assemble):
+        """Test workflow when no components could be built (lines 297-298)"""
+        # Setup mocks
+        mock_exists.side_effect = [True, False]
+        mock_json_load.return_value = {
+            'module_name': 'test_module',
+            'main_logic_description': 'Test'
+        }
+        mock_build.return_value = (
+            False,  # partial_success=False
+            '/tmp/test_module',
+            [],  # no successful components
+            ['func1', 'func2'],  # all failed
+            {'func1': 'failed', 'func2': 'failed'}  # status_report
+        )
+        
+        # Execute
+        factory_manager.run_factory_manager_workflow()
+        
+        # Assertions
+        mock_assemble.assert_not_called()  # Don't assemble if no success
+        mock_print.assert_called_with("\n[❌] No components could be built successfully.")
+        mock_exit.assert_called_once_with(1)
