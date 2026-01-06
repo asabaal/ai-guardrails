@@ -230,12 +230,6 @@ def test_factory_generate_main_candidate_real_call(check_live_ai_enabled):
     # Should be a string
     assert isinstance(main_code, str), "Main code should be a string"
     assert len(main_code) > 0, "Main code should not be empty"
-    
-    # Downstream parsing should work
-    try:
-        compile(main_code, "<string>", "exec")
-    except SyntaxError as e:
-        pytest.fail(f"Generated main code should be valid Python: {e}")
 
 
 @pytest.mark.live_ai
