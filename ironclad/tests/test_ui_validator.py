@@ -1229,6 +1229,293 @@ if __name__ == "__main__":
         finally:
             import shutil
             shutil.rmtree(temp_dir)
+    
+    def test_validate_cli_gui_missing_gui_file(self):
+        """Test CLI GUI validation with missing gui.py file (line 181)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "requirements.txt"), 'w') as f:
+                f.write("tkinter\n")
+            
+            validator = UIValidator(temp_dir, "cli_gui")
+            result = validator.validate_all()
+            
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert any("Missing gui.py file" in issue.message for issue in critical_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_cli_gui_missing_requirements(self):
+        """Test CLI GUI validation with missing requirements.txt (line 191)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "gui.py"), 'w') as f:
+                f.write("import tkinter as tk\n\nclass GUI:\n    pass")
+            
+            validator = UIValidator(temp_dir, "cli_gui")
+            result = validator.validate_all()
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("Missing requirements.txt file" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_api_docs_missing_openapi_json(self):
+        """Test API docs validation with missing openapi.json (line 232)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert any("Missing openapi.json file" in issue.message for issue in critical_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_package_json_read_error(self):
+        """Test package.json with read error (lines 576-577)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            package_path = os.path.join(temp_dir, "package.json")
+            with open(package_path, 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            # Make package.json unreadable
+            os.chmod(package_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if "Error reading package.json" in i.message]
+            assert len(error_issues) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(package_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_requirements_read_error(self):
+        """Test requirements.txt with read error (lines 607-608)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "gui.py"), 'w') as f:
+                f.write("import tkinter as tk\n\nclass GUI:\n    pass")
+            
+            req_path = os.path.join(temp_dir, "requirements.txt")
+            with open(req_path, 'w') as f:
+                f.write("tkinter\n")
+            
+            # Make requirements.txt unreadable
+            os.chmod(req_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "cli_gui")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if "Error reading requirements.txt" in i.message]
+            assert len(error_issues) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(req_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_electron_main_missing_import(self):
+        """Test Electron main.js missing Electron import (line 621)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "main.js"), 'w') as f:
+                f.write("console.log('no electron import');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0", "main": "main.js"}, f)
+            
+            validator = UIValidator(temp_dir, "desktop")
+            result = validator.validate_all()
+            
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert any("Missing Electron import" in issue.message for issue in critical_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_electron_preload_missing_contextbridge(self):
+        """Test Electron preload.js missing contextBridge (lines 659-660)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "main.js"), 'w') as f:
+                f.write("const { app, BrowserWindow } = require('electron');")
+            
+            with open(os.path.join(temp_dir, "preload.js"), 'w') as f:
+                f.write("console.log('no context bridge here');")
+            
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0", "main": "main.js"}, f)
+            
+            validator = UIValidator(temp_dir, "desktop")
+            result = validator.validate_all()
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("No contextBridge usage found" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_electron_package_missing_main_field(self):
+        """Test Electron package.json missing 'main' field (line 682)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "main.js"), 'w') as f:
+                f.write("const { app, BrowserWindow } = require('electron');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            validator = UIValidator(temp_dir, "desktop")
+            result = validator.validate_all()
+            
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert any("Missing 'main' field in package.json" in issue.message for issue in critical_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_electron_package_read_error(self):
+        """Test Electron package.json with read error (lines 699-700)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "main.js"), 'w') as f:
+                f.write("const { app, BrowserWindow } = require('electron');")
+            
+            package_path = os.path.join(temp_dir, "package.json")
+            with open(package_path, 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0", "main": "main.js"}, f)
+            
+            # Make package.json unreadable
+            os.chmod(package_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "desktop")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if "Error validating Electron package.json" in i.message]
+            assert len(error_issues) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(package_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_openapi_read_error(self):
+        """Test OpenAPI spec with read error (lines 748-749)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            openapi_path = os.path.join(temp_dir, "openapi.json")
+            with open(openapi_path, 'w') as f:
+                json.dump({"openapi": "3.0.0", "info": {"title": "Test", "version": "1.0.0"}, "paths": {}}, f)
+            
+            # Make openapi.json unreadable
+            os.chmod(openapi_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if "Error reading OpenAPI spec" in i.message]
+            assert len(error_issues) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(openapi_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_swagger_html_missing_swagger_ui(self):
+        """Test Swagger HTML missing Swagger UI references (line 762)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                json.dump({"openapi": "3.0.0", "info": {"title": "Test", "version": "1.0.0"}, "paths": {}}, f)
+            
+            with open(os.path.join(temp_dir, "swagger.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><body>No Swagger UI references</body></html>")
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if i.level == ValidationLevel.ERROR]
+            assert any("No Swagger UI references found" in issue.message for issue in error_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_swagger_html_missing_openapi_ref(self):
+        """Test Swagger HTML missing OpenAPI spec reference (line 771)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                json.dump({"openapi": "3.0.0", "info": {"title": "Test", "version": "1.0.0"}, "paths": {}}, f)
+            
+            with open(os.path.join(temp_dir, "swagger.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><head><script src='swagger-ui.js'></script></head><body></body></html>")
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("No OpenAPI spec reference found" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_print_validation_report_with_critical_issues(self):
+        """Test print_validation_report with critical issues (line 899)"""
+        issues = [
+            ValidationIssue(ValidationLevel.CRITICAL, "Critical error", "/test/file.html")
+        ]
+        
+        result = ValidationResult(
+            status=ValidationStatus.FAILED,
+            issues=issues,
+            execution_time=0.5,
+            metadata={"total_issues": 1, "critical_issues": 1}
+        )
+        
+        # Just verify it doesn't crash and has critical output
+        import io
+        import sys
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        
+        try:
+            print_validation_report(result)
+            output = captured_output.getvalue()
+            assert "Critical: 1" in output
+        finally:
+            sys.stdout = sys.__stdout__
 
 
 if __name__ == "__main__":
