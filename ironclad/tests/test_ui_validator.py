@@ -186,7 +186,7 @@ if __name__ == "__main__":
             validator = UIValidator(temp_dir, "web")
             result = validator.validate_all()
             
-            assert result.status in [ValidationStatus.PASSED, ValidationStatus.WARNING]
+            assert result.status == ValidationStatus.WARNING
             assert result.execution_time > 0
             assert "ui_type" in result.metadata
             assert result.metadata["ui_type"] == "web"
@@ -220,7 +220,7 @@ if __name__ == "__main__":
             validator = UIValidator(temp_dir, "cli_gui")
             result = validator.validate_all()
             
-            assert result.status in [ValidationStatus.PASSED, ValidationStatus.WARNING]
+            assert result.status == ValidationStatus.WARNING
             assert result.execution_time > 0
         finally:
             import shutil
@@ -303,7 +303,7 @@ if __name__ == "__main__":
             validator = UIValidator(temp_dir, "api_docs")
             result = validator.validate_all()
             
-            assert result.status in [ValidationStatus.PASSED, ValidationStatus.WARNING]
+            assert result.status == ValidationStatus.PASSED
         finally:
             import shutil
             shutil.rmtree(temp_dir)
@@ -457,7 +457,7 @@ class TestConvenienceFunctions:
             result = validate_ui_directory(temp_dir, "web")
             
             assert isinstance(result, ValidationResult)
-            assert result.status in [ValidationStatus.PASSED, ValidationStatus.WARNING, ValidationStatus.FAILED]
+            assert result.status == ValidationStatus.FAILED
             assert "total_issues" in result.metadata
         finally:
             import shutil
