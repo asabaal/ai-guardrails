@@ -196,13 +196,8 @@ def fix_common_code_issues(code: str) -> str:
     out_lines = []
     blank_run = 0
     for ln in lines:
-        if ln == "":
-            blank_run += 1
-            if blank_run <= 1:
-                out_lines.append("")
-        else:
-            blank_run = 0
-            out_lines.append(ln)
+        blank_run = 0
+        out_lines.append(ln)
 
     result = "\n".join(out_lines).strip("\n")
     return result + "\n" if result else ""
