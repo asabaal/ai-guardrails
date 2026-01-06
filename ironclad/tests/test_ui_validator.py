@@ -753,6 +753,482 @@ class TestEdgeCases(TestUIValidator):
         finally:
             import shutil
             shutil.rmtree(temp_dir)
+    
+    def test_validate_cli_tui_success(self):
+        """Test successful CLI TUI validation"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            tui_content = """#!/usr/bin/env python3
+from rich.console import Console
+from rich.table import Table
+
+class TUIApp:
+    def __init__(self):
+        self.console = Console()
+    
+    def run(self):
+        table = Table(title="Test")
+        table.add_column("Name")
+        table.add_row("Test")
+        self.console.print(table)
+
+if __name__ == "__main__":
+    try:
+        app = TUIApp()
+        app.run()
+    except Exception as e:
+        print(f"Error: {e}")
+"""
+            
+            with open(os.path.join(temp_dir, "tui.py"), 'w') as f:
+                f.write(tui_content)
+            
+            with open(os.path.join(temp_dir, "requirements.txt"), 'w') as f:
+                f.write("rich>=13.0.0\n")
+            
+            validator = UIValidator(temp_dir, "cli_tui")
+            result = validator.validate_all()
+            
+            assert result.status == ValidationStatus.PASSED
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_cli_tui_missing_tui_file(self):
+        """Test CLI TUI validation with missing tui.py"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "requirements.txt"), 'w') as f:
+                f.write("rich\n")
+            
+            validator = UIValidator(temp_dir, "cli_tui")
+            result = validator.validate_all()
+            
+            assert result.status == ValidationStatus.FAILED
+            
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert any("Missing tui.py file" in issue.message for issue in critical_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_cli_tui_missing_requirements(self):
+        """Test CLI TUI validation with missing requirements.txt"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "tui.py"), 'w') as f:
+                f.write("from rich.console import Console\n\nconsole = Console()")
+            
+            validator = UIValidator(temp_dir, "cli_tui")
+            result = validator.validate_all()
+            
+            assert result.status == ValidationStatus.WARNING
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("Missing requirements.txt file" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_cli_tui_missing_rich_import(self):
+        """Test CLI TUI validation with missing rich import"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "tui.py"), 'w') as f:
+                f.write("print('No rich import')")
+            
+            with open(os.path.join(temp_dir, "requirements.txt"), 'w') as f:
+                f.write("rich\n")
+            
+            validator = UIValidator(temp_dir, "cli_tui")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if i.level == ValidationLevel.ERROR]
+            assert any("Missing rich library import" in issue.message for issue in error_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_cli_tui_empty_requirements(self):
+        """Test CLI TUI validation with empty requirements.txt"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "tui.py"), 'w') as f:
+                f.write("from rich.console import Console\n\nconsole = Console()")
+            
+            with open(os.path.join(temp_dir, "requirements.txt"), 'w') as f:
+                f.write("")
+            
+            validator = UIValidator(temp_dir, "cli_tui")
+            result = validator.validate_all()
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("Empty requirements.txt file" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_desktop_ui_missing_html(self):
+        """Test desktop UI validation with missing index.html"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "main.js"), 'w') as f:
+                f.write("const { app, BrowserWindow } = require('electron');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0", "main": "main.js"}, f)
+            
+            validator = UIValidator(temp_dir, "desktop")
+            result = validator.validate_all()
+            
+            # Should have errors but not fail due to missing index.html
+            assert len(result.issues) > 0
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_html_unreadable_file(self):
+        """Test HTML validation with unreadable file"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            html_path = os.path.join(temp_dir, "index.html")
+            with open(html_path, 'w') as f:
+                f.write("<!DOCTYPE html><html><head><title>Test</title></head></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            # Make HTML file unreadable
+            os.chmod(html_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            # Should have error for HTML read error
+            html_errors = [i for i in result.issues if "Error reading HTML file" in i.message]
+            assert len(html_errors) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(html_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_python_file_unreadable(self):
+        """Test Python file validation with unreadable file"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            gui_path = os.path.join(temp_dir, "gui.py")
+            with open(gui_path, 'w') as f:
+                f.write("import tkinter as tk\n\nroot = tk.Tk()\nroot.mainloop()")
+            
+            with open(os.path.join(temp_dir, "requirements.txt"), 'w') as f:
+                f.write("tkinter\n")
+            
+            # Make Python file unreadable
+            os.chmod(gui_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "cli_gui")
+            result = validator.validate_all()
+            
+            # Should have error for Python read error
+            python_errors = [i for i in result.issues if "Error reading Python file" in i.message]
+            assert len(python_errors) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(gui_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_electron_main_exception(self):
+        """Test Electron main.js validation with read exception"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            main_path = os.path.join(temp_dir, "main.js")
+            with open(main_path, 'w') as f:
+                f.write("const { app } = require('electron');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0", "main": "main.js"}, f)
+            
+            # Make main.js unreadable
+            os.chmod(main_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "desktop")
+            result = validator.validate_all()
+            
+            # Should have error for main.js read error
+            main_errors = [i for i in result.issues if "Error reading Electron main.js" in i.message]
+            assert len(main_errors) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(main_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_electron_preload_exception(self):
+        """Test Electron preload.js validation with read exception"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            preload_path = os.path.join(temp_dir, "preload.js")
+            with open(preload_path, 'w') as f:
+                f.write("const { contextBridge } = require('electron');")
+            
+            with open(os.path.join(temp_dir, "main.js"), 'w') as f:
+                f.write("const { app, BrowserWindow } = require('electron');")
+            
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0", "main": "main.js"}, f)
+            
+            # Make preload.js unreadable
+            os.chmod(preload_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "desktop")
+            result = validator.validate_all()
+            
+            # Should have error for preload.js read error
+            preload_errors = [i for i in result.issues if "Error reading preload.js" in i.message]
+            assert len(preload_errors) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(preload_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_openapi_missing_openapi_field(self):
+        """Test OpenAPI spec missing 'openapi' field"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            openapi_data = {
+                "info": {"title": "Test API", "version": "1.0.0"},
+                "paths": {}
+            }
+            
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                json.dump(openapi_data, f)
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert any("Missing 'openapi' version field" in issue.message for issue in critical_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_openapi_missing_info_field(self):
+        """Test OpenAPI spec missing 'info' field"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            openapi_data = {
+                "openapi": "3.0.0",
+                "paths": {}
+            }
+            
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                json.dump(openapi_data, f)
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert any("Missing 'info' field" in issue.message for issue in critical_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_openapi_missing_paths_field(self):
+        """Test OpenAPI spec missing 'paths' field"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            openapi_data = {
+                "openapi": "3.0.0",
+                "info": {"title": "Test API", "version": "1.0.0"}
+            }
+            
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                json.dump(openapi_data, f)
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if i.level == ValidationLevel.ERROR]
+            assert any("Missing 'paths' field" in issue.message for issue in error_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_openapi_empty_paths(self):
+        """Test OpenAPI spec with empty paths"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            openapi_data = {
+                "openapi": "3.0.0",
+                "info": {"title": "Test API", "version": "1.0.0"},
+                "paths": {}
+            }
+            
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                json.dump(openapi_data, f)
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("No API paths defined" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_swagger_html_unreadable(self):
+        """Test Swagger HTML validation with unreadable file"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            openapi_data = {
+                "openapi": "3.0.0",
+                "info": {"title": "Test API", "version": "1.0.0"},
+                "paths": {"/test": {"get": {}}}
+            }
+            
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                json.dump(openapi_data, f)
+            
+            html_path = os.path.join(temp_dir, "swagger.html")
+            with open(html_path, 'w') as f:
+                f.write("<html><body>Swagger</body></html>")
+            
+            # Make HTML file unreadable
+            os.chmod(html_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            # Should have error for HTML read error
+            html_errors = [i for i in result.issues if "Error reading Swagger HTML" in i.message]
+            assert len(html_errors) > 0
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(html_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_api_endpoints_invalid_json(self):
+        """Test API endpoints validation with invalid JSON"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "openapi.json"), 'w') as f:
+                f.write("{invalid json")
+            
+            validator = UIValidator(temp_dir, "api_docs")
+            result = validator.validate_all()
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("Could not analyze API endpoints" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_html_missing_html_tag(self):
+        """Test HTML validation missing <html> tag"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html>\n<head><title>Test</title></head>\n<body></body>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if i.level == ValidationLevel.ERROR]
+            assert any("Missing <html> tag" in issue.message for issue in error_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_html_missing_head_tag(self):
+        """Test HTML validation missing <head> tag"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html>\n<html><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            error_issues = [i for i in result.issues if i.level == ValidationLevel.ERROR]
+            assert any("Missing <head> tag" in issue.message for issue in error_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_validate_web_external_script_sources(self):
+        """Test web security validation with external script sources"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write('<!DOCTYPE html><html><head><script src="http://example.com/script.js"></script></head><body></body></html>')
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert any("External script sources detected" in issue.message for issue in warning_issues)
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
 
 
 if __name__ == "__main__":
