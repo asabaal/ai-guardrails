@@ -603,6 +603,225 @@ class TestEdgeCases:
             
             # Should include custom CSS
             assert custom_css in css_content
+    
+    def test_html_input_type_float(self):
+        """Test HTML input type for float validation"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Float Test",
+            components=[
+                UIComponent(
+                    name="price_field",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.price",
+                    label="Price",
+                    validation={"type": "float", "min": 0}
+                )
+            ],
+            layout=UILayout(type="vertical")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            html_content = files["index.html"]
+            
+            # Should use number input type for float
+            assert 'type="number"' in html_content
+            assert 'name="price_field"' in html_content
+            
+            # Check JavaScript validation for float
+            js_content = files["app.js"]
+            assert "parseFloat(value)" in js_content
+    
+    def test_html_input_type_url(self):
+        """Test HTML input type for URL validation"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="URL Test",
+            components=[
+                UIComponent(
+                    name="website_field",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.website",
+                    label="Website",
+                    validation={"type": "url"}
+                )
+            ],
+            layout=UILayout(type="vertical")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            html_content = files["index.html"]
+            
+            # Should use url input type
+            assert 'type="url"' in html_content
+            assert 'name="website_field"' in html_content
+    
+    def test_css_green_theme(self):
+        """Test CSS generation with green theme"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Green Theme UI",
+            components=[
+                UIComponent(
+                    name="test",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.test",
+                    label="Test"
+                )
+            ],
+            layout=UILayout(type="vertical"),
+            styling=UIStyling(theme="modern", color_scheme="green")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            css_content = files["styles.css"]
+            
+            # Should use green color scheme
+            assert "#28a745" in css_content
+            assert "#1e7e34" in css_content
+    
+    def test_select_component_no_options(self):
+        """Test SELECT component with no options"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Select Test",
+            components=[
+                UIComponent(
+                    name="empty_select",
+                    type=ComponentType.SELECT,
+                    data_binding="main.empty",
+                    label="Empty Select"
+                    # No options provided
+                )
+            ],
+            layout=UILayout(type="vertical")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            html_content = files["index.html"]
+            
+            # Should show "No options available"
+            assert "No options available" in html_content
+            assert 'name="empty_select"' in html_content
+    
+    def test_cli_gui_text_area(self):
+        """Test CLI GUI (Tkinter) with TEXT_AREA component"""
+        ui_spec = UISpec(
+            ui_type=UIType.CLI_GUI,
+            title="Text Area Test",
+            components=[
+                UIComponent(
+                    name="notes",
+                    type=ComponentType.TEXT_AREA,
+                    data_binding="main.notes",
+                    label="Notes"
+                )
+            ],
+            layout=UILayout(type="vertical")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            gui_content = files["gui.py"]
+            
+            # Should have Text widget for TEXT_AREA
+            assert "tk.Text(main_frame, height=5, width=40)" in gui_content
+            assert "Notes:" in gui_content
+            
+            # Should have proper data collection with Text widget
+            assert 'notes_text.get("1.0", tk.END).strip()' in gui_content
+    
+    def test_cli_tui_text_area(self):
+        """Test CLI TUI (Rich) with TEXT_AREA component"""
+        ui_spec = UISpec(
+            ui_type=UIType.CLI_TUI,
+            title="TUI Text Area Test",
+            components=[
+                UIComponent(
+                    name="description",
+                    type=ComponentType.TEXT_AREA,
+                    data_binding="main.description",
+                    label="Description"
+                )
+            ],
+            layout=UILayout(type="vertical")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            tui_content = files["tui.py"]
+            
+            # Should have multiline prompt for TEXT_AREA
+            assert 'Prompt.ask("[bold]Description[/bold]", multiline=True)' in tui_content
+    
+    def test_html_input_type_file_path(self):
+        """Test HTML input type for file_path validation"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="File Path Test",
+            components=[
+                UIComponent(
+                    name="file_field",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.file",
+                    label="File",
+                    validation={"type": "file_path"}
+                )
+            ],
+            layout=UILayout(type="vertical")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            html_content = files["index.html"]
+            
+            # Should use file input type
+            assert 'type="file"' in html_content
+            assert 'name="file_field"' in html_content
+    
+    def test_css_unknown_color_scheme(self):
+        """Test CSS generation with unknown color scheme"""
+        ui_spec = UISpec(
+            ui_type=UIType.WEB,
+            title="Unknown Color UI",
+            components=[
+                UIComponent(
+                    name="test",
+                    type=ComponentType.FORM_INPUT,
+                    data_binding="main.test",
+                    label="Test"
+                )
+            ],
+            layout=UILayout(type="vertical"),
+            styling=UIStyling(theme="modern", color_scheme="unknown")
+        )
+        
+        generator = UIGenerator(ui_spec)
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            files = generator.generate(temp_dir)
+            css_content = files["styles.css"]
+            
+            # Should fall back to default (blue) colors
+            assert "#3498db" in css_content
 
 
 if __name__ == "__main__":
