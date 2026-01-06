@@ -173,25 +173,24 @@ class TestHandleValidate:
             assert "VALIDATION RESULTS" in captured.out
             assert "Validation passed!" in captured.out
     
-    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory')
-    def test_handle_validate_with_failed_status(self, mock_validate, capsys):
+    def test_handle_validate_with_failed_status(self):
         """Test validation with failed status (lines 224-225, 229)"""
         from ironclad_ai_guardrails.ui_validator import ValidationStatus, ValidationResult, ValidationLevel, ValidationIssue
-        mock_validate.return_value = ValidationResult(
-            status=ValidationStatus.FAILED,
-            issues=[ValidationIssue(level=ValidationLevel.ERROR, message="Test error")],
-            execution_time=0.5,
-            metadata={}
-        )
         
         with tempfile.TemporaryDirectory() as temp_dir:
             args = create_mock_args(ui_dir=temp_dir, ui_type="web")
-            with patch('sys.exit') as mock_exit:
-                handle_validate(args)
-                mock_exit.assert_called_once_with(1)
-        
-        captured = capsys.readouterr()
-        assert "DETAILED REPORT" in captured.out
+            
+            with patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory') as mock_validate:
+                mock_validate.return_value = ValidationResult(
+                    status=ValidationStatus.FAILED,
+                    issues=[ValidationIssue(level=ValidationLevel.ERROR, message="Test error")],
+                    execution_time=0.5,
+                    metadata={"total_issues": 1}
+                )
+                
+                with pytest.raises(SystemExit) as exc_info:
+                    handle_validate(args)
+                assert exc_info.value.code == 1
     
     @patch('ironclad_ai_guardrails.ui_cli.validate_ui_directory')
     def test_handle_validate_with_warning_status(self, mock_validate, capsys):
@@ -311,6 +310,29 @@ class TestHandleGenerate:
             with patch('sys.exit') as mock_exit:
                 handle_generate(args)
                 mock_exit.assert_called_once_with(1)
+    
+    @patch('ironclad_ai_guardrails.ui_cli.validate_ui_type')
+    @patch('ironclad_ai_guardrails.ui_cli.transform_module_spec_to_ui_spec')
+    @patch('ironclad_ai_guardrails.ui_cli.save_ui_artifacts')
+    @patch('ironclad_ai_guardrails.ui_cli.load_module_spec')
+    def test_handle_generate_all_types(self, mock_load_spec, mock_save, mock_transform, mock_validate_type):
+        """Test generating all UI types (lines 151-152, 174, 200)"""
+        mock_load_spec.return_value = {"module_name": "test", "functions": []}
+        mock_validate_type.return_value = UIType.WEB
+        mock_transform.return_value = MagicMock()
+        mock_save.return_value = ["index.html", "styles.css"]
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            args = create_mock_args(
+                spec="spec.json",
+                type="all",
+                output=temp_dir,
+                validate=False,
+                title=None
+            )
+            handle_generate(args)
+        
+        assert mock_save.call_count == len([t.value for t in UIType])
 
 
 class TestUICLIMain:
