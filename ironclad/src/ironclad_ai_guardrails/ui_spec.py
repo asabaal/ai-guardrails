@@ -524,5 +524,3 @@ def ui_spec_from_dict(data: Dict[str, Any]) -> UISpec:
         raise UISpecValidationError(f"Missing required field in UISpec data: {e}")
     except ValueError as e:
         raise
-    except Exception as e:
-        raise UISpecValidationError(f"Error creating UISpec from data: {e}")
