@@ -558,6 +558,201 @@ class TestEdgeCases(TestUIValidator):
         finally:
             import shutil
             shutil.rmtree(temp_dir)
+    
+    def test_web_ui_css_read_error(self):
+        """Test Web UI validation with CSS file read error (lines 424-425)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            # Create valid HTML, JS, and package.json
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><head></head><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            # Create CSS file with restrictive permissions
+            css_path = os.path.join(temp_dir, "styles.css")
+            with open(css_path, 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            # Make CSS file unreadable by removing read permission
+            os.chmod(css_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            # Should have error for CSS read error
+            css_errors = [i for i in result.issues if "Error reading CSS file" in i.message]
+            assert len(css_errors) > 0
+            
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(css_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_web_ui_js_read_error(self):
+        """Test Web UI validation with JS file read error (lines 472-473)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            # Create valid HTML, CSS, and package.json
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><head></head><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            # Create JS file with restrictive permissions
+            js_path = os.path.join(temp_dir, "app.js")
+            with open(js_path, 'w') as f:
+                f.write("console.log('test');")
+            
+            # Make JS file unreadable
+            os.chmod(js_path, 0o000)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            # Should have error for JS read error
+            js_errors = [i for i in result.issues if "Error reading JavaScript file" in i.message]
+            assert len(js_errors) > 0
+            
+        finally:
+            import shutil
+            # Restore permissions before cleanup
+            os.chmod(js_path, 0o644)
+            shutil.rmtree(temp_dir)
+    
+    def test_web_ui_package_json_decode_error(self):
+        """Test Web UI validation with package.json JSON decode error (lines 570-575)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            # Create valid HTML, CSS, and JS
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><head></head><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            # Create package.json with invalid JSON
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                f.write("{invalid json content")
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            # Should have critical issue for invalid JSON
+            critical_issues = [i for i in result.issues if i.level == ValidationLevel.CRITICAL]
+            assert len(critical_issues) > 0
+            assert any("Invalid JSON in package.json" in i.message for i in critical_issues)
+            
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_web_ui_package_json_missing_scripts(self):
+        """Test Web UI validation with package.json missing scripts (lines 552-559)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            # Create valid HTML, CSS, and JS
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><head></head><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            # Create package.json without scripts or with empty scripts
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0", "scripts": {}}, f)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            # Should have warning for missing scripts
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert len(warning_issues) > 0
+            assert any("No scripts defined" in i.message for i in warning_issues)
+            
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_web_ui_package_json_missing_dependencies(self):
+        """Test Web UI validation with package.json missing dependencies (lines 561-568)"""
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            # Create valid HTML, CSS, and JS
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><head></head><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            # Create package.json without dependencies
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({"name": "test", "version": "1.0.0"}, f)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            # Should have info for missing dependencies
+            info_issues = [i for i in result.issues if i.level == ValidationLevel.INFO]
+            assert len(info_issues) > 0
+            assert any("No dependencies defined" in i.message for i in info_issues)
+            
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    def test_web_ui_package_json_empty(self):
+        """Test Web UI validation with empty package.json (line 545)"""
+        temp_dir = self.create_temp_ui_dir("web")
+        
+        try:
+            # Create valid HTML, CSS, and JS
+            with open(os.path.join(temp_dir, "index.html"), 'w') as f:
+                f.write("<!DOCTYPE html><html><head></head><body></body></html>")
+            
+            with open(os.path.join(temp_dir, "styles.css"), 'w') as f:
+                f.write("body { margin: 0; }")
+            
+            with open(os.path.join(temp_dir, "app.js"), 'w') as f:
+                f.write("console.log('test');")
+            
+            # Create package.json that's empty but valid
+            with open(os.path.join(temp_dir, "package.json"), 'w') as f:
+                json.dump({}, f)
+            
+            validator = UIValidator(temp_dir, "web")
+            result = validator.validate_all()
+            
+            # Should have warning for missing required fields
+            warning_issues = [i for i in result.issues if i.level == ValidationLevel.WARNING]
+            assert len(warning_issues) >= 1
+            
+        finally:
+            import shutil
+            shutil.rmtree(temp_dir)
 
 
 if __name__ == "__main__":
