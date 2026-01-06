@@ -103,7 +103,13 @@ class TestDecodeNewlinesRecursive:
             "main": "main_code\nwith newlines"
         }
         assert code_utils.decode_newlines_recursive(input_data) == expected
-
+    
+    def test_non_iterable_types(self):
+        """Test handling of non-iterable types"""
+        assert code_utils.decode_newlines_recursive(123) == 123
+        assert code_utils.decode_newlines_recursive(True) is True
+        assert code_utils.decode_newlines_recursive(None) is None
+        assert code_utils.decode_newlines_recursive(3.14) == 3.14
 
 class TestCleanJsonResponse:
     """Test JSON response cleaning functionality"""
@@ -143,6 +149,83 @@ class TestCleanJsonResponse:
         input_json = 'invalid json with \\n escapes'
         result = code_utils.clean_json_response(input_json)
         assert result == 'invalid json with \n escapes'
+    
+    def test_non_string_input(self):
+        """Test non-string input handling"""
+        assert code_utils.clean_json_response(123) == "123"
+        assert code_utils.clean_json_response(None) == "None"
+        assert code_utils.clean_json_response([]) == "[]"
+    
+    def test_second_attempt_success(self):
+        """Test second attempt with escaped backslashes succeeds"""
+        input_json = '{"key": "value\\_with\\_invalid\\_escapes"}'
+        result = code_utils.clean_json_response(input_json)
+        parsed = json.loads(result)
+        assert parsed["key"] == "value\\_with\\_invalid\\_escapes"
+
+
+class TestEscapeInvalidBackslashes:
+    """Test _escape_invalid_backslashes function"""
+    
+    def test_outside_string_quote(self):
+        """Test quote outside string context"""
+        result = code_utils._escape_invalid_backslashes('text"inside')
+        assert result == 'text"inside'
+    
+    def test_outside_string_backslash_u(self):
+        """Test \\u outside string context"""
+        result = code_utils._escape_invalid_backslashes('\\u1234')
+        assert result == 'u1234'
+    
+    def test_outside_string_backslash_valid_escape(self):
+        """Test backslash with valid escape outside string"""
+        result = code_utils._escape_invalid_backslashes('\\n')
+        assert result == '\\n'
+    
+    def test_outside_string_backslash_invalid(self):
+        """Test backslash with invalid char outside string"""
+        result = code_utils._escape_invalid_backslashes('\\x')
+        assert result == '\\\\x'
+    
+    def test_inside_string_valid_escapes(self):
+        """Test valid JSON escape sequences inside string"""
+        result = code_utils._escape_invalid_backslashes('"\\n\\t\\"\\\\/\\b\\f\\r"')
+        assert result == '"\\n\\t\\"\\\\/\\b\\f\\r"'
+    
+    def test_inside_string_u_sequence(self):
+        """Test \\u sequence inside string"""
+        result = code_utils._escape_invalid_backslashes('"\\u0041\\u0042"')
+        assert result == '"\\u0041\\u0042"'
+    
+    def test_inside_string_invalid_escape(self):
+        """Test invalid escape inside string"""
+        result = code_utils._escape_invalid_backslashes('"\\x\\y"')
+        assert result == '"\\\\x\\\\y"'
+    
+    def test_inside_string_end_quote(self):
+        """Test closing quote inside string"""
+        result = code_utils._escape_invalid_backslashes('"hello"world"')
+        assert result == '"hello"world"'
+    
+    def test_inside_string_backslash(self):
+        """Test backslash inside string"""
+        result = code_utils._escape_invalid_backslashes('"hello\\\\world"')
+        assert result == '"hello\\\\world"'
+    
+    def test_empty_string(self):
+        """Test empty string"""
+        result = code_utils._escape_invalid_backslashes('')
+        assert result == ''
+    
+    def test_no_strings(self):
+        """Test input with no strings"""
+        result = code_utils._escape_invalid_backslashes('abc123')
+        assert result == 'abc123'
+    
+    def test_complex_json_string(self):
+        """Test complex JSON-like string"""
+        result = code_utils._escape_invalid_backslashes('"key1": "value1\\_", "key2": "\\u1234"')
+        assert result == '"key1": "value1\\\\_", "key2": "\\u1234"'
 
 
 class TestCleanCodeContent:
@@ -206,6 +289,21 @@ class TestValidatePythonSyntax:
         is_valid, error = code_utils.validate_python_syntax(import_code)
         assert is_valid is True
         assert error == ""
+    
+    def test_non_syntax_error_exception(self):
+        """Test handling of non-SyntaxError exceptions"""
+        # Mock ast to raise a non-SyntaxError exception
+        import ast
+        original_parse = ast.parse
+        def bad_parse(*args, **kwargs):
+            raise ValueError("Unexpected error")
+        ast.parse = bad_parse
+        try:
+            is_valid, error = code_utils.validate_python_syntax("code")
+            assert is_valid is False
+            assert "Validation error" in error
+        finally:
+            ast.parse = original_parse
 
 
 class TestFixCommonCodeIssues:
@@ -230,6 +328,29 @@ class TestFixCommonCodeIssues:
         input_code = "def hello():    \\n    \\n    pass\\n"
         result = code_utils.fix_common_code_issues(input_code)
         assert result.strip() == "def hello():\n    pass"
+    
+    def test_non_string_input(self):
+        """Test non-string input handling"""
+        assert code_utils.fix_common_code_issues(123) == "123\n"
+        assert code_utils.fix_common_code_issues(None) == "None\n"
+    
+    def test_blank_line_handling(self):
+        """Test proper handling of blank lines"""
+        input_code = "line1\n\nline2\n\n\nline3"
+        result = code_utils.fix_common_code_issues(input_code)
+        assert result == "line1\nline2\nline3\n"
+    
+    def test_only_whitespace_lines(self):
+        """Test input with only whitespace lines"""
+        input_code = "   \n  \t  \n   "
+        result = code_utils.fix_common_code_issues(input_code)
+        assert result == ""
+    
+    def test_mixed_blank_lines_with_content(self):
+        """Test mixed blank lines and content"""
+        input_code = "\n\nline1\n\nline2\n\n\n\nline3\n\n"
+        result = code_utils.fix_common_code_issues(input_code)
+        assert result == "line1\nline2\nline3\n"
 
 
 class TestSanitizeJsonContent:
@@ -288,6 +409,12 @@ class TestExtractCodeFromResponse:
         response = 'This is just some explanation text without any code.'
         result = code_utils.extract_code_from_response(response)
         assert result == response
+    
+    def test_non_string_input(self):
+        """Test non-string input handling"""
+        assert code_utils.extract_code_from_response(123) == "123"
+        assert code_utils.extract_code_from_response(None) == "None"
+        assert code_utils.extract_code_from_response([]) == "[]"
     
     def test_multiple_code_blocks(self):
         """Test extracting from multiple code blocks"""
