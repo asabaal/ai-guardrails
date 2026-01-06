@@ -925,3 +925,33 @@ class TestRunFactoryManagerWorkflow:
         mock_assemble.assert_not_called()  # Don't assemble if no success
         mock_print.assert_called_with("\n[❌] No components could be built successfully.")
         mock_exit.assert_called_once_with(1)
+    
+    @patch('ironclad_ai_guardrails.factory_manager.assemble_main')
+    @patch('ironclad_ai_guardrails.factory_manager.build_components')
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('builtins.print')
+    @patch('sys.exit')
+    def test_run_workflow_all_successful_no_failures(self, mock_exit, mock_print, mock_json_load, mock_file, mock_exists, mock_build, mock_assemble):
+        """Test workflow when all components successful with no failures (to cover line 295)"""
+        # Setup mocks
+        mock_exists.side_effect = [True, False]
+        mock_json_load.return_value = {
+            'module_name': 'test_module',
+            'main_logic_description': 'Test'
+        }
+        mock_build.return_value = (
+            True,  # partial_success
+            '/tmp/test_module',
+            ['func1', 'func2'],  # successful_components
+            [],  # NO failed_components
+            {'func1': 'success', 'func2': 'success'}  # status_report
+        )
+        
+        # Execute
+        factory_manager.run_factory_manager_workflow()
+        
+        # Assertions
+        mock_assemble.assert_called_once()
+        mock_print.assert_called_with("\n[✅] All 2 components built successfully!")
