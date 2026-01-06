@@ -60,6 +60,22 @@ def _escape_invalid_backslashes(s: str) -> str:
         if not in_string:
             if ch == '"':
                 in_string = True
+                out.append(ch)
+                i += 1
+                continue
+
+            if ch == "\\":
+                if i + 1 < len(s) and s[i + 1] == "u":
+                    out.append("u")
+                    i += 2
+                elif i + 1 < len(s) and s[i + 1] in _VALID_JSON_ESCAPES:
+                    out.append("\\")
+                    i += 1
+                else:
+                    out.append("\\\\")
+                    i += 1
+                continue
+
             out.append(ch)
             i += 1
             continue
