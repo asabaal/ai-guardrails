@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brick-commissioner"
+version = "0.1.0"
+description = "Local Python system for commissioning verified bricks"
+authors = []
+license = "MIT"
+dependencies = [
+    "click>=8.1.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "openai>=1.0.0",
+    "pytest>=7.0.0",
+    "coverage>=7.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "jsonschema>=4.0.0",
+]
+
+[project.scripts]
+brick = "brick_commissioner.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["brick_commissioner*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", "venv/*", ".venv/*"]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true

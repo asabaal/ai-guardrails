@@ -1,0 +1,53 @@
+{
+  "run_id": "simple_math_20251231_133336",
+  "module_name": "simple_math",
+  "module_spec_path": "/mnt/storage/repos/ai-guardrails/remote-model-module-forge/tests/integration/specs/simple_math.json",
+  "module_spec_hash": "c461ea2fc6d790c3fa9ac43cfb562b5ca3c33dee7e7a550400bdeb805d4781ab",
+  "enumerated_functions": [
+    {
+      "name": "add",
+      "description": "Add two numbers",
+      "inputs": [
+        "a: float",
+        "b: float"
+      ],
+      "outputs": "float",
+      "side_effects": "None"
+    },
+    {
+      "name": "subtract",
+      "description": "Subtract two numbers",
+      "inputs": [
+        "a: float",
+        "b: float"
+      ],
+      "outputs": "float",
+      "side_effects": "None"
+    },
+    {
+      "name": "multiply",
+      "description": "Multiply two numbers",
+      "inputs": [
+        "a: float",
+        "b: float"
+      ],
+      "outputs": "float",
+      "side_effects": "None"
+    }
+  ],
+  "selected_function": "add",
+  "files_touched": [],
+  "test_command": "pytest",
+  "coverage_command": "coverage run -m pytest && coverage report",
+  "ui_path": null,
+  "ui_runner_path": null,
+  "current_step": 3,
+  "blocking_questions": [],
+  "report_path": "runs/simple_math_20251231_133336_halted_report.txt",
+  "start_time": 1767209616.2485583,
+  "last_step_time": 1767209619.7863145,
+  "llm_calls_made": 0,
+  "wall_time_elapsed": 5.894778728485107,
+  "diff_summary": [],
+  "status": "halted"
+}

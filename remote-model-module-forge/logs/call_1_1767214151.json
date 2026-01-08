@@ -1,0 +1,74 @@
+{
+  "request": {
+    "model": "glm-4.7",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are an expert Python software architect and product manager. Your task is to create a module specification from a human description.\n\nREQUIREMENTS:\n1. Analyze the human description to understand what the module should contain.\n2. Create a clear, concise module name (snake_case, no special characters).\n3. Write a brief but accurate module description.\n4. Identify all public functions needed for this module.\n5. For each function, specify:\n   - A descriptive function name (snake_case, Python-compatible)\n   - What the function does (clear, specific description)\n   - All input parameters with Python types\n   - The return type with Python type\n   - Any side effects (file I/O, network calls, state changes, etc.)\n\nOUTPUT:\n- A JSON object matching the provided schema with:\n  - module_name: short, snake_case module name\n  - module_description: 1-2 sentence description of module purpose\n  - required_public_functions: array of function specifications\n  - is_complete: true if specification is clear and complete\n  - questions: any clarifying questions needed\n\nFUNCTION SPECIFICATION RULES:\n- Use snake_case for function names\n- Use standard Python types: str, int, float, bool, list, dict, Optional[str], etc.\n- Be specific about what inputs represent\n- Be explicit about error cases (e.g., raises ValueError if input is negative)\n- Indicate if function is pure (no side effects) or not\n\nReturn a valid JSON object matching the schema."
+      },
+      {
+        "role": "user",
+        "content": "\nHuman Description:\nA calculator that adds and subtracts numbers\n\nCreate a module specification for this module.\n"
+      }
+    ],
+    "max_tokens": 8192,
+    "response_format": {
+      "type": "json_object",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "module_name": {
+            "type": "string",
+            "description": "Name of the module/package"
+          },
+          "module_description": {
+            "type": "string",
+            "description": "Brief description of what the module does"
+          },
+          "required_public_functions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "inputs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "outputs": {
+                  "type": "string"
+                },
+                "side_effects": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "description",
+                "inputs",
+                "outputs",
+                "side_effects"
+              ]
+            }
+          }
+        },
+        "required": [
+          "module_name",
+          "module_description",
+          "required_public_functions"
+        ]
+      }
+    }
+  },
+  "error": "Error code: 429 - {'error': {'code': '1113', 'message': '\u4f59\u989d\u4e0d\u8db3\u6216\u65e0\u53ef\u7528\u8d44\u6e90\u5305,\u8bf7\u5145\u503c\u3002'}}",
+  "elapsed_seconds": 3.5587234497070312,
+  "timestamp": 1767214151.0230072,
+  "failed": true
+}

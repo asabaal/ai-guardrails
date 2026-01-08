@@ -1,0 +1,20 @@
+[run]
+source = core_logic
+omit = 
+    */tests/*
+    */__pycache__/*
+    # Exclude __main__ blocks from coverage
+    */reasoner.py:76-93
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod

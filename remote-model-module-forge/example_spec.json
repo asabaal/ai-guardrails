@@ -1,0 +1,27 @@
+{
+  "module_name": "string_calculator",
+  "module_description": "A simple module for performing string calculations and transformations",
+  "required_public_functions": [
+    {
+      "name": "add_numbers",
+      "description": "Adds two numbers together",
+      "inputs": ["a: float", "b: float"],
+      "outputs": "float",
+      "side_effects": "None"
+    },
+    {
+      "name": "reverse_string",
+      "description": "Reverses the input string",
+      "inputs": ["s: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "count_words",
+      "description": "Counts the number of words in a string",
+      "inputs": ["text: str"],
+      "outputs": "int",
+      "side_effects": "None"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "module_name": "string_utils",
+  "module_description": "String utility functions",
+  "required_public_functions": [
+    {
+      "name": "uppercase",
+      "description": "Convert string to uppercase",
+      "inputs": ["s: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "lowercase",
+      "description": "Convert string to lowercase",
+      "inputs": ["s: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "trim",
+      "description": "Remove whitespace from string",
+      "inputs": ["s: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    }
+  ]
+}

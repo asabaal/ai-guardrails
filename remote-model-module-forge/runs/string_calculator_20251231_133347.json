@@ -1,0 +1,51 @@
+{
+  "run_id": "string_calculator_20251231_133347",
+  "module_name": "string_calculator",
+  "module_spec_path": "/mnt/storage/repos/ai-guardrails/remote-model-module-forge/tests/integration/specs/string_calculator.json",
+  "module_spec_hash": "371fdc5d477c98662cbcce5aca1ec1aa603d7905aef91c81557c39d09b96c4d3",
+  "enumerated_functions": [
+    {
+      "name": "add_numbers",
+      "description": "Adds two numbers together",
+      "inputs": [
+        "a: float",
+        "b: float"
+      ],
+      "outputs": "float",
+      "side_effects": "None"
+    },
+    {
+      "name": "reverse_string",
+      "description": "Reverses a string",
+      "inputs": [
+        "s: str"
+      ],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "count_words",
+      "description": "Counts words in a string",
+      "inputs": [
+        "text: str"
+      ],
+      "outputs": "int",
+      "side_effects": "None"
+    }
+  ],
+  "selected_function": "add_numbers",
+  "files_touched": [],
+  "test_command": "pytest",
+  "coverage_command": "coverage run -m pytest && coverage report",
+  "ui_path": null,
+  "ui_runner_path": null,
+  "current_step": 3,
+  "blocking_questions": [],
+  "report_path": "runs/string_calculator_20251231_133347_halted_report.txt",
+  "start_time": 1767209627.9742308,
+  "last_step_time": 1767209630.643186,
+  "llm_calls_made": 0,
+  "wall_time_elapsed": 4.7414000034332275,
+  "diff_summary": [],
+  "status": "halted"
+}

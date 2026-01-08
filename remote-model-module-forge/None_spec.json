@@ -1,0 +1,15 @@
+{
+  "module_name": null,
+  "module_description": "Module described as: You are an expert Python software architect and pr...",
+  "required_public_functions": [
+    {
+      "name": "example_function",
+      "description": "A function that does something",
+      "inputs": [
+        "param: str"
+      ],
+      "outputs": "str",
+      "side_effects": "None"
+    }
+  ]
+}

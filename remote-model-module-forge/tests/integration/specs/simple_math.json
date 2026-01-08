@@ -1,0 +1,27 @@
+{
+  "module_name": "simple_math",
+  "module_description": "Simple mathematical operations",
+  "required_public_functions": [
+    {
+      "name": "add",
+      "description": "Add two numbers",
+      "inputs": ["a: float", "b: float"],
+      "outputs": "float",
+      "side_effects": "None"
+    },
+    {
+      "name": "subtract",
+      "description": "Subtract two numbers",
+      "inputs": ["a: float", "b: float"],
+      "outputs": "float",
+      "side_effects": "None"
+    },
+    {
+      "name": "multiply",
+      "description": "Multiply two numbers",
+      "inputs": ["a: float", "b: float"],
+      "outputs": "float",
+      "side_effects": "None"
+    }
+  ]
+}

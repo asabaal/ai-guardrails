@@ -1,0 +1,97 @@
+{
+  "request": {
+    "model": "glm-4.7",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are an expert Python developer. Your task is to implement exactly ONE function from the module specification.\n\nREQUIREMENTS:\n1. Implement ONLY the specified function - do not implement any other functions.\n2. Include clear input validation rules.\n3. Include clear output format specification.\n4. Follow Python best practices and type hints.\n5. The function must be pure unless side effects are explicitly required.\n\nOUTPUT:\n- A JSON object matching the provided schema with:\n  - function_name: name of the function to implement\n  - contract: input validation, output format, exceptions\n  - implementation: the Python function code as a string\n  - file_path: path where this function should be written\n  - file_content: full content of the file to write (may include imports, etc.)\n  - files_to_create: any additional files needed\n  - questions: any blocking questions\n  - is_complete: true if implementation is complete\n\nIMPORTANT:\n- Do NOT implement multiple functions.\n- Do NOT add any functionality beyond the function specification.\n- Return ONLY the JSON object matching the schema."
+      },
+      {
+        "role": "user",
+        "content": "\nFunction Specification:\n{\n  \"name\": \"add_numbers\",\n  \"description\": \"Adds two numbers together\",\n  \"inputs\": [\n    \"a: float\",\n    \"b: float\"\n  ],\n  \"outputs\": \"float\",\n  \"side_effects\": \"None\"\n}\n\nImplement this function.\n"
+      }
+    ],
+    "max_tokens": 8192,
+    "response_format": {
+      "type": "json_object",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "function_name": {
+            "type": "string"
+          },
+          "contract": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "input_validation": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "output_format": {
+                "type": "string"
+              },
+              "raises": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "implementation": {
+            "type": "string",
+            "description": "The actual Python function code as a string"
+          },
+          "file_path": {
+            "type": "string"
+          },
+          "file_content": {
+            "type": "string",
+            "description": "Full content of the file to write"
+          },
+          "files_to_create": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "is_complete": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "function_name",
+          "contract",
+          "implementation",
+          "file_path",
+          "file_content",
+          "questions",
+          "is_complete"
+        ]
+      }
+    }
+  },
+  "error": "Error code: 429 - {'error': {'code': '1113', 'message': '\u4f59\u989d\u4e0d\u8db3\u6216\u65e0\u53ef\u7528\u8d44\u6e90\u5305,\u8bf7\u5145\u503c\u3002'}}",
+  "elapsed_seconds": 2.0718636512756348,
+  "timestamp": 1767209630.6433809,
+  "failed": true
+}

@@ -1,0 +1,50 @@
+{
+  "run_id": "string_utils_20251231_133457",
+  "module_name": "string_utils",
+  "module_spec_path": "/mnt/storage/repos/ai-guardrails/remote-model-module-forge/tests/integration/specs/string_utils.json",
+  "module_spec_hash": "073df4881d590d55b45b4a5042d496970671634750de2351a3d7a2fa0513e94c",
+  "enumerated_functions": [
+    {
+      "name": "uppercase",
+      "description": "Convert string to uppercase",
+      "inputs": [
+        "s: str"
+      ],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "lowercase",
+      "description": "Convert string to lowercase",
+      "inputs": [
+        "s: str"
+      ],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "trim",
+      "description": "Remove whitespace from string",
+      "inputs": [
+        "s: str"
+      ],
+      "outputs": "str",
+      "side_effects": "None"
+    }
+  ],
+  "selected_function": "uppercase",
+  "files_touched": [],
+  "test_command": "pytest",
+  "coverage_command": "coverage run -m pytest && coverage report",
+  "ui_path": null,
+  "ui_runner_path": null,
+  "current_step": 3,
+  "blocking_questions": [],
+  "report_path": "runs/string_utils_20251231_133457_halted_report.txt",
+  "start_time": 1767209697.5404196,
+  "last_step_time": 1767209700.8024013,
+  "llm_calls_made": 0,
+  "wall_time_elapsed": 6.088956594467163,
+  "diff_summary": [],
+  "status": "halted"
+}

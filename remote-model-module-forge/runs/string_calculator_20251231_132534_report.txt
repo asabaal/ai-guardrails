@@ -1,0 +1,85 @@
+
+============================================================
+BRICK COMMISSION REPORT
+============================================================
+
+Module: string_calculator
+Brick Function: add_numbers
+Run ID: string_calculator_20251231_132534
+Status: completed
+
+FUNCTION CONTRACT
+------------------
+[
+  {
+    "name": "add_numbers",
+    "description": "Adds two numbers together",
+    "inputs": [
+      "a: float",
+      "b: float"
+    ],
+    "outputs": "float",
+    "side_effects": "None"
+  },
+  {
+    "name": "reverse_string",
+    "description": "Reverses the input string",
+    "inputs": [
+      "s: str"
+    ],
+    "outputs": "str",
+    "side_effects": "None"
+  },
+  {
+    "name": "count_words",
+    "description": "Counts the number of words in a string",
+    "inputs": [
+      "text: str"
+    ],
+    "outputs": "int",
+    "side_effects": "None"
+  }
+]
+
+FILES CHANGED
+-------------
+
+
+TEST COMMAND
+------------
+pytest
+
+COVERAGE COMMAND
+----------------
+coverage run -m pytest && coverage report
+
+UI RUN COMMAND
+--------------
+python None
+
+UI URL
+------
+http://127.0.0.1:8000
+
+UI FILE
+-------
+None
+
+SAMPLE INPUTS TO TRY
+--------------------
+(See UI for sample input buttons)
+
+RUNTIME METRICS
+---------------
+Wall Time: 0.03s
+LLM Calls: 0
+
+NEXT STEPS
+----------
+1. Run tests: pytest
+2. Run UI server: python None
+3. Open UI in browser: http://127.0.0.1:8000
+4. Try the sample inputs
+5. Verify function behavior matches expectations
+
+============================================================

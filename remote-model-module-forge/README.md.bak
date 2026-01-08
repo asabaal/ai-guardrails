@@ -1,0 +1,692 @@
+# Brick Commissioner
+
+A local Python system that uses a Z.ai coding subscription to forge modules as small verified bricks with 100% statement coverage and interactive verification UIs.
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Creating Module Specifications](#creating-module-specifications)
+- [Commissioning Your First Brick](#commissioning-your-first-brick)
+- [Commissioning Multiple Bricks](#commissioning-multiple-bricks)
+- [Module Specification Format](#module-specification-format)
+- [CLI Reference](#cli-reference)
+- [Understanding Brick Output](#understanding-brick-output)
+- [Troubleshooting](#troubleshooting)
+
+## Quick Start
+
+```bash
+#1. Install
+pip install -e .
+
+# 2. Set API key
+export Z_AI_API_KEY=your_actual_key_here
+
+# 3. Create and commission brick (easiest way - one command!)
+brick build "A calculator that does basic math: add, subtract, multiply"
+```
+
+That's it! The single `brick build` command:
+1. Generates a proper JSON spec from your description
+2. Implements a function with type hints
+3. Creates tests with 100.00% coverage
+4. Generates a colorful verification UI
+5. Shows you the final code and results
+
+## Installation
+
+### From source
+
+```bash
+# Clone or navigate to the project
+cd /path/to/remote-model-module-forge
+
+# Install in development mode
+pip install -e .
+```
+
+### Verify Installation
+
+```bash
+# Check CLI is available
+brick --help
+
+# Should show commands: describe, run, status, report, ui
+```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file or set environment variables:
+
+```bash
+# Required
+export Z_AI_API_KEY=your_actual_z_ai_api_key
+
+# Optional (with defaults shown)
+export Z_AI_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+export Z_AI_MODEL_NAME=glm-4.7
+export DRY_RUN=false
+export LOGS_DIR=logs
+export RUNS_DIR=runs
+```
+
+### Using .env file
+
+```bash
+# Copy from example
+cp .env.example .env
+
+# Edit with your actual API key
+nano .env  # or your preferred editor
+```
+
+**Important**: The variable is `Z_AI_API_KEY` (with underscore), not `ZAI_API_KEY`.
+
+## Creating Module Specifications
+
+### Option 1: Let AI Generate Spec (Recommended)
+
+Instead of writing JSON manually, describe your module in plain English:
+
+```bash
+brick describe "A calculator that can add, subtract, multiply, and divide numbers"
+```
+
+This will:
+- Analyze your description
+- Generate a complete JSON spec
+- Write it to `<module_name>_spec.json`
+- Save you from JSON syntax errors
+
+#### Good Description Examples
+
+**✅ Clear and Specific:**
+```
+"A calculator that performs basic arithmetic: add, subtract, multiply, and divide two numbers.
+All operations should handle floating point numbers and return floats."
+```
+
+**✅ Multiple Functions:**
+```
+"A string utilities module with functions to reverse strings, convert to uppercase/lowercase,
+and count words in a text."
+```
+
+**✅ Detailed Requirements:**
+```
+"A module that validates email addresses, sanitizes user input by removing HTML tags,
+and generates unique IDs with a configurable prefix."
+```
+
+**❌ Too Vague:**
+```
+"A math module"  // What kind of math?
+"A string module"  // What should it do?
+```
+
+#### Review and Edit Generated Spec
+
+After generation, review the spec:
+
+```bash
+# View the generated spec
+cat calculator_spec.json
+
+# Or edit it if needed
+nano calculator_spec.json
+```
+
+#### Advanced Describe Options
+
+```bash
+# Custom output filename
+brick describe --output my_spec.json "My description here"
+
+# Read from a file
+echo "A module that does X, Y, Z" > description.txt
+brick describe --output my_spec.json description.txt
+```
+
+### Option 2: Write JSON Manually
+
+If you prefer, create a JSON file directly (see [Module Specification Format](#module-specification-format)):
+
+```bash
+cat > my_module.json << 'EOF'
+{
+  "module_name": "my_calculator",
+  "module_description": "A simple calculator for arithmetic operations",
+  "required_public_functions": [...]
+}
+EOF
+```
+
+## Commissioning Your First Brick
+
+### Step 1: Have Your Spec Ready
+
+Either:
+- Generated via: `brick describe "your description"`
+- Or manually created as JSON
+
+### Step 2: Run Commission
+
+```bash
+brick run my_spec.json
+```
+
+### Step 3: Watch the Process
+
+The system will automatically:
+
+1. **Enumerate Functions** - Lists all functions from your spec
+2. **Select One Function** - AI chooses implementation order based on dependencies
+3. **Implement Function** - Generates Python code with type hints
+4. **Define Test Plan** - Creates a plan for 100.00% coverage
+5. **Implement Tests** - Writes pytest tests
+6. **Confirm Coverage** - Runs tests and enforces 100.00% coverage
+7. **Build Verification UI** - Creates interactive HTML UI
+8. **Pause and Report** - Halts with summary
+
+### Step 4: Review the Output
+
+After completion, you'll see a report like:
+
+```
+============================================================
+BRICK COMMISSION REPORT
+============================================================
+
+Module: my_calculator
+Brick Function: add
+Run ID: my_calculator_20251231_123456
+Status: completed
+
+FUNCTION CONTRACT
+------------------
+[Function details...]
+
+FILES CHANGED
+-------------
+  - my_calculator.py
+  - tests/test_my_calculator.py
+
+TEST COMMAND
+------------
+pytest tests/test_my_calculator.py -v
+
+COVERAGE COMMAND
+----------------
+coverage run -m pytest && coverage report
+
+UI RUN COMMAND
+--------------
+python runs/my_calculator_20251231_123456_runner.py
+
+UI URL
+------
+http://127.0.0.1:8000
+
+SAMPLE INPUTS TO TRY
+--------------------
+(See UI for sample input buttons)
+
+NEXT STEPS
+----------
+1. Run tests: pytest tests/test_my_calculator.py -v
+2. Run UI server: python runs/my_calculator_20251231_123456_runner.py
+3. Open UI in browser: http://127.0.0.1:8000
+4. Try the sample inputs
+5. Verify function behavior matches expectations
+```
+
+### Step 5: Test the Function Manually
+
+```bash
+# Run the generated tests
+pytest tests/test_my_calculator.py -v
+
+# Should show 100% coverage
+coverage report
+```
+
+### Step 6: Try the Verification UI
+
+```bash
+# Start the UI server
+python runs/my_calculator_20251231_123456_runner.py
+
+# In your browser, open:
+# http://127.0.0.1:8000
+```
+
+The UI lets you:
+- Click sample input buttons to fill in values
+- Enter custom inputs
+- See the function output immediately
+- View validation errors for invalid inputs
+
+## Commissioning Multiple Bricks
+
+When your spec has multiple functions, Brick Commissioner implements **one function per brick run**.
+
+### Example: Multi-Function Spec
+
+```json
+{
+  "module_name": "string_utils",
+  "module_description": "String manipulation utilities",
+  "required_public_functions": [
+    {
+      "name": "reverse",
+      "description": "Reverses a string",
+      "inputs": ["s: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "uppercase",
+      "description": "Converts string to uppercase",
+      "inputs": ["s: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "count_characters",
+      "description": "Counts characters in a string",
+      "inputs": ["s: str"],
+      "outputs": "int",
+      "side_effects": "None"
+    }
+  ]
+}
+```
+
+### Commissioning Workflow
+
+The AI will choose an **implementation order** based on dependencies. Functions with no dependencies come first.
+
+```bash
+# Run 1: First function chosen by AI
+brick run string_utils.json
+
+# Review output, verify tests pass, try the UI
+
+# Run 2: Next function
+# The state is preserved, so you can continue
+brick run string_utils.json
+
+# Repeat until all functions are implemented
+```
+
+### Finding Which Function Was Implemented
+
+Check the report:
+
+```bash
+# View the report to see which function was done
+brick report string_utils_20251231_123456
+
+# Check status
+brick status string_utils_20251231_123456
+```
+
+## Module Specification Format
+
+### Required Fields
+
+```json
+{
+  "module_name": "string",           // Required: Module/package name
+  "module_description": "string",     // Required: Brief description
+  "required_public_functions": [...]   // Required: Array of functions
+}
+```
+
+### Function Specification
+
+```json
+{
+  "name": "function_name",           // Required: Python function name
+  "description": "string",           // Required: What it does
+  "inputs": ["param: type"],       // Required: Parameters with types
+  "outputs": "return_type",         // Required: Return type
+  "side_effects": "string"          // Required: Any side effects
+}
+```
+
+### Complete Example
+
+```json
+{
+  "module_name": "data_processor",
+  "module_description": "Data processing utilities",
+  "required_public_functions": [
+    {
+      "name": "validate_email",
+      "description": "Validates an email address format",
+      "inputs": ["email: str"],
+      "outputs": "bool",
+      "side_effects": "None"
+    },
+    {
+      "name": "sanitize_input",
+      "description": "Removes dangerous characters from input",
+      "inputs": ["text: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    },
+    {
+      "name": "generate_id",
+      "description": "Generates a unique identifier",
+      "inputs": ["prefix: str"],
+      "outputs": "str",
+      "side_effects": "None"
+    }
+  ]
+}
+```
+
+## CLI Reference
+
+### brick describe
+
+Generate a module specification from a human description.
+
+```bash
+brick describe <description> [options]
+```
+
+**Arguments:**
+- `description` (required): Text description or path to description file
+
+**Options:**
+- `--output`, `-o`: Output spec file path (default: `<module_name>_spec.json`)
+- `--dry-run`: Show what would be generated without writing
+
+**Examples:**
+```bash
+# Simple description
+brick describe "A calculator with add, subtract, multiply"
+
+# From file
+brick describe --output calculator_spec.json description.txt
+
+# Dry run to see what AI would generate
+DRY_RUN=true brick describe "A module that..."
+```
+
+### brick run
+
+Commission one brick from a specification.
+
+```bash
+brick run <spec_path>
+```
+
+**Arguments:**
+- `spec_path` (required): Path to JSON module specification file
+
+**Example:**
+```bash
+brick run example_spec.json
+brick run my_specs/calculator.json
+```
+
+### brick status
+
+Check the status of a brick run.
+
+```bash
+brick status <run_id>
+```
+
+**Arguments:**
+- `run_id` (required): Run ID (shown in report or find with `ls runs/`)
+
+**Example:**
+```bash
+brick status calculator_20251231_123456
+```
+
+### brick report
+
+View the full report for a completed brick.
+
+```bash
+brick report <run_id>
+```
+
+**Arguments:**
+- `run_id` (required): Run ID
+
+**Example:**
+```bash
+brick report calculator_20251231_123456
+```
+
+### brick ui
+
+Open the verification UI for a brick.
+
+```bash
+brick ui <run_id>
+```
+
+**Arguments:**
+- `run_id` (required): Run ID
+
+**Example:**
+```bash
+brick ui calculator_20251231_123456
+
+# Then open http://127.0.0.1:8000 in browser
+```
+
+## Understanding Brick Output
+
+### Directory Structure
+
+After a brick run, you'll have:
+
+```
+project/
+├── my_module.py              # Generated function code
+├── tests/
+│   └── test_my_module.py     # Generated tests (100% coverage)
+├── runs/
+│   ├── my_module_20251231_123456.json      # Run state
+│   ├── my_module_20251231_123456_report.txt  # Summary report
+│   ├── my_module_20251231_123456_ui.html    # Verification UI
+│   └── my_module_20251231_123456_runner.py  # UI server
+└── logs/
+    ├── call_1_1767209616.json    # LLM call logs
+    ├── call_2_1767209619.json
+    └── ...
+```
+
+### What Gets Generated
+
+**1. Function Code** (`my_module.py`)
+- Type-hinted function
+- Input validation
+- Docstring
+- Pure by default (no side effects unless specified)
+
+**2. Tests** (`tests/test_my_module.py`)
+- Pytest-based
+- Deterministic (no randomness)
+- Normal, edge, and failure cases
+- Achieves 100.00% statement coverage
+
+**3. Verification UI** (`runs/..._ui.html`)
+- Single HTML file with embedded CSS/JS
+- Colorful, no white backgrounds
+- Sample input buttons
+- Custom input fields
+- Real-time output display
+- Local-only (no external services)
+
+**4. Report** (`runs/..._report.txt`)
+- Function name and contract
+- Files changed
+- Test and coverage commands
+- UI run instructions
+- Sample inputs to try
+
+## Troubleshooting
+
+### API Key Issues
+
+**Error: `Z_AI_API_KEY not set`**
+
+```bash
+# Check environment variable
+echo $Z_AI_API_KEY
+
+# Set it
+export Z_AI_API_KEY=your_actual_key
+
+# Or add to .env file
+echo "Z_AI_API_KEY=your_actual_key" >> .env
+```
+
+### Spec Generation Issues
+
+**Error: AI generates unclear spec**
+
+```bash
+# Re-run with more specific description
+brick describe "A calculator that adds, subtracts, multiplies, and divides two float numbers. Handles division by zero by raising an error."
+
+# Or use --dry-run to see what would be generated
+DRY_RUN=true brick describe "Your description"
+```
+
+### API Connection Issues
+
+**Error: Connection timeout or API errors**
+
+```bash
+# Check API URL
+echo $Z_AI_BASE_URL
+
+# Try dry run first to test logic
+DRY_RUN=true brick run example_spec.json
+```
+
+### Coverage Issues
+
+**Error: Could not achieve 100.00% coverage**
+
+The system will halt and ask you to:
+1. Review the generated tests
+2. Run tests manually: `pytest tests/test_my_module.py -v`
+3. Run coverage manually: `coverage run -m pytest && coverage report`
+4. Check which lines aren't covered
+5. Adjust the spec to clarify expected behavior
+6. Run `brick` again
+
+### Timeout Issues
+
+**Error: Max wall time / max calls exceeded**
+
+Current limits (configurable via environment):
+- Per LLM call timeout: 300 seconds (5 minutes)
+- Max LLM calls per brick: 8
+- Max total wall time per brick: 300 seconds (5 minutes)
+- Max file changes per brick: 6
+
+**To increase limits:** Not currently configurable at runtime. The defaults are set for safety.
+
+### Halt Immediately
+
+**To stop any running brick:**
+
+```bash
+# Create STOP file
+touch STOP
+
+# The brick will halt and save state
+
+# Remove when ready to continue
+rm STOP
+```
+
+### Finding Run IDs
+
+```bash
+# List all runs
+ls -lt runs/*.json
+
+# List all reports
+ls -lt runs/*_report.txt
+
+# Pattern: <module_name>_<timestamp>
+```
+
+## Examples
+
+### Example 1: Simple Math Function
+
+```bash
+# Let AI generate the spec
+brick describe "A calculator that adds two numbers together"
+
+# Then commission
+brick run calculator_spec.json
+```
+
+### Example 2: String Utilities
+
+```bash
+# More detailed description
+brick describe "A string utilities module with reverse, uppercase, lowercase, and word count functions"
+
+# Commission
+brick run string_utils_spec.json
+```
+
+### Example 3: Validation Function
+
+```bash
+# Specific requirements
+brick describe "A validation module that checks if an email address is valid format and returns boolean"
+
+# Commission
+brick run validators_spec.json
+```
+
+## Tips
+
+1. **Start Simple**: Begin with a single, well-understood function
+2. **Be Specific**: Clear descriptions lead to better implementations
+3. **Use `brick describe`**: Much easier than writing JSON manually
+4. **Review Generated Specs**: Always check the AI-generated spec before running
+5. **Specify Types Clearly**: Use Python types (`str`, `float`, `int`, `bool`, etc.)
+6. **One Brick at a Time**: Let the AI choose implementation order
+7. **Review Tests**: Always verify that the generated tests make sense
+8. **Use the UI**: The verification UI is great for manual testing
+9. **Check Logs**: `logs/call_*.json` files show all LLM interactions
+10. **Preserve State**: Each run creates a state file you can review
+
+## Integration Tests
+
+To run integration tests (requires real API key):
+
+```bash
+# Set your API key
+export Z_AI_API_KEY=your_actual_key
+
+# Run all integration tests
+python tests/integration/run_tests.py
+
+# Or with pytest
+pytest tests/integration/ -v
+```
+
+See `tests/integration/README.md` for details.
