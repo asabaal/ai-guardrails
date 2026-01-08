@@ -25,6 +25,7 @@ def build_components(blueprint, resume_mode="smart"):
     if resume_mode == "smart" and os.path.exists(module_dir):
         # Fresh start for smart mode
         shutil.rmtree(module_dir)
+        os.makedirs(module_dir, exist_ok=True)
     elif resume_mode == "resume" and os.path.exists(module_dir):
         print(f"[*] Resuming from existing module: {module_dir}")
     else:
@@ -75,11 +76,18 @@ def build_components(blueprint, resume_mode="smart"):
         is_valid = False
         attempts = 0
         while not is_valid and attempts < 3:
+            if candidate is None:
+                print(f"   [!] Candidate is None, cannot validate. Marking as failed.")
+                break
+            
             is_valid, logs = ironclad.validate_candidate(candidate)
             if not is_valid:
                 if attempts < 2:  # Only repair 2 times max
                     print(f"   [-] Ironclad Repairing {func['name']} (Attempt {attempts+1})...")
                     candidate = ironclad.repair_candidate(candidate, logs, MODEL_NAME, ironclad.DEFAULT_SYSTEM_PROMPT)
+                    if candidate is None:
+                        print(f"   [!] Repair returned None, cannot continue.")
+                        break
                 attempts += 1
             else:
                 attempts += 1  # Count successful attempt too
@@ -241,6 +249,7 @@ def assemble_main(blueprint, module_dir, components):
     # 2. Ironclad validation loop
     is_valid = False
     attempts = 0
+    logs = "Initial validation"
     while not is_valid and attempts < 3:
         is_valid, logs = validate_main_candidate(candidate, components, module_dir)
         if not is_valid:

@@ -29,10 +29,7 @@ class TestBuildComponents:
             'code': 'def test_func(): pass',
             'explanation': 'Generated function'
         }
-        mock_validate.return_value = {
-            'status': 'success',
-            'message': 'Component is valid'
-        }
+        mock_validate.return_value = (True, "Component is valid")
         
         blueprint = {
             'module_name': 'test_module',
@@ -49,9 +46,9 @@ class TestBuildComponents:
         assert successful_components == ['test_func']
         assert failed_components == []
         
-        # Verify existing directory was removed (line 25)
+        # Verify existing directory was removed and recreated (FAILURE MODE A fix)
         mock_rmtree.assert_called_once()
-        mock_makedirs.assert_not_called()  # makedirs only called in else branch
+        mock_makedirs.assert_called_once()  # Should be called after rmtree
     
     @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
     @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
@@ -107,16 +104,25 @@ class TestBuildComponents:
     @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
     @patch('os.makedirs')
     @patch('builtins.print')
-    def test_build_components_max_retries_exceeded(self, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
+    @patch('builtins.open', create=True)
+    def test_build_components_max_retries_exceeded(self, mock_open, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
         """Test component building when max retries exceeded"""
-        # Setup mocks - validation always fails
+        # Setup mocks - validation always fails, but repair returns a candidate (not None)
         mock_generate.return_value = {
             'filename': 'broken_func',
             'code': 'def broken_func(): return "broken"',
             'test': 'def test_broken_func(): assert broken_func() == "test"'
         }
-        mock_validate.return_value = (False, "Test failed")
-        mock_repair.return_value = None  # Repair also fails
+        mock_validate.side_effect = [
+            (False, "Test failed"),  # Initial attempt
+            (False, "Test failed"),  # After first repair
+            (False, "Test failed")    # After second repair
+        ]
+        # Return candidates (not None) so validation continues
+        mock_repair.side_effect = [
+            {'filename': 'broken_func', 'code': 'def broken_func(): return "broken"', 'test': 'def test_broken_func(): assert broken_func() == "test"'},
+            {'filename': 'broken_func', 'code': 'def broken_func(): return "broken"', 'test': 'def test_broken_func(): assert broken_func() == "test"'}
+        ]
         
         blueprint = {
             'module_name': 'test_module',
@@ -955,3 +961,203 @@ class TestRunFactoryManagerWorkflow:
         # Assertions
         mock_assemble.assert_called_once()
         mock_print.assert_called_with("\n[✅] All 2 components built successfully!")
+
+
+class TestBuildComponentsDirectoryInvariant:
+    """Test directory invariant in build_components (FAILURE MODE A)"""
+    
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('os.makedirs')
+    @patch('shutil.rmtree')
+    @patch('os.path.exists')
+    @patch('builtins.print')
+    @patch('builtins.open', create=True)
+    def test_smart_mode_recreates_directory(self, mock_open, mock_print, mock_exists, mock_rmtree, mock_makedirs, mock_validate, mock_generate):
+        """Test that smart mode recreates directory after deletion (FAILURE MODE A fix)"""
+        # Setup mocks - directory exists, gets deleted, then recreated
+        mock_exists.return_value = True
+        mock_generate.return_value = {
+            'filename': 'test_func',
+            'code': 'def test_func(): return "success"',
+            'test': 'def test_test_func(): assert test_func() == "success"'
+        }
+        mock_validate.return_value = (True, "Tests passed")
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'functions': [
+                {'name': 'test_func', 'signature': 'def test_func()', 'description': 'Test function'}
+            ]
+        }
+        
+        # Execute in smart mode
+        factory_manager.build_components(blueprint, "smart")
+        
+        # Verify directory was deleted and then recreated
+        mock_rmtree.assert_called_once()
+        mock_makedirs.assert_called_once()  # NEW: Should be called after rmtree
+    
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('os.path.exists')
+    @patch('os.listdir')
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    @patch('builtins.open', create=True)
+    def test_resume_mode_preserves_directory(self, mock_open, mock_print, mock_makedirs, mock_listdir, mock_exists, mock_validate, mock_generate):
+        """Test that resume mode does NOT delete directory (FAILURE MODE A prevention)"""
+        # Setup mocks - directory exists but not deleted in resume mode
+        def exists_side_effect(path):
+            if 'existing_func.py' in path:
+                return True
+            return True  # Directory exists
+        
+        mock_exists.side_effect = exists_side_effect
+        mock_listdir.return_value = ['existing_func.py', '__init__.py']
+        mock_generate.return_value = {
+            'filename': 'test_func',
+            'code': 'def test_func(): return "success"',
+            'test': 'def test_test_func(): assert test_func() == "success"'
+        }
+        mock_validate.return_value = (True, "Tests passed")
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'functions': [
+                {'name': 'existing_func', 'signature': 'def existing_func()', 'description': 'Existing function'}
+            ]
+        }
+        
+        # Execute in resume mode
+        factory_manager.build_components(blueprint, "resume")
+        
+        # Verify directory was NOT deleted
+        assert not any('rmtree' in str(call) for call in mock_makedirs.call_args_list)
+        # Verify makedirs was NOT called (directory preserved)
+        mock_makedirs.assert_not_called()
+
+
+class TestBuildComponentsRepairSafety:
+    """Test repair safety in build_components (FAILURE MODE B)"""
+    
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    @patch('builtins.open', create=True)
+    def test_repair_returns_none_is_handled(self, mock_open, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
+        """Test that repair returning None is handled gracefully (FAILURE MODE B fix)"""
+        # Setup mocks - repair returns None (simulating failure mode B)
+        mock_generate.return_value = {
+            'filename': 'broken_func',
+            'code': 'def broken_func(): return "broken"',
+            'test': 'def test_broken_func(): assert broken_func() == "test"'
+        }
+        mock_validate.return_value = (False, "Test failed")  # Initial validation fails
+        mock_repair.return_value = None  # Repair returns None
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'functions': [
+                {'name': 'broken_func', 'signature': 'def broken_func()', 'description': 'Broken function'}
+            ]
+        }
+        
+        # Execute - should NOT crash, should mark as failed
+        partial_success, module_dir, successful_components, failed_components, status_report = factory_manager.build_components(blueprint)
+        
+        # Assertions
+        assert partial_success is False
+        assert successful_components == []
+        assert failed_components == ['broken_func']
+        # Handle both formats: string "Generation failed" or dict with status
+        if isinstance(status_report['broken_func'], str):
+            assert status_report['broken_func'] == "Generation failed"
+        else:
+            assert status_report['broken_func']['status'] == 'failed'
+            # attempts is 0 because repair returns None before increment
+            assert status_report['broken_func']['attempts'] == 0
+        # Verify validate was called once before repair failed
+        assert mock_validate.call_count == 1
+    
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    @patch('builtins.open', create=True)
+    def test_validation_with_none_candidate_is_handled(self, mock_open, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
+        """Test that None candidate before validation is handled (FAILURE MODE B fix)"""
+        # Setup mocks - initial candidate is None
+        mock_generate.return_value = None  # Generation fails
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'functions': [
+                {'name': 'failed_func', 'signature': 'def failed_func()', 'description': 'Failed function'}
+            ]
+        }
+        
+        # Execute - should NOT pass None to validate
+        partial_success, module_dir, successful_components, failed_components, status_report = factory_manager.build_components(blueprint)
+        
+        # Assertions
+        assert partial_success is False
+        assert successful_components == []
+        assert failed_components == ['failed_func']
+        assert status_report['failed_func'] == "Generation failed"
+        # Validate should NOT have been called since candidate is None
+        mock_validate.assert_not_called()
+    
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    @patch('builtins.open', create=True)
+    def test_partial_success_with_mixed_components(self, mock_open, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
+        """Test partial success with some components failing due to None repair"""
+        # Setup mocks - first function succeeds, second fails with None repair
+        def generate_side_effect(*args, **kwargs):
+            func_name = args[2] if len(args) > 2 else ''
+            if func_name == 'success_func':
+                return {
+                    'filename': 'success_func',
+                    'code': 'def success_func(): return "success"',
+                    'test': 'def test_success_func(): assert success_func() == "success"'
+                }
+            else:
+                return {
+                    'filename': 'failed_func',
+                    'code': 'def failed_func(): return "broken"',
+                    'test': 'def test_failed_func(): assert failed_func() == "test"'
+                }
+        
+        mock_generate.side_effect = generate_side_effect
+        mock_validate.side_effect = [
+            (True, "Tests passed"),  # First function passes
+            (False, "Test failed"),  # Second function fails
+            (False, "Test failed"),
+            (False, "Test failed")
+        ]
+        mock_repair.return_value = None  # Second function's repair fails
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'functions': [
+                {'name': 'success_func', 'signature': 'def success_func()', 'description': 'Success function'},
+                {'name': 'failed_func', 'signature': 'def failed_func()', 'description': 'Failed function'}
+            ]
+        }
+        
+        # Execute
+        partial_success, module_dir, successful_components, failed_components, status_report = factory_manager.build_components(blueprint)
+        
+        # Assertions
+        assert partial_success is True  # Partial success
+        assert 'success_func' in successful_components
+        assert 'failed_func' in failed_components
+        assert status_report['success_func']['status'] == 'success'
+        assert status_report['failed_func']['status'] == 'failed'

@@ -5,25 +5,25 @@
     ],
     "functions": [
         {
-            "name": "find_and_replace_emails",
-            "signature": "def find_and_replace_emails(text: str) -> str",
-            "description": "Uses a regex pattern that matches typical email addresses. The pattern accounts for alphanumeric characters, periods, hyphens, underscores, and plus signs in the local part, and domain names with subdomains and top\u2011level domains. It then substitutes every match with '[REDACTED]'. Edge cases such as email addresses with quoted local parts, IP literal addresses in the domain part, and internationalized domain names are ignored to keep the regex manageable."
+            "name": "_replace_emails",
+            "signature": "def _replace_emails(text: str) -> str",
+            "description": "Uses a comprehensive regular expression to locate email addresses in the input string. The pattern supports quoted local parts, domain literals, and top\u2011level domains up to 63 characters. It replaces each match with the string '[REDACTED]'. Edge cases handled: emails embedded in URLs or surrounded by punctuation, multi\u2011line strings, and very long addresses. The function returns the string with all emails replaced."
         },
         {
-            "name": "find_and_replace_ipv4",
-            "signature": "def find_and_replace_ipv4(text: str) -> str",
-            "description": "Uses a regex pattern that matches IPv4 addresses where each octet is between 0 and 255. The pattern ensures that numbers like 999 or 256 are not matched. It replaces any matched IP with '[REDACTED]'. Edge cases such as IP addresses embedded in URLs or surrounded by brackets are handled by using word boundaries."
+            "name": "_replace_ipv4",
+            "signature": "def _replace_ipv4(text: str) -> str",
+            "description": "Detects IPv4 addresses using a regex that validates each octet to be between 0 and 255, preventing matches like '999.999.999.999'. The function replaces each found address with '[REDACTED]'. It also considers addresses that may be part of URLs, log entries, or embedded in text. It returns the string with all IPv4 addresses replaced."
         },
         {
-            "name": "find_and_replace_phones",
-            "signature": "def find_and_replace_phones(text: str) -> str",
-            "description": "Matches common North\u2011American phone number formats, including optional country code '+1', area code in parentheses or not, separators such as dashes, dots, or spaces, and optional extension indicators (x, ext, extension). It replaces every match with '[REDACTED]'. The regex is case\u2011insensitive and allows for 10 or 11 digit sequences. It does not attempt to validate phone number length beyond basic structure to avoid excessive complexity."
+            "name": "_replace_phone_numbers",
+            "signature": "def _replace_phone_numbers(text: str) -> str",
+            "description": "Covers common US phone number formats: (XXX) XXX\u2011XXXX, XXX\u2011XXX\u2011XXXX, XXX.XXX.XXXX, XXX XXX XXXX, +1 XXX XXX XXXX, and 1\u2011XXX\u2011XXX\u2011XXXX. It normalises optional country code, area code brackets, separators, and whitespace. The function replaces each match with '[REDACTED]'. It does not replace arbitrary digit sequences that are not phone numbers (e.g., dates). Returns the string with all phone numbers redacted."
         },
         {
             "name": "scrub_pii",
             "signature": "def scrub_pii(text: str) -> str",
-            "description": "Sequentially calls find_and_replace_emails, find_and_replace_ipv4, and find_and_replace_phones on the input text. Each step receives the output of the previous step, ensuring that overlapping patterns are all redacted. The function returns the fully sanitized string."
+            "description": "Public entry point. Sequentially applies the three helper replacement functions to the input text. The order ensures that overlapping patterns (e.g., an email containing a domain that looks like an IPv4 address) are handled correctly. Returns the fully sanitized string."
         }
     ],
-    "main_logic_description": "The main block imports the scrub_pii function, reads input text, and prints the redacted result. It demonstrates usage by calling scrub_pii on a sample string."
+    "main_logic_description": "The main logic in the module starts with the input string and passes it through _replace_emails, then _replace_ipv4, and finally _replace_phone_numbers. Each helper uses a compiled regular expression to find and replace matches with '[REDACTED]'. The resulting string from each step is fed into the next function, ensuring that all categories of PII are removed while preserving the rest of the text. The module exposes only the scrub_pii function to callers, keeping the internal helpers private."
 }

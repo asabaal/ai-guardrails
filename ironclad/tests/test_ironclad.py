@@ -114,9 +114,9 @@ class TestValidateCandidate:
     """Test the validate_candidate function"""
     
     def test_validate_candidate_none_candidate(self):
-        """Test validation with None candidate - should raise AttributeError"""
-        with pytest.raises(AttributeError):
-            ironclad.validate_candidate(None)
+        """Test validation with None candidate - should return False with message"""
+        result = ironclad.validate_candidate(None)
+        assert result == (False, "Candidate is None")
     
     def test_validate_candidate_invalid_structure(self):
         """Test validation with invalid candidate structure - still runs pytest"""
