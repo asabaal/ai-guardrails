@@ -47,8 +47,8 @@ def generate_candidate(request: str, model_name=DEFAULT_MODEL_NAME, system_promp
         data["test"] = clean_code_content(data.get("test", ""))
         return data
     except json.JSONDecodeError:
-        log_debug_raw(phase='repair', message='Repair output was not valid JSON', data=raw_content)
-        print("[!] Repair Error: Model output was not valid JSON.")
+        log_debug_raw(phase='generate', message='Model output was not valid JSON', data=raw_content)
+        print("[!] Validation Failed: Model output was not valid JSON.")
         return None
     except Exception as e:
         print("[!] Error connecting to Ollama: Connection error")
