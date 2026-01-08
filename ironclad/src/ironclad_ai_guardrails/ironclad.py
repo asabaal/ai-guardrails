@@ -9,6 +9,7 @@ import ollama
 from ironclad_ai_guardrails.code_utils import (
     clean_json_response,
     clean_code_content,
+    log_debug_raw,
 )
 
 DEFAULT_MODEL_NAME = "gpt-oss:20b"
@@ -45,6 +46,7 @@ def generate_candidate(request: str, model_name=DEFAULT_MODEL_NAME, system_promp
         data["test"] = clean_code_content(data.get("test", ""))
         return data
     except json.JSONDecodeError:
+        log_debug_raw(phase='generate', message='Model output was not valid JSON', data=content)
         print("[!] Validation Failed: Model output was not valid JSON.")
         return None
     except Exception as e:

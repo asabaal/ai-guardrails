@@ -49,8 +49,8 @@ class TestCleanJsonResponse:
 
 
 class TestGenerateCandidate:
-    """Test the generate_candidate function"""
-    
+    """Test generate_candidate function"""
+
     @patch('ironclad.ollama.chat')
     def test_generate_candidate_success(self, mock_chat):
         """Test successful candidate generation"""
@@ -60,15 +60,15 @@ class TestGenerateCandidate:
             }
         }
         mock_chat.return_value = mock_response
-        
+
         result = ironclad.generate_candidate("test request")
-        
+
         assert result is not None
         assert result['filename'] == "test_func"
         assert 'def test_func(): pass' in result['code']
         assert 'test_test_func' in result['test']
         mock_chat.assert_called_once()
-    
+
     @patch('ironclad.ollama.chat')
     def test_generate_candidate_json_decode_error(self, mock_chat):
         """Test handling of JSON decode error"""
@@ -78,17 +78,86 @@ class TestGenerateCandidate:
             }
         }
         mock_chat.return_value = mock_response
-        
+
         with patch('builtins.print') as mock_print:
             result = ironclad.generate_candidate("test request")
             assert result is None
             mock_print.assert_any_call("[!] Validation Failed: Model output was not valid JSON.")
-    
+
+    @patch('ironclad.ollama.chat')
+    def test_generate_candidate_json_decode_error_with_debug_enabled(self, mock_chat):
+        """Test that debug file is created when IRONCLAD_DEBUG=1 and JSON decode error occurs"""
+        malformed_json = '{"filename": "test_func", "code": "def test_func(): return broken"'
+        mock_response = {
+            'message': {
+                'content': malformed_json
+            }
+        }
+        mock_chat.return_value = mock_response
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            original_cwd = os.getcwd()
+            os.chdir(temp_dir)
+            os.environ['IRONCLAD_DEBUG'] = '1'
+
+            try:
+                with patch('builtins.print'):
+                    result = ironclad.generate_candidate("test request")
+
+                assert result is None
+
+                debug_dir = os.path.join(temp_dir, 'build', '.ironclad_debug')
+                assert os.path.exists(debug_dir)
+
+                debug_files = os.listdir(debug_dir)
+                assert len(debug_files) == 1
+
+                debug_file = os.path.join(debug_dir, debug_files[0])
+                with open(debug_file, 'r') as f:
+                    content = f.read()
+                assert 'Phase: generate' in content
+                assert 'Message: Model output was not valid JSON' in content
+                assert 'RAW DATA:' in content
+                assert malformed_json in content
+            finally:
+                os.chdir(original_cwd)
+                if 'IRONCLAD_DEBUG' in os.environ:
+                    del os.environ['IRONCLAD_DEBUG']
+
+    @patch('ironclad.ollama.chat')
+    def test_generate_candidate_json_decode_error_with_debug_disabled(self, mock_chat):
+        """Test that no debug file is created when IRONCLAD_DEBUG is not set"""
+        malformed_json = '{"filename": "test_func", "code": "def test_func(): return broken"'
+        mock_response = {
+            'message': {
+                'content': malformed_json
+            }
+        }
+        mock_chat.return_value = mock_response
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            original_cwd = os.getcwd()
+            os.chdir(temp_dir)
+
+            if 'IRONCLAD_DEBUG' in os.environ:
+                del os.environ['IRONCLAD_DEBUG']
+
+            try:
+                with patch('builtins.print'):
+                    result = ironclad.generate_candidate("test request")
+
+                assert result is None
+
+                debug_dir = os.path.join(temp_dir, 'build', '.ironclad_debug')
+                assert not os.path.exists(debug_dir)
+            finally:
+                os.chdir(original_cwd)
+
     @patch('ironclad.ollama.chat')
     def test_generate_candidate_ollama_error(self, mock_chat):
         """Test handling of ollama connection error"""
         mock_chat.side_effect = Exception("Connection error")
-        
+
         with patch('builtins.print') as mock_print:
             result = ironclad.generate_candidate("test request")
             assert result is None
