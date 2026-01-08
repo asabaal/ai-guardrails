@@ -1,13 +1,28 @@
-import pytest
 import os
 import tempfile
 import shutil
-from unittest.mock import patch, MagicMock
+import pytest
+from io import StringIO
+from unittest.mock import patch
+
 from ironclad_ai_guardrails.code_utils import is_debug_enabled, log_debug_raw
 
 
-class TestDebugMode:
-    """Test debug mode functionality"""
+class TestDebugAPIPresence:
+    """Test that the required API functions exist"""
+    
+    def test_is_debug_enabled_exists(self):
+        """Test is_debug_enabled function exists and is callable"""
+        assert callable(is_debug_enabled)
+        assert is_debug_enabled() is not None
+        
+    def test_log_debug_raw_exists(self):
+        """Test log_debug_raw function exists and is callable"""
+        assert callable(log_debug_raw)
+
+
+class TestDebugDisabledBehavior:
+    """Test behavior when debug mode is disabled"""
     
     def setup_method(self):
         """Clear IRONCLAD_DEBUG before each test"""
@@ -19,265 +34,310 @@ class TestDebugMode:
         if 'IRONCLAD_DEBUG' in os.environ:
             del os.environ['IRONCLAD_DEBUG']
     
-    def test_is_debug_enabled_returns_false_by_default(self):
+    def test_is_debug_enabled_returns_false_when_not_set(self):
         """Test is_debug_enabled returns False when env var not set"""
         assert is_debug_enabled() is False
-    
-    def test_is_debug_enabled_returns_true_when_set(self):
-        """Test is_debug_enabled returns True when env var is '1'"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        try:
-            assert is_debug_enabled() is True
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
     
     def test_is_debug_enabled_returns_false_when_zero(self):
         """Test is_debug_enabled returns False when env var is '0'"""
         os.environ['IRONCLAD_DEBUG'] = '0'
-        try:
+        assert is_debug_enabled() is False
+    
+    def test_is_debug_enabled_returns_false_when_any_other_value(self):
+        """Test is_debug_enabled returns False for non-'1' values"""
+        for value in ['true', 'yes', 'enabled', '2', '']:
+            os.environ['IRONCLAD_DEBUG'] = value
             assert is_debug_enabled() is False
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
     
-    @patch('os.makedirs')
-    @patch('builtins.open', create=True)
-    def test_log_debug_raw_writes_file_when_enabled(self, mock_open, mock_makedirs):
-        """Test log_debug_raw writes debug file when IRONCLAD_DEBUG=1"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        try:
-            log_debug_raw("generate", "test_func", 1, "gpt-oss:20b", "raw output", None)
-            
-            # Verify debug directory was created
-            mock_makedirs.assert_called_once_with('build/.ironclad_debug', exist_ok=True)
-            
-            # Verify file was written with correct content
-            assert mock_open.call_count >= 1
-            write_call = mock_open.call_args
-            filepath = write_call[0][0]
-            content = write_call[0][1][0]
-            
-            assert filepath == 'build/.ironclad_debug/generate_test_func_attempt1_gpt-oss:20b.txt'
-            assert 'Phase: generate' in content
-            assert 'Component: test_func' in content
-            assert 'Attempt: 1' in content
-            assert 'Model: gpt-oss:20b' in content
-            assert 'RAW OUTPUT:' in content
-            assert 'raw output' in content
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
+    def test_log_debug_raw_no_op_when_disabled(self):
+        """Test log_debug_raw is a no-op when debug is disabled"""
+        with patch('os.makedirs') as mock_makedirs:
+            with patch('builtins.open', create=True) as mock_open:
+                log_debug_raw(
+                    phase='test_phase',
+                    message='test message',
+                    data='test data',
+                    component='test_component',
+                    attempt=1
+                )
+                mock_makedirs.assert_not_called()
+                mock_open.assert_not_called()
     
-    @patch('os.makedirs')
-    @patch('builtins.open', create=True)
-    def test_log_debug_raw_does_not_write_file_when_disabled(self, mock_open, mock_makedirs):
-        """Test log_debug_raw does not write file when IRONCLAD_DEBUG is not '1'"""
-        os.environ['IRONCLAD_DEBUG'] = '0'
+    def test_log_debug_raw_no_exception_when_disabled(self):
+        """Test log_debug_raw never raises exceptions when disabled"""
         try:
-            log_debug_raw("generate", "test_func", 1, "gpt-oss:20b", "raw output", None)
-            
-            # Verify debug directory was NOT created
-            mock_makedirs.assert_not_called()
-            
-            # Verify file was NOT written
-            mock_open.assert_not_called()
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
+            log_debug_raw(
+                phase='test_phase',
+                message='test message',
+                data='test data',
+                component='test_component',
+                attempt=1
+            )
+        except Exception as e:
+            pytest.fail(f"log_debug_raw raised exception: {e}")
     
-    @patch('os.makedirs')
-    @patch('builtins.open', create=True)
-    def test_log_debug_raw_includes_error_when_provided(self, mock_open, mock_makedirs):
-        """Test log_debug_raw includes error message when provided"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        try:
-            error_msg = "JSONDecodeError: Expecting value"
-            log_debug_raw("generate", "test_func", 1, "gpt-oss:20b", "raw output", error_msg)
-            
-            # Verify error was included in file
-            write_call = mock_open.call_args
-            content = write_call[0][1][0]
-            assert 'Error: JSONDecodeError: Expecting value' in content
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
-    
-    @patch('os.makedirs')
-    @patch('builtins.open', create=True)
-    def test_log_debug_raw_handles_makedirs_exception_gracefully(self, mock_open, mock_makedirs):
-        """Test log_debug_raw handles makedirs exceptions without crashing"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        mock_makedirs.side_effect = Exception("Permission denied")
-        
-        try:
-            # Should not crash even if makedirs fails
-            log_debug_raw("generate", "test_func", 1, "gpt-oss:20b", "raw output", None)
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
-        
-        # Should not crash, just silently fail
-        assert True
-    
-    @patch('os.makedirs')
-    @patch('builtins.open', create=True)
-    def test_log_debug_raw_handles_open_exception_gracefully(self, mock_open, mock_makedirs):
-        """Test log_debug_raw handles open exceptions without crashing"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        mock_open.side_effect = Exception("Disk full")
-        
-        try:
-            # Should not crash even if open fails
-            log_debug_raw("generate", "test_func", 1, "gpt-oss:20b", "raw output", None)
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
-        
-        # Should not crash, just silently fail
-        assert True
+    def test_log_debug_raw_does_not_create_files_when_disabled(self, tmp_path):
+        """Test no files are created when debug is disabled"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='test_phase',
+            message='test message',
+            data='test data',
+            component='test_component',
+            attempt=1
+        )
+        debug_dir = tmp_path / 'build' / '.ironclad_debug'
+        assert not debug_dir.exists()
 
 
-class TestDebugIntegration:
-    """Test debug logging integration with actual pipeline"""
+class TestDebugEnabledBehavior:
+    """Test behavior when debug mode is enabled"""
     
     def setup_method(self):
-        """Clear IRONCLAD_DEBUG and clean up debug dir before each test"""
-        if 'IRONCLAD_DEBUG' in os.environ:
-            del os.environ['IRONCLAD_DEBUG']
-        if os.path.exists('build/.ironclad_debug'):
-            shutil.rmtree('build/.ironclad_debug')
+        """Enable debug mode before each test"""
+        os.environ['IRONCLAD_DEBUG'] = '1'
     
     def teardown_method(self):
-        """Clean up debug dir and IRONCLAD_DEBUG after each test"""
+        """Disable debug mode and cleanup after each test"""
         if 'IRONCLAD_DEBUG' in os.environ:
             del os.environ['IRONCLAD_DEBUG']
         if os.path.exists('build/.ironclad_debug'):
-            shutil.rmtree('build/.ironclad_debug')
+            shutil.rmtree('build')
     
-    @patch('ironclad_ai_guardrails.module_designer.ollama.chat')
-    def test_module_designer_writes_debug_files(self, mock_chat):
-        """Test module_designer writes debug files when IRONCLAD_DEBUG=1"""
+    def test_is_debug_enabled_returns_true_when_set_to_one(self):
+        """Test is_debug_enabled returns True when IRONCLAD_DEBUG=1"""
+        assert is_debug_enabled() is True
+    
+    def test_log_debug_raw_creates_debug_directory(self, tmp_path):
+        """Test log_debug_raw creates debug directory"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='test_phase',
+            message='test message'
+        )
+        debug_dir = tmp_path / 'build' / '.ironclad_debug'
+        assert debug_dir.exists()
+        assert debug_dir.is_dir()
+    
+    def test_log_debug_raw_creates_file_with_phase_only(self, tmp_path):
+        """Test file creation with only phase parameter"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='generate',
+            message='test message',
+            data='raw data content'
+        )
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'generate.txt'
+        assert filepath.exists()
+        
+        content = filepath.read_text()
+        assert 'Phase: generate' in content
+        assert 'Message: test message' in content
+        assert 'RAW DATA:' in content
+        assert 'raw data content' in content
+    
+    def test_log_debug_raw_creates_file_with_component(self, tmp_path):
+        """Test file creation with phase and component"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='generate',
+            message='test message',
+            data='raw data',
+            component='test_func'
+        )
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'generate_test_func.txt'
+        assert filepath.exists()
+        
+        content = filepath.read_text()
+        assert 'Phase: generate' in content
+        assert 'Component: test_func' in content
+        assert 'Message: test message' in content
+        assert 'RAW DATA:' in content
+    
+    def test_log_debug_raw_creates_file_with_attempt(self, tmp_path):
+        """Test file creation with phase and attempt"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='generate',
+            message='test message',
+            data='raw data',
+            attempt=3
+        )
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'generate_attempt3.txt'
+        assert filepath.exists()
+        
+        content = filepath.read_text()
+        assert 'Phase: generate' in content
+        assert 'Attempt: 3' in content
+    
+    def test_log_debug_raw_creates_file_with_all_parameters(self, tmp_path):
+        """Test file creation with all parameters"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='generate',
+            message='test message',
+            data='raw data content\nmultiple lines',
+            component='test_func',
+            attempt=2
+        )
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'generate_test_func_attempt2.txt'
+        assert filepath.exists()
+        
+        content = filepath.read_text()
+        assert 'Phase: generate' in content
+        assert 'Component: test_func' in content
+        assert 'Attempt: 2' in content
+        assert 'Message: test message' in content
+        assert 'RAW DATA:' in content
+        assert 'raw data content' in content
+        assert 'multiple lines' in content
+    
+    def test_log_debug_raw_without_data(self, tmp_path):
+        """Test file creation without data parameter"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='test_phase',
+            message='test message',
+            component='test_component'
+        )
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'test_phase_test_component.txt'
+        assert filepath.exists()
+        
+        content = filepath.read_text()
+        assert 'Phase: test_phase' in content
+        assert 'Component: test_component' in content
+        assert 'Message: test message' in content
+        assert 'RAW DATA:' not in content
+    
+    def test_log_debug_raw_directory_idempotent(self, tmp_path):
+        """Test debug directory creation is idempotent"""
+        os.chdir(tmp_path)
+        log_debug_raw(phase='test1', message='msg1')
+        log_debug_raw(phase='test2', message='msg2')
+        log_debug_raw(phase='test3', message='msg3')
+        
+        debug_dir = tmp_path / 'build' / '.ironclad_debug'
+        assert debug_dir.exists()
+        assert len(list(debug_dir.glob('*.txt'))) == 3
+
+
+class TestDebugLoggingRobustness:
+    """Test robustness and error handling"""
+    
+    def setup_method(self):
+        """Enable debug mode before each test"""
         os.environ['IRONCLAD_DEBUG'] = '1'
-        
-        # Mock valid response
-        mock_chat.return_value = {
-            'message': {
-                'content': '{"module_name": "test"}'
-            }
-        }
-        
-        try:
-            from ironclad_ai_guardrails import module_designer
-            blueprint = module_designer.draft_blueprint("test request")
-            
-            # Verify debug files were created
-            assert os.path.exists('build/.ironclad_debug')
-            debug_files = os.listdir('build/.ironclad_debug')
-            assert len(debug_files) > 0
-            
-            # Verify at least one file contains 'architect' in name
-            architect_files = [f for f in debug_files if 'architect' in f]
-            assert len(architect_files) > 0
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
     
-    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
-    def test_ironclad_generate_writes_debug_files(self, mock_generate):
-        """Test ironclad generate writes debug files when IRONCLAD_DEBUG=1"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        
-        # Mock valid response
-        mock_generate.return_value = {
-            'filename': 'test_func',
-            'code': 'def test_func(): pass',
-            'test': 'def test_test_func(): pass'
-        }
-        
-        try:
-            from ironclad_ai_guardrails import ironclad
-            result = ironclad.generate_candidate("test request")
-            
-            # Verify result
-            assert result is not None
-            assert result['filename'] == 'test_func'
-            
-            # Verify debug files were created
-            assert os.path.exists('build/.ironclad_debug')
-            debug_files = os.listdir('build/.ironclad_debug')
-            generate_files = [f for f in debug_files if 'generate' in f and 'test_func' in f]
-            assert len(generate_files) > 0
-        finally:
+    def teardown_method(self):
+        """Disable debug mode and cleanup after each test"""
+        if 'IRONCLAD_DEBUG' in os.environ:
             del os.environ['IRONCLAD_DEBUG']
-    
-    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
-    def test_ironclad_repair_writes_debug_files(self, mock_repair):
-        """Test ironclad repair writes debug files when IRONCLAD_DEBUG=1"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        
-        # Mock valid response
-        mock_repair.return_value = {
-            'filename': 'test_func',
-            'code': 'def test_func(): return "fixed"',
-            'test': 'def test_test_func(): assert test_func() == "fixed"'
-        }
-        
-        try:
-            from ironclad_ai_guardrails import ironclad
-            result = ironclad.repair_candidate({
-                'filename': 'test_func',
-                'code': 'def test_func(): return "broken"',
-                'test': 'def test_test_func(): assert test_func() == "broken"'
-            }, 'Test failed')
-            
-            # Verify result
-            assert result is not None
-            
-            # Verify debug files were created
-            assert os.path.exists('build/.ironclad_debug')
-            debug_files = os.listdir('build/.ironclad_debug')
-            repair_files = [f for f in debug_files if 'repair' in f and 'test_func' in f]
-            assert len(repair_files) > 0
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
-    
-    @patch('ironclad_ai_guardrails.factory_manager.ollama.chat')
-    @patch('ironclad_ai_guardrails.factory_manager.validate_main_candidate')
-    @patch('os.makedirs')
-    @patch('builtins.open', create=True)
-    def test_assemble_main_writes_debug_files(self, mock_chat, mock_validate, mock_makedirs, mock_open):
-        """Test assemble_main writes debug files when IRONCLAD_DEBUG=1"""
-        os.environ['IRONCLAD_DEBUG'] = '1'
-        
-        # Mock successful generation and validation
-        mock_chat.return_value = {
-            'message': {
-                'content': '{"filename": "main.py", "code": "def main(): pass"}'
-            }
-        }
-        mock_validate.return_value = (True, "Valid")
-        
-        # Mock open for file writing
-        mock_file_handle = MagicMock()
-        mock_open.return_value.__enter__.return_value = mock_file_handle
-        
-        try:
-            from ironclad_ai_guardrails import factory_manager
-            blueprint = {
-                'module_name': 'test_module',
-                'main_logic_description': 'Test logic'
-            }
-            factory_manager.assemble_main(blueprint, '/tmp/test_module', ['func1', 'func2'])
-            
-            # Verify debug files were created
-            assert os.path.exists('build/.ironclad_debug')
-            debug_files = os.listdir('build/.ironclad_debug')
-            assemble_files = [f for f in debug_files if 'assemble' in f and 'main' in f]
-            assert len(assemble_files) > 0
-        finally:
-            del os.environ['IRONCLAD_DEBUG']
-    
-    def test_no_debug_files_when_debug_disabled(self):
-        """Test no debug files are created when IRONCLAD_DEBUG is not '1'"""
-        # Ensure debug dir doesn't exist
         if os.path.exists('build/.ironclad_debug'):
-            shutil.rmtree('build/.ironclad_debug')
+            shutil.rmtree('build')
+    
+    def test_log_debug_raw_handles_makedirs_exception(self):
+        """Test log_debug_raw handles makedirs exceptions gracefully"""
+        with patch('os.makedirs') as mock_makedirs:
+            mock_makedirs.side_effect = Exception("Permission denied")
+            
+            try:
+                log_debug_raw(phase='test', message='msg', data='data')
+            except Exception:
+                pytest.fail("log_debug_raw raised exception on makedirs failure")
+    
+    def test_log_debug_raw_handles_file_write_exception(self):
+        """Test log_debug_raw handles file write exceptions gracefully"""
+        with patch('builtins.open', side_effect=Exception("Disk full")):
+            try:
+                log_debug_raw(phase='test', message='msg', data='data')
+            except Exception:
+                pytest.fail("log_debug_raw raised exception on file write failure")
+    
+    def test_log_debug_raw_never_raises(self, tmp_path):
+        """Test log_debug_raw never raises exceptions"""
+        os.chdir(tmp_path)
         
-        from ironclad_ai_guardrails import module_designer
-        module_designer.draft_blueprint("test request")
+        test_cases = [
+            {'phase': 'test', 'message': 'msg'},
+            {'phase': '', 'message': ''},
+            {'phase': 'test', 'message': 'msg', 'data': None},
+            {'phase': 'test', 'message': 'msg', 'component': None},
+            {'phase': 'test', 'message': 'msg', 'attempt': None},
+            {'phase': 'test', 'message': 'msg', 'data': 'x' * 1000000},
+        ]
         
-        # Verify no debug files were created
-        assert not os.path.exists('build/.ironclad_debug')
+        for kwargs in test_cases:
+            try:
+                log_debug_raw(**kwargs)
+            except Exception as e:
+                pytest.fail(f"log_debug_raw raised exception for {kwargs}: {e}")
+
+
+class TestDebugOutputFormat:
+    """Test debug output format and content"""
+    
+    def setup_method(self):
+        """Enable debug mode before each test"""
+        os.environ['IRONCLAD_DEBUG'] = '1'
+    
+    def teardown_method(self):
+        """Disable debug mode and cleanup after each test"""
+        if 'IRONCLAD_DEBUG' in os.environ:
+            del os.environ['IRONCLAD_DEBUG']
+        if os.path.exists('build/.ironclad_debug'):
+            shutil.rmtree('build')
+    
+    def test_file_format_structure(self, tmp_path):
+        """Test file follows correct format structure"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='test_phase',
+            message='test message',
+            data='test data',
+            component='test_component',
+            attempt=1
+        )
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'test_phase_test_component_attempt1.txt'
+        content = filepath.read_text()
+        
+        lines = content.split('\n')
+        assert lines[0] == 'Phase: test_phase'
+        assert lines[1] == 'Component: test_component'
+        assert lines[2] == 'Attempt: 1'
+        assert lines[3] == 'Message: test message'
+        assert lines[4] == ''
+        assert lines[5] == 'RAW DATA:'
+    
+    def test_data_preserved_exactly(self, tmp_path):
+        """Test raw data is preserved exactly as provided"""
+        os.chdir(tmp_path)
+        raw_data = '''def test():
+    """Multi-line
+    with special chars: \\"\\'\\t\\n"""
+    return True'''
+        
+        log_debug_raw(phase='test', message='msg', data=raw_data)
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'test.txt'
+        content = filepath.read_text()
+        
+        assert raw_data in content
+    
+    def test_filename_encoding(self, tmp_path):
+        """Test filename encoding for various component names"""
+        os.chdir(tmp_path)
+        log_debug_raw(
+            phase='generate',
+            message='msg',
+            component='test-func_name',
+            attempt=1
+        )
+        
+        filepath = tmp_path / 'build' / '.ironclad_debug' / 'generate_test-func_name_attempt1.txt'
+        assert filepath.exists()

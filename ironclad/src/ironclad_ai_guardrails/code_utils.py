@@ -5,6 +5,7 @@ Ensures proper newline handling in generated code.
 """
 
 import json
+import os
 import re
 from typing import Any
 
@@ -225,3 +226,64 @@ def extract_code_from_response(response: str) -> str:
         return clean_code_content(response[pythonish.start():])
 
     return response
+
+
+def is_debug_enabled() -> bool:
+    """
+    Check if debug logging is enabled via IRONCLAD_DEBUG environment variable.
+    Returns True if IRONCLAD_DEBUG=1, False otherwise.
+    """
+    return os.environ.get('IRONCLAD_DEBUG') == '1'
+
+
+def log_debug_raw(
+    *,
+    phase: str,
+    message: str,
+    data: str | None = None,
+    component: str | None = None,
+    attempt: int | None = None
+) -> None:
+    """
+    Log debug information when debug mode is enabled.
+    
+    This function is a no-op when debug mode is disabled.
+    When enabled:
+    - Writes short summary to console
+    - Writes full raw data to disk if provided
+    
+    Args:
+        phase: Debug phase identifier
+        message: Short message describing the debug event
+        data: Optional raw data to write to disk
+        component: Optional component name
+        attempt: Optional attempt number
+    """
+    if not is_debug_enabled():
+        return
+
+    try:
+        debug_dir = 'build/.ironclad_debug'
+        os.makedirs(debug_dir, exist_ok=True)
+
+        parts = [phase]
+        if component:
+            parts.append(component)
+        if attempt is not None:
+            parts.append(f'attempt{attempt}')
+
+        filename = '_'.join(parts) + '.txt'
+        filepath = os.path.join(debug_dir, filename)
+
+        with open(filepath, 'w') as f:
+            f.write(f'Phase: {phase}\n')
+            if component:
+                f.write(f'Component: {component}\n')
+            if attempt is not None:
+                f.write(f'Attempt: {attempt}\n')
+            f.write(f'Message: {message}\n')
+            if data:
+                f.write('\nRAW DATA:\n')
+                f.write(data)
+    except Exception:
+        pass
