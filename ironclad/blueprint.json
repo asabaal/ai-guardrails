@@ -1,41 +1,29 @@
 {
-    "module_name": "temp_converter",
+    "module_name": "pii_scrubber",
     "dependencies": [
-        "argparse",
-        "sys",
-        "typing"
+        "re"
     ],
     "functions": [
         {
-            "name": "parse_args",
-            "signature": "def parse_args(argv: List[str]) -> argparse.Namespace",
-            "description": "Parse command\u2011line arguments. Expects a numeric value with --value/-v, a source unit with --unit/-u ('c' or 'f'), and a target unit with --target/-t ('c' or 'f'). Validates that units are one of the allowed characters and that target is the opposite of source. Provides helpful error messages and exits if parsing fails."
+            "name": "find_and_replace_emails",
+            "signature": "def find_and_replace_emails(text: str) -> str",
+            "description": "Uses a regex pattern that matches typical email addresses. The pattern accounts for alphanumeric characters, periods, hyphens, underscores, and plus signs in the local part, and domain names with subdomains and top\u2011level domains. It then substitutes every match with '[REDACTED]'. Edge cases such as email addresses with quoted local parts, IP literal addresses in the domain part, and internationalized domain names are ignored to keep the regex manageable."
         },
         {
-            "name": "validate_temperature",
-            "signature": "def validate_temperature(value_str: str) -> float",
-            "description": "Attempts to convert the input string to a float. Raises ValueError with a clear message if conversion fails, covering cases such as empty string, non\u2011numeric characters, or overflow. Returns the numeric value on success."
+            "name": "find_and_replace_ipv4",
+            "signature": "def find_and_replace_ipv4(text: str) -> str",
+            "description": "Uses a regex pattern that matches IPv4 addresses where each octet is between 0 and 255. The pattern ensures that numbers like 999 or 256 are not matched. It replaces any matched IP with '[REDACTED]'. Edge cases such as IP addresses embedded in URLs or surrounded by brackets are handled by using word boundaries."
         },
         {
-            "name": "celsius_to_fahrenheit",
-            "signature": "def celsius_to_fahrenheit(celsius: float) -> float",
-            "description": "Perform the standard Celsius to Fahrenheit conversion: F = C * 9/5 + 32. Handles extreme float values by letting Python's IEEE\u2011754 rules apply; no special clipping is performed."
+            "name": "find_and_replace_phones",
+            "signature": "def find_and_replace_phones(text: str) -> str",
+            "description": "Matches common North\u2011American phone number formats, including optional country code '+1', area code in parentheses or not, separators such as dashes, dots, or spaces, and optional extension indicators (x, ext, extension). It replaces every match with '[REDACTED]'. The regex is case\u2011insensitive and allows for 10 or 11 digit sequences. It does not attempt to validate phone number length beyond basic structure to avoid excessive complexity."
         },
         {
-            "name": "fahrenheit_to_celsius",
-            "signature": "def fahrenheit_to_celsius(fahrenheit: float) -> float",
-            "description": "Perform the standard Fahrenheit to Celsius conversion: C = (F - 32) * 5/9. Handles extreme float values similarly to the other conversion function."
-        },
-        {
-            "name": "format_output",
-            "signature": "def format_output(original_value: float, original_unit: str, converted_value: float, target_unit: str) -> str",
-            "description": "Return a human\u2011readable string showing the original temperature, its unit, the converted temperature, and its unit. Formats numbers to two decimal places and normalises unit symbols to uppercase 'C' and 'F'."
-        },
-        {
-            "name": "main",
-            "signature": "def main(argv: List[str]) -> None",
-            "description": "Entry point for the CLI. Calls parse_args to get the Namespace, validates the numeric value, selects the appropriate conversion function based on the source and target units, formats the output string, prints it to stdout, and exits with code 0. If any exception occurs, prints an error message to stderr and exits with a non\u2011zero code."
+            "name": "scrub_pii",
+            "signature": "def scrub_pii(text: str) -> str",
+            "description": "Sequentially calls find_and_replace_emails, find_and_replace_ipv4, and find_and_replace_phones on the input text. Each step receives the output of the previous step, ensuring that overlapping patterns are all redacted. The function returns the fully sanitized string."
         }
     ],
-    "main_logic_description": "The main block first parses command\u2011line arguments using the parse_args function. It then validates and converts the provided temperature string to a float via validate_temperature. Depending on the source unit, it selects celsius_to_fahrenheit or fahrenheit_to_celsius, performs the conversion, and formats the result with format_output. Finally, it prints the formatted string to the console. Errors in parsing or validation trigger a user\u2011friendly message and an exit code of 1, ensuring the tool behaves predictably in shell scripts or other automated environments."
+    "main_logic_description": "The main block imports the scrub_pii function, reads input text, and prints the redacted result. It demonstrates usage by calling scrub_pii on a sample string."
 }

@@ -36,13 +36,23 @@ def clean_json(text):
 
 def draft_blueprint(request):
     print(f"[*] Architecting solution for: '{request}'...")
-    try:
-        full_prompt = f"{ARCHITECT_PROMPT}\n\n{request}"
-        response = ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": full_prompt}])
-        return json.loads(clean_json(response['message']['content']))
-    except Exception as e:
-        print(f"[!] Blueprint Failed: {e}")
-        return None
+    
+    MAX_RETRY_ATTEMPTS = 3
+    
+    for attempt in range(MAX_RETRY_ATTEMPTS):
+        try:
+            full_prompt = f"{ARCHITECT_PROMPT}\n\n{request}"
+            response = ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": full_prompt}])
+            return json.loads(clean_json(response['message']['content']))
+        except json.JSONDecodeError as e:
+            if attempt < MAX_RETRY_ATTEMPTS - 1:
+                print(f"[-] Attempt {attempt + 1}/{MAX_RETRY_ATTEMPTS}: Invalid JSON from architect, retrying...")
+            else:
+                print(f"[!] Blueprint Failed: Invalid JSON after {MAX_RETRY_ATTEMPTS} attempts")
+                return None
+        except Exception as e:
+            print(f"[!] Blueprint Failed: {e}")
+            return None
 
 def main():
     if len(sys.argv) < 2:
