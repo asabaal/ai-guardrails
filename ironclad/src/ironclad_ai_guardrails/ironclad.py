@@ -40,14 +40,15 @@ def generate_candidate(request: str, model_name=DEFAULT_MODEL_NAME, system_promp
             model=model_name,
             messages=[{"role": "user", "content": prompt}],
         )
+        raw_content = resp["message"]["content"]
         content = resp["message"]["content"]
         data = json.loads(clean_json_response(content))
         data["code"] = clean_code_content(data.get("code", ""))
         data["test"] = clean_code_content(data.get("test", ""))
         return data
     except json.JSONDecodeError:
-        log_debug_raw(phase='generate', message='Model output was not valid JSON', data=content)
-        print("[!] Validation Failed: Model output was not valid JSON.")
+        log_debug_raw(phase='repair', message='Repair output was not valid JSON', data=raw_content)
+        print("[!] Repair Error: Model output was not valid JSON.")
         return None
     except Exception as e:
         print("[!] Error connecting to Ollama: Connection error")
@@ -120,12 +121,14 @@ Return only the fixed JSON structure.
                 {"role": "user", "content": repair_prompt}
             ],
         )
+        raw_content = resp["message"]["content"]
         content = resp["message"]["content"]
         data = json.loads(clean_json_response(content))
         data["code"] = clean_code_content(data.get("code", ""))
         data["test"] = clean_code_content(data.get("test", ""))
         return data
     except json.JSONDecodeError:
+        log_debug_raw(phase='repair', message='Repair output was not valid JSON', data=raw_content)
         print("[!] Repair Error: Model output was not valid JSON.")
         return None
     except Exception as e:

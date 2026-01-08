@@ -1,0 +1,5 @@
+Phase: repair
+Message: Repair output was not valid JSON
+
+RAW DATA:
+{\"filename\": \"bad\", \"code\": \"def bad():\\n    return bad\\n\"}
