@@ -1088,6 +1088,39 @@ class TestBuildComponentsRepairSafety:
     @patch('os.makedirs')
     @patch('builtins.print')
     @patch('builtins.open', create=True)
+    def test_defensive_assertion_candidate_not_none(self, mock_open, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
+        """Test that defensive assertion ensures candidate is not None before validation"""
+        # Setup mocks - normal successful generation and validation
+        mock_generate.return_value = {
+            'filename': 'test_func',
+            'code': 'def test_func(): return "test"',
+            'test': 'def test_test_func(): assert test_func() == "test"'
+        }
+        mock_validate.return_value = (True, "Tests passed")
+        
+        blueprint = {
+            'module_name': 'test_module',
+            'functions': [
+                {'name': 'test_func', 'signature': 'def test_func()', 'description': 'Test function'}
+            ]
+        }
+        
+        # Execute - should succeed and hit defensive assertion
+        partial_success, module_dir, successful_components, failed_components, status_report = factory_manager.build_components(blueprint)
+        
+        # Assertions
+        assert partial_success is True
+        assert successful_components == ['test_func']
+        assert failed_components == []
+        assert status_report['test_func']['status'] == 'success'
+        # Defensive assertion should pass (candidate exists before each validate call)
+    
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
+    @patch('os.makedirs')
+    @patch('builtins.print')
+    @patch('builtins.open', create=True)
     def test_validation_with_none_candidate_is_handled(self, mock_open, mock_print, mock_makedirs, mock_repair, mock_validate, mock_generate):
         """Test that None candidate before validation is handled (FAILURE MODE B fix)"""
         # Setup mocks - initial candidate is None

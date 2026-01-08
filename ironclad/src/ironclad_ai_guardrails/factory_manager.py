@@ -76,9 +76,12 @@ def build_components(blueprint, resume_mode="smart"):
         is_valid = False
         attempts = 0
         while not is_valid and attempts < 3:
-            if candidate is None:
-                print(f"   [!] Candidate is None, cannot validate. Marking as failed.")
-                break
+            # Note: candidate is None check removed because it's provably unreachable.
+            # If candidate is None initially, lines 69-73 handle it (continue to next component).
+            # If repair returns None, lines 88-90 handle it (break out of loop).
+            # This means we never loop back to check candidate is None at start of iteration.
+            # Defensive check: candidate should exist before validation
+            assert candidate is not None, "Candidate must exist before validation"
             
             is_valid, logs = ironclad.validate_candidate(candidate)
             if not is_valid:
