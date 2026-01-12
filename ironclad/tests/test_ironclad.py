@@ -487,6 +487,58 @@ class TestMain:
         mock_repair.assert_called_once()
         mock_print.assert_any_call("[!] Repair produced invalid JSON. Aborting.")
 
+    @patch('sys.argv', ['ironclad.py', 'test request'])
+    @patch('ironclad_ai_guardrails.ironclad.generate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.validate_candidate')
+    @patch('ironclad_ai_guardrails.ironclad.repair_candidate')
+    def test_debug_logs_written_on_validation_failure(self, mock_repair, mock_validate, mock_generate):
+        """Test that debug logs are written when validation fails with IRONCLAD_DEBUG=1"""
+        mock_generate.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'test'",
+            "test": "def test_test_func(): assert test_func() == 'test'"
+        }
+        test_failure_log = "=== test session starts ===\n1 failed in 0.001s\nAssertionError: expected 'test' but got 'wrong'"
+        mock_validate.return_value = (False, test_failure_log)
+        mock_repair.return_value = {
+            "filename": "test_func",
+            "code": "def test_func(): return 'still broken'",
+            "test": "def test_test_func(): assert test_func() == 'still broken'"
+        }
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            original_cwd = os.getcwd()
+            os.chdir(temp_dir)
+            os.environ['IRONCLAD_DEBUG'] = '1'
+            
+            try:
+                with patch('builtins.print'):
+                    with pytest.raises(SystemExit) as exc_info:
+                        ironclad.main()
+                    assert exc_info.value.code == 1
+                
+                debug_dir = os.path.join(temp_dir, 'build', '.ironclad_debug')
+                assert os.path.exists(debug_dir)
+                
+                debug_files = os.listdir(debug_dir)
+                assert len(debug_files) == 3
+                
+                for attempt in range(1, 4):
+                    debug_file = os.path.join(debug_dir, f'validate_test_func_attempt{attempt}.txt')
+                    assert os.path.exists(debug_file)
+                    with open(debug_file, 'r') as f:
+                        content = f.read()
+                    assert 'Phase: validate' in content
+                    assert 'Component: test_func' in content
+                    assert f'Attempt: {attempt}' in content
+                    assert 'Message: Validation failed' in content
+                    assert 'RAW DATA:' in content
+                    assert test_failure_log in content
+            finally:
+                os.chdir(original_cwd)
+                if 'IRONCLAD_DEBUG' in os.environ:
+                    del os.environ['IRONCLAD_DEBUG']
+
 
 class TestMainExecution:
     """Test main execution when run as __main__"""

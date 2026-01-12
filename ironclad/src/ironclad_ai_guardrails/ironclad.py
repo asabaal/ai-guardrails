@@ -160,6 +160,7 @@ def main(request=None, model_name=None, output_dir=None, system_prompt=None):
 
     while (not is_valid) and (attempts < MAX_RETRIES):
         print(f"[-] FAIL (Attempt {attempts + 1}/{MAX_RETRIES}). Triggering repair...")
+        log_debug_raw(phase='validate', component=candidate.get('filename', 'candidate'), attempt=attempts + 1, message='Validation failed', data=logs)
         candidate = ironclad.repair_candidate(candidate, logs, model_name, system_prompt)
         if candidate is None:
             print("[!] Repair produced invalid JSON. Aborting.")
