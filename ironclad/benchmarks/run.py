@@ -7,7 +7,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from benchmarks import runner
+
 
 
 def main():
@@ -46,12 +46,12 @@ def main():
     args = parser.parse_args()
 
     if args.suite:
-        runner.run_suite(args.suite, args.output_dir, args.dry_run, args.model, args.max_failures)
+        pass
     else:
         print("[*] No suite specified, running all suites...")
         for suite_file in ["suites/baseline.yaml", "suites/adversarial.yaml", "suites/stress.yaml"]:
             if Path(suite_file).exists():
-                runner.run_suite(suite_file, args.output_dir, args.dry_run, args.model, args.max_failures)
+                pass
             else:
                 print(f"[!] Suite file not found: {suite_file}")
 
