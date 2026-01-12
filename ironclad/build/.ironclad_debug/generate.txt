@@ -1,0 +1,32 @@
+Phase: generate
+Message: Model output was not valid JSON
+
+RAW DATA:
+{
+    "filename": "factorial",
+    "code": "def factorial(n):
+    if not isinstance(n, int):
+        raise TypeError('factorial() only accepts integers')
+    if n < 0:
+        raise ValueError('factorial() not defined for negative values')
+    result = 1
+    for i in range(2, n+1):
+        result *= i
+    return result",
+    "test": "def test_factorial():
+    assert factorial(0) == 1
+    assert factorial(1) == 1
+    assert factorial(5) == 120
+    try:
+        factorial(-1)
+    except ValueError:
+        pass
+    else:
+        assert False, 'Expected ValueError for negative input'
+    try:
+        factorial(3.5)
+    except TypeError:
+        pass
+    else:
+        assert False, 'Expected TypeError for non-integer input'"
+}

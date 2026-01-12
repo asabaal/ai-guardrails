@@ -169,7 +169,7 @@ def main(request=None, model_name=None, output_dir=None, system_prompt=None):
         attempts += 1
 
     if is_valid:
-        print("[+] Verified after 1 repairs.")
+        print(f"[+] Verified after {attempts} repairs.")
         ironclad.save_brick(candidate, output_dir)
         return candidate
 

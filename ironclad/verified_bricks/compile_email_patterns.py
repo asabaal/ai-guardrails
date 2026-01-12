@@ -1,26 +1,21 @@
-import re
-
 def compile_email_patterns(patterns):
-    """Compile a list of email patterns into regex objects.
-
-    Parameters
-    ----------
-    patterns : Iterable[str]
-        An iterable of string patterns. Each pattern is compiled into a
-        :class:`re.Pattern` object with the ``re.IGNORECASE`` flag set.
-
-    Returns
-    -------
-    List[re.Pattern]
-        A list of compiled regex objects corresponding to the input patterns.
-
-    Raises
-    ------
-    re.error
-        If any pattern is an invalid regular expression.
-    """
+    import re
     compiled = []
+    meta_chars = {'.', '^', '$', '+', '{', '[', '|', ')'}
+    # '*' and '?' are treated as wildcards; '(' and ')' are left as regex meta characters
     for pat in patterns:
-        # Compile each pattern with case‑insensitive flag
-        compiled.append(re.compile(pat, re.IGNORECASE))
+        escaped = ''
+        for ch in pat:
+            if ch in '*?':
+                escaped += ch
+            elif ch in meta_chars:
+                escaped += '\\' + ch
+            else:
+                escaped += ch
+        # Replace wildcards with regex equivalents
+        regex_pat = escaped.replace('*', '.*').replace('?', '.')
+        try:
+            compiled.append(re.compile(regex_pat))
+        except re.error as e:
+            raise ValueError(f"Invalid pattern '{pat}': {e}") from e
     return compiled
