@@ -1,0 +1,101 @@
+suite_id: adversarial_v1
+mode: adversarial
+
+runs_per_variant: 10
+timeout_seconds: 60
+repair_enabled: true
+debug_enabled: true
+
+base_case: compile_email_regex
+
+cases:
+  - id: compile_email_regex_whitespace
+    base_instruction: "Compile a list of email patterns into regex objects."
+
+    variants:
+      - generator: whitespace_noise
+        params:
+          count: 10
+          intensity_min: 0.05
+          intensity_max: 0.35
+          seed: 1337
+
+      - generator: punctuation_noise
+        params:
+          count: 10
+          intensity_min: 0.05
+          intensity_max: 0.20
+          seed: 1338
+
+      - generator: lexical_shuffle
+        params:
+          count: 10
+          max_swaps: 3
+          seed: 1339
+
+      - generator: synonym_substitution
+        params:
+          count: 10
+          max_replacements: 5
+          seed: 1340
+
+      - generator: ai_rewrite_style
+        params:
+          count: 6
+          styles:
+            - concise_directive
+            - verbose_formal
+            - casual_request
+            - specification_tone
+          seed: 1340
+
+  - id: compile_email_regex_punctuation
+    base_instruction: "Compile a list of email patterns into regex objects."
+
+    variants:
+      - generator: punctuation_noise
+        params:
+          count: 10
+          intensity_min: 0.05
+          intensity_max: 0.20
+          seed: 2345
+
+      - generator: ai_rewrite_style
+        params:
+          count: 6
+          styles:
+            - concise_directive
+            - verbose_formal
+          seed: 2346
+
+  - id: convert_list_to_dict_synonyms
+    base_instruction: "Convert a list of dictionaries into a dictionary keyed by id."
+
+    variants:
+      - generator: synonym_substitution
+        params:
+          count: 10
+          max_replacements: 5
+          seed: 3401
+
+      - generator: ai_semantic_restatement
+        params:
+          count: 6
+          seed: 3402
+
+  - id: simple_cache_ambiguity
+    base_instruction: "Design a simple in-memory cache with get and set operations."
+
+    variants:
+      - generator: ambiguity_injection_light
+        params:
+          count: 10
+          seed: 4501
+
+      - generator: ai_rephrase_with_focus_shift
+        params:
+          count: 5
+          focus_values:
+            - simplicity
+            - maintainability
+          seed: 4502

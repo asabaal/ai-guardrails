@@ -1,0 +1,87 @@
+suite_id: stress_v1
+mode: stress
+
+runs_per_variant: 5
+timeout_seconds: 120
+repair_enabled: true
+debug_enabled: true
+
+cases:
+  - id: compile_email_regex
+    base_instruction: "Compile a list of email patterns into regex objects."
+
+    stress_ladder:
+      - level: 1
+        generator: add_scope_detail
+        params:
+          additions:
+            - "Include plus addressing and subdomains."
+            - "Include clear examples of what each pattern is intended to match."
+          seed: 2101
+
+      - level: 2
+        generator: add_constraints_tension
+        params:
+          additions:
+            - "Handle common real world variations without overfitting."
+            - "Prefer maintainable patterns over extreme strictness."
+          seed: 2102
+
+      - level: 3
+        generator: add_ambiguity
+        params:
+          additions:
+            - "Consider edge cases where users include unusual but plausible characters."
+            - "Make reasonable choices when standards and practicality conflict."
+          seed: 2103
+
+      - level: 4
+        generator: add_multi_objective
+        params:
+          additions:
+            - "Return both compiled regex objects and a brief explanation of each pattern."
+            - "Keep public API small and clean."
+          seed: 2104
+
+  - id: convert_list_to_dict
+    base_instruction: "Convert a list of dictionaries into a dictionary keyed by id."
+
+    stress_ladder:
+      - level: 1
+        generator: add_scope_detail
+        params:
+          additions:
+            - "Handle cases where id values are duplicates."
+          seed: 3101
+
+      - level: 2
+        generator: add_ambiguity
+        params:
+          additions:
+            - "Include behavior for missing or null id values."
+          seed: 3102
+
+  - id: simple_cache
+    base_instruction: "Design a simple in-memory cache with get and set operations."
+
+    stress_ladder:
+      - level: 1
+        generator: add_scope_detail
+        params:
+          additions:
+            - "Support checking if a key exists."
+          seed: 4101
+
+      - level: 2
+        generator: add_constraints_tension
+        params:
+          additions:
+            - "Prefer performance of reads over writes."
+          seed: 4102
+
+      - level: 3
+        generator: add_ambiguity
+        params:
+          additions:
+            - "Handle cache invalidation where appropriate."
+          seed: 4103
