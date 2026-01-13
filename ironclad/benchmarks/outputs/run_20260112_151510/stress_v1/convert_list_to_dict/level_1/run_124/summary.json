@@ -1,0 +1,16 @@
+{
+  "run_id": "run_124",
+  "instruction_hash": "sha256:9f1b92b70453",
+  "instruction_length": 61,
+  "success": false,
+  "failure_stage": "validation",
+  "attempts": 1,
+  "repairs_triggered": 0,
+  "duration_ms": 19924,
+  "debug_enabled": true,
+  "debug_artifacts_present": false,
+  "timestamp_utc": "2026-01-12T23:00:11.823786+00:00",
+  "stdout": "[!] Validation Failed: Model output was not valid JSON.\n[X] INCINERATED: Output invalid.\n",
+  "stderr": "<frozen runpy>:128: RuntimeWarning: 'ironclad_ai_guardrails.ironclad' found in sys.modules after import of package 'ironclad_ai_guardrails', but prior to execution of 'ironclad_ai_guardrails.ironclad'; this may result in unpredictable behaviour\n",
+  "level": 1
+}

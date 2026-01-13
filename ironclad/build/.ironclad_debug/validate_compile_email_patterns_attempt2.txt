@@ -6,7 +6,7 @@ Message: Validation failed
 RAW DATA:
 ============================= test session starts ==============================
 platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
-rootdir: /mnt/storage/tmp/tmp6c6bj29d
+rootdir: /mnt/storage/tmp/tmpug716_y0
 plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
 collected 1 item
 
@@ -16,19 +16,13 @@ test_compile_email_patterns.py F                                         [100%]
 _________________________ test_compile_email_patterns __________________________
 
     def test_compile_email_patterns():
-        import pytest
         import re
-        from compile_email_patterns import compile_email_patterns
-        patterns = ['test@example.com', 'user*@domain.com', '*@*.com']
-        compiled = compile_email_patterns(patterns)
-        assert len(compiled) == 3
-        assert compiled[0].fullmatch('test@example.com')
->       assert compiled[1].fullmatch('user123@domain.com')
-E       AssertionError: assert None
-E        +  where None = <built-in method fullmatch of re.Pattern object at 0x7cccd91f5ad0>('user123@domain.com')
-E        +    where <built-in method fullmatch of re.Pattern object at 0x7cccd91f5ad0> = re.compile('user\\*@domain\\.com').fullmatch
+        patterns = ['[a-z]+@example\\.com', 'user\\..+@domain\\.org']
+>       regexes = compile_email_patterns(patterns)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+E       NameError: name 'compile_email_patterns' is not defined
 
-test_compile_email_patterns.py:9: AssertionError
+test_compile_email_patterns.py:4: NameError
 =========================== short test summary info ============================
-FAILED test_compile_email_patterns.py::test_compile_email_patterns - Assertio...
+FAILED test_compile_email_patterns.py::test_compile_email_patterns - NameErro...
 ============================== 1 failed in 0.01s ===============================

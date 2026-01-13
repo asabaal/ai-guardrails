@@ -3,30 +3,46 @@ Message: Model output was not valid JSON
 
 RAW DATA:
 {
-    "filename": "factorial",
-    "code": "def factorial(n):
-    if not isinstance(n, int):
-        raise TypeError('factorial() only accepts integers')
-    if n < 0:
-        raise ValueError('factorial() not defined for negative values')
-    result = 1
-    for i in range(2, n+1):
-        result *= i
+    "filename": "list_to_dict_by_id",
+    "code": "def list_to_dict_by_id(lst):
+    if not isinstance(lst, list):
+        raise TypeError(\"Input must be a list of dictionaries\")
+    result = {}
+    for item in lst:
+        if not isinstance(item, dict):
+            raise TypeError(\"Each item must be a dictionary\")
+        if 'id' not in item:
+            raise KeyError(\"Dictionary missing 'id' key\")
+        key = item['id']
+        if key in result:
+            raise ValueError(f\"Duplicate id detected: {key}\")
+        result[key] = item
     return result",
-    "test": "def test_factorial():
-    assert factorial(0) == 1
-    assert factorial(1) == 1
-    assert factorial(5) == 120
-    try:
-        factorial(-1)
-    except ValueError:
-        pass
-    else:
-        assert False, 'Expected ValueError for negative input'
-    try:
-        factorial(3.5)
-    except TypeError:
-        pass
-    else:
-        assert False, 'Expected TypeError for non-integer input'"
+    "test": "def test_list_to_dict_by_id():
+    # Normal case
+    lst = [{'id': 1, 'name': 'Alice'}, {'id': 2, 'name': 'Bob'}]
+    expected = {1: {'id': 1, 'name': 'Alice'}, 2: {'id': 2, 'name': 'Bob'}}
+    assert list_to_dict_by_id(lst) == expected
+
+    # Empty list
+    assert list_to_dict_by_id([]) == {}
+
+    # Duplicate id
+    dup_lst = [{'id': 1, 'name': 'A'}, {'id': 1, 'name': 'B'}]
+    import pytest
+    with pytest.raises(ValueError):
+        list_to_dict_by_id(dup_lst)
+
+    # Missing 'id' key
+    missing_id_lst = [{'name': 'NoID'}]
+    with pytest.raises(KeyError):
+        list_to_dict_by_id(missing_id_lst)
+
+    # Non-list input
+    with pytest.raises(TypeError):
+        list_to_dict_by_id('not a list')
+
+    # Non-dictionary item
+    with pytest.raises(TypeError):
+        list_to_dict_by_id([1, 2])"
 }

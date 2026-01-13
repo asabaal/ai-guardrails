@@ -1,0 +1,25 @@
+Phase: validate
+Component: convert_dicts_to_dict_by_id
+Attempt: 1
+Message: Validation failed
+
+RAW DATA:
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: /mnt/storage/tmp/tmpohhy_g4w
+plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
+collected 1 item
+
+test_convert_dicts_to_dict_by_id.py F                                    [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_convert_dicts_to_dict_by_id _______________________
+
+    def test_convert_dicts_to_dict_by_id():
+>       from __main__ import convert_dicts_to_dict_by_id
+E       ImportError: cannot import name 'convert_dicts_to_dict_by_id' from '__main__' (/mnt/storage/python_env/devtools/lib/python3.12/site-packages/pytest/__main__.py)
+
+test_convert_dicts_to_dict_by_id.py:2: ImportError
+=========================== short test summary info ============================
+FAILED test_convert_dicts_to_dict_by_id.py::test_convert_dicts_to_dict_by_id
+============================== 1 failed in 0.01s ===============================

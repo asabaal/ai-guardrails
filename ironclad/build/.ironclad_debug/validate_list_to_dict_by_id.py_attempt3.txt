@@ -1,0 +1,25 @@
+Phase: validate
+Component: list_to_dict_by_id.py
+Attempt: 3
+Message: Validation failed
+
+RAW DATA:
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: /mnt/storage/tmp/tmpt7bzoiap
+plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
+collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+________________ ERROR collecting test_list_to_dict_by_id.py.py ________________
+ImportError while importing test module '/mnt/storage/tmp/tmpt7bzoiap/test_list_to_dict_by_id.py.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ModuleNotFoundError: No module named 'test_list_to_dict_by_id'
+=========================== short test summary info ============================
+ERROR test_list_to_dict_by_id.py.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.05s ===============================

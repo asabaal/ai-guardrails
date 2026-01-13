@@ -1,0 +1,1 @@
+Convert a list of dictionaries into a dictionary keyed by id.

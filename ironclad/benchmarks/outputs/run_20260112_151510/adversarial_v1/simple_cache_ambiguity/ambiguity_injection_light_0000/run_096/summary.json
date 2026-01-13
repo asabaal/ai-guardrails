@@ -1,0 +1,16 @@
+{
+  "run_id": "run_096",
+  "instruction_hash": "sha256:c59c3f78b17c",
+  "instruction_length": 60,
+  "success": true,
+  "failure_stage": "unknown",
+  "attempts": 1,
+  "repairs_triggered": 0,
+  "duration_ms": 16728,
+  "debug_enabled": true,
+  "debug_artifacts_present": false,
+  "timestamp_utc": "2026-01-12T22:36:09.506613+00:00",
+  "stdout": "[+] Verified after 0 repairs.\n[SUCCESS] Verified brick saved to: verified_bricks/simple_cache.py\n",
+  "stderr": "<frozen runpy>:128: RuntimeWarning: 'ironclad_ai_guardrails.ironclad' found in sys.modules after import of package 'ironclad_ai_guardrails', but prior to execution of 'ironclad_ai_guardrails.ironclad'; this may result in unpredictable behaviour\n",
+  "variant_id": "ambiguity_injection_light_0000"
+}

@@ -1,0 +1,16 @@
+suite_id: canonical_test_v1
+mode: canonical
+runs_per_case: 2
+timeout_seconds: 300
+repair_enabled: true
+debug_enabled: true
+
+small:
+  - id: compile_email_regex
+    complexity: small
+    instruction: "Compile a list of email patterns into regex objects."
+
+mid:
+  - id: convert_list_to_dict
+    complexity: mid
+    instruction: "Convert a list of dictionaries into a dictionary keyed by id."

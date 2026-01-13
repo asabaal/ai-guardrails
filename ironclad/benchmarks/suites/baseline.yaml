@@ -2,7 +2,7 @@ suite_id: baseline_v1
 mode: baseline
 
 runs: 10
-timeout_seconds: 60
+timeout_seconds: 300
 repair_enabled: true
 debug_enabled: true
 

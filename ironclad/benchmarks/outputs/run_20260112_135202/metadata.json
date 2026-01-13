@@ -1,0 +1,7 @@
+{
+  "run_id": "run_20260112_135202",
+  "timestamp_utc": "2026-01-12T19:52:02.219990+00:00",
+  "output_dir": "benchmarks/outputs/run_20260112_135202",
+  "dry_run": true,
+  "model": "ollama"
+}

@@ -1,0 +1,27 @@
+Phase: validate
+Component: convert_list_to_dict
+Attempt: 1
+Message: Validation failed
+
+RAW DATA:
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: /mnt/storage/tmp/tmpxzo_z38x
+plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
+collected 1 item
+
+test_convert_list_to_dict.py F                                           [100%]
+
+=================================== FAILURES ===================================
+__________________________ test_convert_list_to_dict ___________________________
+
+    def test_convert_list_to_dict():
+        lst = [{'id': 1, 'name': 'a'}, {'id': 2, 'name': 'b'}]
+>       assert convert_list_to_dict(lst) == {1: {'id': 1, 'name': 'a'}, 2: {'id': 2, 'name': 'b'}}
+               ^^^^^^^^^^^^^^^^^^^^
+E       NameError: name 'convert_list_to_dict' is not defined
+
+test_convert_list_to_dict.py:3: NameError
+=========================== short test summary info ============================
+FAILED test_convert_list_to_dict.py::test_convert_list_to_dict - NameError: n...
+============================== 1 failed in 0.01s ===============================

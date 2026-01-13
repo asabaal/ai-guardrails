@@ -2,7 +2,7 @@ suite_id: stress_v1
 mode: stress
 
 runs_per_variant: 5
-timeout_seconds: 120
+timeout_seconds: 300
 repair_enabled: true
 debug_enabled: true
 

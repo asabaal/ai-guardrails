@@ -1,0 +1,27 @@
+Phase: validate
+Component: __main__
+Attempt: 2
+Message: Validation failed
+
+RAW DATA:
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: /mnt/storage/tmp/tmpyn25uz4x
+plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
+collected 1 item
+
+test___main__.py F                                                       [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_compile_email_patterns __________________________
+
+    def test_compile_email_patterns():
+        import re
+        import pytest
+>       from __main__ import compile_email_patterns
+E       ImportError: cannot import name 'compile_email_patterns' from '__main__' (/mnt/storage/python_env/devtools/lib/python3.12/site-packages/pytest/__main__.py)
+
+test___main__.py:4: ImportError
+=========================== short test summary info ============================
+FAILED test___main__.py::test_compile_email_patterns - ImportError: cannot im...
+============================== 1 failed in 0.01s ===============================

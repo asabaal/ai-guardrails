@@ -1,0 +1,16 @@
+{
+  "run_id": "run_109",
+  "instruction_hash": "sha256:55ba63eb1c1a",
+  "instruction_length": 52,
+  "success": false,
+  "failure_stage": "validation",
+  "attempts": 1,
+  "repairs_triggered": 0,
+  "duration_ms": 137794,
+  "debug_enabled": true,
+  "debug_artifacts_present": false,
+  "timestamp_utc": "2026-01-12T22:49:16.095844+00:00",
+  "stdout": "[-] FAIL (Attempt 1/3). Triggering repair...\n[*] Attempting repair...\n[-] FAIL (Attempt 2/3). Triggering repair...\n[*] Attempting repair...\n[-] FAIL (Attempt 3/3). Triggering repair...\n[*] Attempting repair...\n[!] Repair Error: error parsing tool call: raw='{\"patch\":\"*** Begin Patch\\n*** Update File: pyparsing/examples/regexp.py\\n@@\\n-    import re\\n-\\n-    if isinstance(pattern, (list, tuple)):\\n-        # If it's a list or tuple, join with OR operator\\n-        pattern_str = '|'.join(pattern)\\n-    else:\\n-        pattern_str = pattern\\n-\\n-    # Escape all regex special characters except for our wildcards * and ?\\n-    # We will replace * with .* and ? with .\\n-    escaped = re.escape(pattern_str)\\n-    escaped = escaped.replace(r\\\"\\\\*\\\", r\\\".*\\\")\\n-    escaped = escaped.replace(r\\\"\\\\?\\\", r\\\".\\\")\\n-    # Anchor the pattern\\n-    escaped = \\\"^\\\" + escaped + \\\"$\\\"\\n-    return escaped\\n+    import re\\n+    if isinstance(pattern, (list, tuple)):\\n+        # If it's a list or tuple, join with OR operator\\n+        pattern_str = '|'.join(pattern)\\n+    else:\\n+        pattern_str = pattern\\n+    # Build the regex pattern by iterating through the string\\n+    # Wildcards: '*' -> '.*', '?' -> '.'\\n+    # Special case: a literal '.' that is immediately followed by a '*'\\n+    # or a '?' is treated as a placeholder for the wildcard\\n+    # so the '.' is omitted and the wildcard is expanded.\\n+    res = []\\n+    i = 0\\n+    while i < len(pattern_str):\\n+        ch = pattern_str[i]\\n+        if ch == \\\"*\\\":\\n+            res.append(\\\".*\\\")\\n+            i += 1\\n+        elif ch == \\\"?\\\":\\n+            res.append(\\\".\\\")\\n+            i += 1\\n+        elif ch == \\\".\\\" and i + 1 < len(pattern_str) and pattern_str[i + 1] == \\\"*\\\":\\n+            # Dot followed by asterix: treat as wildcard expansion\\n+            res.append(\\\".*\\\")\\n+            i += 2\\n+        else:\\n+            res.append(re.escape(ch))\\n+            i += 1\\n+    # Anchor the pattern\\n+    return \\\"^\\\" + \\\"\\\".join(res) + \\\"$\\\"\\n*** End Patch\"}\n*** End Patch\"}', err=invalid character '*' after top-level value (status code: 500)\n[!] Repair produced invalid JSON. Aborting.\n",
+  "stderr": "<frozen runpy>:128: RuntimeWarning: 'ironclad_ai_guardrails.ironclad' found in sys.modules after import of package 'ironclad_ai_guardrails', but prior to execution of 'ironclad_ai_guardrails.ironclad'; this may result in unpredictable behaviour\n",
+  "level": 2
+}

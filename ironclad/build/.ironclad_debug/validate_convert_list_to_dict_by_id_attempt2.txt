@@ -1,0 +1,93 @@
+Phase: validate
+Component: convert_list_to_dict_by_id
+Attempt: 2
+Message: Validation failed
+
+RAW DATA:
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: /mnt/storage/tmp/tmpvguxz5pv
+plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
+collected 1 item
+
+test_convert_list_to_dict_by_id.py F                                     [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_convert_list_to_dict_by_id ________________________
+
+    def test_convert_list_to_dict_by_id():
+        # Normal case
+        data = [{'id': 1, 'name': 'Alice'}, {'id': 2, 'name': 'Bob'}]
+        expected = {1: {'id': 1, 'name': 'Alice'}, 2: {'id': 2, 'name': 'Bob'}}
+        assert convert_list_to_dict_by_id(data) == expected
+    
+        # Duplicate id overrides
+        data_dup = [{'id': 1, 'name': 'Alice'}, {'id': 1, 'name': 'Alicia'}]
+        expected_dup = {1: {'id': 1, 'name': 'Alicia'}}
+        assert convert_list_to_dict_by_id(data_dup) == expected_dup
+    
+        # Empty list returns empty dict
+        assert convert_list_to_dict_by_id([]) == {}
+    
+        # Missing 'id' key raises KeyError
+        data_missing = [{'name': 'Charlie'}]
+        try:
+>           convert_list_to_dict_by_id(data_missing)
+
+test_convert_list_to_dict_by_id.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lst = [{'name': 'Charlie'}]
+
+    def convert_list_to_dict_by_id(lst):
+        """Convert a list of dictionaries into a dictionary keyed by 'id'.
+    
+        Parameters:
+            lst (list of dict): The input list where each dict must contain an 'id' key.
+    
+        Returns:
+            dict: A dictionary mapping each id to its corresponding dictionary.
+    
+        Raises:
+            KeyError: If a dictionary in the list does not contain an 'id' key.
+        """
+        result = {}
+        for item in lst:
+            if 'id' not in item:
+>               raise KeyError("Missing 'id' key in item: {}".format(item))
+E               KeyError: "Missing 'id' key in item: {'name': 'Charlie'}"
+
+convert_list_to_dict_by_id.py:16: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_convert_list_to_dict_by_id():
+        # Normal case
+        data = [{'id': 1, 'name': 'Alice'}, {'id': 2, 'name': 'Bob'}]
+        expected = {1: {'id': 1, 'name': 'Alice'}, 2: {'id': 2, 'name': 'Bob'}}
+        assert convert_list_to_dict_by_id(data) == expected
+    
+        # Duplicate id overrides
+        data_dup = [{'id': 1, 'name': 'Alice'}, {'id': 1, 'name': 'Alicia'}]
+        expected_dup = {1: {'id': 1, 'name': 'Alicia'}}
+        assert convert_list_to_dict_by_id(data_dup) == expected_dup
+    
+        # Empty list returns empty dict
+        assert convert_list_to_dict_by_id([]) == {}
+    
+        # Missing 'id' key raises KeyError
+        data_missing = [{'name': 'Charlie'}]
+        try:
+            convert_list_to_dict_by_id(data_missing)
+        except KeyError as e:
+>           assert str(e) == "Missing 'id' key in item: {'name': 'Charlie'}"
+E           assert '"Missing \'i...\'Charlie\'}"' == "Missing 'id'...': 'Charlie'}"
+E             
+E             - Missing 'id' key in item: {'name': 'Charlie'}
+E             + "Missing 'id' key in item: {'name': 'Charlie'}"
+E             ? +                                             +
+
+test_convert_list_to_dict_by_id.py:22: AssertionError
+=========================== short test summary info ============================
+FAILED test_convert_list_to_dict_by_id.py::test_convert_list_to_dict_by_id - ...
+============================== 1 failed in 0.01s ===============================

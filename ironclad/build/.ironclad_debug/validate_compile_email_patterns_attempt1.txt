@@ -6,7 +6,7 @@ Message: Validation failed
 RAW DATA:
 ============================= test session starts ==============================
 platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
-rootdir: /mnt/storage/tmp/tmpeghxhkjo
+rootdir: /mnt/storage/tmp/tmpb8o2p_v4
 plugins: anyio-4.12.0, cov-7.0.0, mock-3.15.1
 collected 1 item
 
@@ -16,14 +16,13 @@ test_compile_email_patterns.py F                                         [100%]
 _________________________ test_compile_email_patterns __________________________
 
     def test_compile_email_patterns():
-        import pytest
-        import re
-        patterns = ['test@example.com', 'user*@domain.com', '*@*.com']
->       compiled = compile_email_patterns(patterns)
-                   ^^^^^^^^^^^^^^^^^^^^^^
+        # Valid patterns
+        patterns_valid = [r"\w+@\w+\.com", r"user\.[a-z]+@example\.org"]
+>       regexes = compile_email_patterns(patterns_valid)
+                  ^^^^^^^^^^^^^^^^^^^^^^
 E       NameError: name 'compile_email_patterns' is not defined
 
-test_compile_email_patterns.py:5: NameError
+test_compile_email_patterns.py:7: NameError
 =========================== short test summary info ============================
 FAILED test_compile_email_patterns.py::test_compile_email_patterns - NameErro...
 ============================== 1 failed in 0.01s ===============================
