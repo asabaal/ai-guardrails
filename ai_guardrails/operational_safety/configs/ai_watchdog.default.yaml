@@ -1,0 +1,50 @@
+# AI Watchdog Default Configuration
+# Thresholds: warning -> log alert, pause -> SIGSTOP then cooldown, kill -> SIGTERM then SIGKILL
+
+cpu_temp:
+  warning: 80.0
+  pause: 88.0
+  kill: 95.0
+
+gpu_edge_temp:
+  warning: 82.0
+  pause: 88.0
+  kill: 95.0
+
+gpu_junction_temp:
+  warning: 95.0
+  pause: 102.0
+  kill: 108.0
+
+gpu_mem_temp:
+  warning: 82.0
+  pause: 88.0
+  kill: 95.0
+
+nvme_temp:
+  warning: 70.0
+  pause: 78.0
+  kill: 82.0
+
+# RAM has no pause action by default - goes straight from warning to kill
+ram_percent:
+  warning: 85.0
+  pause: 95.0
+  kill: 95.0
+
+swap_percent:
+  warning: 50.0
+  pause: 85.0
+  kill: 85.0
+
+# How often to poll sensors (seconds)
+poll_interval: 5.0
+
+# How long to keep the process paused during cooldown (seconds)
+cooldown_seconds: 30.0
+
+# Grace period after SIGTERM before sending SIGKILL (seconds)
+grace_period: 10.0
+
+# Where to write structured JSONL logs
+log_dir: "./watchdog_logs"
